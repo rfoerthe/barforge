@@ -2189,6 +2189,42 @@ enum PointerInputFeatureTests {
                "the panel mouse-button row's caption, attention state, grant button and "
                    + "Manage link all read one engaged flag built from both switches")
 
+        // Issue #2896: the panel Super key link names the mapping only while
+        // the key is on with Accessibility. Without the grant nothing is
+        // mapped, so it keeps Set up… beside the warning, and a switched-off
+        // row shows no link, like the rows above. The link is the key and its
+        // key caps alone, because the sentence gets cut in a mini button at
+        // the panel width; the sentence stays the caption and tooltip.
+        let panelSuperKeyCase = menuPanelLines.firstIndex {
+            $0.trimmingCharacters(in: .whitespaces) == "case .superKey:"
+        }.map { start in
+            menuPanelLines[(start + 1)...]
+                .prefix { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("case .") }
+                .filter(isCodeLine)
+        } ?? []
+        let panelSuperKeyCode = panelSuperKeyCase.joined().filter { !$0.isWhitespace }
+        let superKeyLinkName = panelSuperKeyCode.range(
+            of: "accessoryTitle:superKeyEnabled?(permissions.accessibility?").map {
+            String(panelSuperKeyCode[$0.upperBound...].prefix { $0.isLetter || $0.isNumber || $0 == "_" })
+        } ?? ""
+        suite.expect(!superKeyLinkName.isEmpty
+                && panelSuperKeyCode.contains("accessoryTitle:superKeyEnabled?(permissions.accessibility"
+                    + "?\(superKeyLinkName):superKeyStrings.manageButton):nil,"),
+               "the panel Super key row shows its mapping link only while the key is on with "
+                   + "Accessibility, keeps Set up… without it, and shows no link while it is off")
+        let superKeyLinkDefinition = panelSuperKeyCase.first {
+            !superKeyLinkName.isEmpty && $0.contains("let \(superKeyLinkName) =")
+        }?.trimmingCharacters(in: .whitespaces) ?? ""
+        suite.expect(superKeyLinkDefinition
+                == "let \(superKeyLinkName) = \"\\(superKeyStrings.sourceLabel(superKeySource)) \\(keyCaps)\""
+                && panelSuperKeyCode.contains(
+                    "letkeyCaps=SuperKeySupport.modifiers(from:superKeyModifierStorage).keyCaps.joined()")
+                && panelSuperKeyCode.contains("letmodifierCaption=String(format:superKeyStrings.panelCaptionFormat,"
+                    + "superKeyStrings.sourceLabel(superKeySource),keyCaps)")
+                && panelSuperKeyCode.contains("caption:caption(modifierCaption,needsAccessibility:superKeyEnabled)"),
+               "the panel Super key link reads the key and its key caps without the verb, and the "
+                   + "row caption keeps the full mapping sentence: \(superKeyLinkDefinition)")
+
         // Per call site, not the last one seen: a second one added later must
         // read the switch too, and a file that lost the call entirely has to
         // fail rather than pass on an empty search.
@@ -2839,6 +2875,33 @@ enum PointerInputFeatureTests {
                                                       executablePath: "/opt/other/bin/java"),
                     exceptions: ["/opt/game/runtime/bin/java"]),
                "a listed program path excepts that program and no other")
+        // Java's launcher carries an Info.plist of its own, so a running JVM
+        // reports a bundle identifier, the same one for every Java program:
+        // measured on this Mac, Temurin 25's java reports net.java.openjdk.java.
+        // A runtime picked by its path is told apart by that path alone, so
+        // while a list names a path a program answers to its file as well.
+        suite.expect(MouseAppExceptionSupport.identities(bundleID: "net.java.openjdk.java",
+                                                         executablePath: "/opt/game/runtime/bin/java",
+                                                         readsPath: true)
+                == ["net.java.openjdk.java", "/opt/game/runtime/bin/java"],
+               "a program that reports a bundle identifier also answers to its file while a list names a path")
+        suite.expect(MouseAppExceptionSupport.identities(bundleID: nil,
+                                                         executablePath: "/opt/game/runtime/bin/java",
+                                                         readsPath: true) == ["/opt/game/runtime/bin/java"]
+                && MouseAppExceptionSupport.identities(bundleID: nil, executablePath: "java", readsPath: true).isEmpty
+                && MouseAppExceptionSupport.identities(bundleID: nil, executablePath: nil, readsPath: true).isEmpty,
+               "a program with no bundle identifier answers to its file, and to nothing without an absolute path")
+        var programPathWasRead = false
+        suite.expect(MouseAppExceptionSupport.identities(
+                    bundleID: "com.example.modeler",
+                    executablePath: { programPathWasRead = true; return "/Applications/Modeler.app/Contents/MacOS/Modeler" }(),
+                    readsPath: false) == ["com.example.modeler"]
+                && MouseAppExceptionSupport.identities(
+                    bundleID: nil,
+                    executablePath: { programPathWasRead = true; return "/opt/game/runtime/bin/java" }(),
+                    readsPath: false).isEmpty
+                && !programPathWasRead,
+               "a program's path is not even read while no list names a path: this runs under the event taps")
         suite.expect(InstalledApps.name(for: "/opt/game/runtime/bin/java") == "java",
                "a listed program path is shown by its file name, not the whole path")
 
@@ -3162,8 +3225,8 @@ enum PointerInputFeatureTests {
         for (index, line) in matcherLines.enumerated()
         where !line.trimmingCharacters(in: .whitespaces).hasPrefix("//")
                 && line.contains("executableURL") && line.contains(".path") {
-            if line.contains("MouseAppExceptionSupport.identity(")
-                || (index > 0 && matcherLines[index - 1].contains("MouseAppExceptionSupport.identity(")) {
+            if line.contains("MouseAppExceptionSupport.identities(")
+                || (index > 0 && matcherLines[index - 1].contains("MouseAppExceptionSupport.identities(")) {
                 resolvedMatchSites.append("MouseAppExceptions.swift:\(index + 1)")
             } else {
                 rawMatchSites.append("MouseAppExceptions.swift:\(index + 1)")
@@ -3329,6 +3392,32 @@ enum PointerInputFeatureTests {
             queryWithoutMain("empty-list")
             suite.expect(!verdictWithoutMain(CGPoint(x: -20_010, y: -20_010)),
                    "an empty list stands nothing down")
+
+            // A listed path is matched against the program running that file
+            // whatever bundle identifier it reports: Java's launcher carries an
+            // Info.plist of its own, so a running JVM reports one that every
+            // Java program shares (issue #1009). The app in front stands in for
+            // that program here, with its own file listed and its identifier
+            // on no list.
+            if let front = NSWorkspace.shared.frontmostApplication,
+               front.bundleIdentifier != nil,
+               let frontPath = MouseAppExceptionSupport.executablePathIdentity(front.executableURL?.path) {
+                arguments[MouseExceptionScope.navigation.defaultsKey] = [frontPath]
+                arguments[MouseExceptionScope.smoothScroll.defaultsKey] = [frontPath]
+                arguments[MouseExceptionScope.middleClick.defaultsKey] = ["/opt/game/runtime/bin/java"]
+                defaults.setVolatileDomain(arguments, forName: UserDefaults.argumentDomain)
+                exceptions.reload()
+                let offScreen = CGPoint(x: -30_000, y: -30_000)
+                suite.expect(exceptions.excludesPointerTarget(.navigation, at: offScreen)
+                        && exceptions.excludesActionTarget(.navigation, at: offScreen),
+                       "an app listed by the path of its file is left alone although it reports a bundle identifier")
+                suite.expect(!exceptions.excludesActionTarget(.middleClick, at: offScreen),
+                       "a listed path leaves alone only the program running that file")
+                exceptions.setSourceTracking(true, for: .smoothScroll)
+                suite.expect(exceptions.runningScopes.contains(.smoothScroll),
+                       "an app listed by the path of its file is found among the running apps")
+                exceptions.setSourceTracking(false, for: .smoothScroll)
+            }
         }
 
         for language in AppLanguage.allCases {

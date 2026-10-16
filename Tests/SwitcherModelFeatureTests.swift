@@ -3113,6 +3113,36 @@ enum SwitcherModelFeatureTests {
                "memory menu bar style defaults to percent")
         suite.expect(registeredDefaults[DefaultsKey.monitorPwrTimeRemaining] as? Bool == true,
                "battery time is shown in the Power panel by default")
+        suite.expect(registeredDefaults[DefaultsKey.monitorPwrPeripherals] as? Bool == false,
+               "peripheral batteries stay out of the Power card until turned on")
+        let peripheralsSuite = "com.vorssaint.tests.powerPeripherals.\(UUID().uuidString)"
+        if let peripheralsDefaults = UserDefaults(suiteName: peripheralsSuite) {
+            peripheralsDefaults.removePersistentDomain(forName: peripheralsSuite)
+            peripheralsDefaults.set(false, forKey: DefaultsKey.menuBarPeripheralBattery)
+            Defaults.migratePowerPeripheralsVisibility(in: peripheralsDefaults)
+            suite.expect(peripheralsDefaults.object(forKey: DefaultsKey.monitorPwrPeripherals) as? Bool == false,
+                   "an update with the menu bar item off starts no peripheral reads in Power")
+            peripheralsDefaults.set(true, forKey: DefaultsKey.menuBarPeripheralBattery)
+            Defaults.migratePowerPeripheralsVisibility(in: peripheralsDefaults)
+            suite.expect(!peripheralsDefaults.bool(forKey: DefaultsKey.monitorPwrPeripherals),
+                   "turning on the menu bar item later leaves the Power choice alone")
+            peripheralsDefaults.removePersistentDomain(forName: peripheralsSuite)
+            peripheralsDefaults.set(true, forKey: DefaultsKey.menuBarPeripheralBattery)
+            Defaults.migratePowerPeripheralsVisibility(in: peripheralsDefaults)
+            suite.expect(peripheralsDefaults.bool(forKey: DefaultsKey.monitorPwrPeripherals),
+                   "an update keeps peripheral batteries in Power for menu bar users")
+            peripheralsDefaults.set(false, forKey: DefaultsKey.menuBarPeripheralBattery)
+            Defaults.migratePowerPeripheralsVisibility(in: peripheralsDefaults)
+            suite.expect(peripheralsDefaults.bool(forKey: DefaultsKey.monitorPwrPeripherals),
+                   "hiding the menu bar item later leaves the Power choice alone")
+            peripheralsDefaults.removePersistentDomain(forName: peripheralsSuite)
+            Defaults.migratePowerPeripheralsVisibility(in: peripheralsDefaults)
+            suite.expect(peripheralsDefaults.object(forKey: DefaultsKey.monitorPwrPeripherals) as? Bool == false,
+                   "a fresh install keeps peripheral batteries out of Power")
+            peripheralsDefaults.removePersistentDomain(forName: peripheralsSuite)
+        } else {
+            suite.expect(false, "peripheral visibility migration has isolated preferences")
+        }
         suite.expect(registeredDefaults[DefaultsKey.windowLayoutShortcutsEnabled] as? Bool == false,
                "window layout shortcuts stay off until enabled")
         suite.expect(registeredDefaults[DefaultsKey.windowEdgeSnapEnabled] as? Bool == false,
@@ -3133,14 +3163,36 @@ enum SwitcherModelFeatureTests {
                "window gestures do not change app focus unless requested")
         suite.expect(registeredDefaults[DefaultsKey.windowLayoutIgnoredApps] as? [String] == [],
                "window layout ignores no apps by default")
-        suite.expect(WindowLayoutIgnoredApps.contains("com.example.game", in: ["com.example.game"])
-                && !WindowLayoutIgnoredApps.contains("com.example.editor", in: ["com.example.game"])
-                && !WindowLayoutIgnoredApps.contains(nil, in: ["com.example.game"]),
+        suite.expect(WindowLayoutIgnoredApps.matches(bundleID: "com.example.game", executablePath: nil,
+                                               apps: ["com.example.game"])
+                && !WindowLayoutIgnoredApps.matches(bundleID: "com.example.editor", executablePath: nil,
+                                                    apps: ["com.example.game"])
+                && !WindowLayoutIgnoredApps.matches(bundleID: nil, executablePath: nil,
+                                                    apps: ["com.example.game"]),
                "window layout only pauses for the focused app on its list")
         suite.expect(WindowLayoutIgnoredApps.matches(bundleID: nil,
                                                executablePath: "/Applications/Game",
                                                apps: ["/Applications/Game"]),
                "window layout pauses for a focused executable without a bundle identifier")
+        // Java's launcher carries an Info.plist of its own, so a running JVM
+        // reports a bundle identifier that every Java program shares (issue
+        // #1009). The runtime that was picked is told apart by its path.
+        let ignoredRuntime = "/Users/tester/Library/Application Support/PrismLauncher/java/java-runtime-gamma/bin/java"
+        suite.expect(WindowLayoutIgnoredApps.matches(bundleID: "net.java.openjdk.java",
+                                               executablePath: ignoredRuntime,
+                                               apps: [ignoredRuntime])
+                && !WindowLayoutIgnoredApps.matches(
+                    bundleID: "net.java.openjdk.java",
+                    executablePath: "/Users/tester/Library/Application Support/PrismLauncher/java/jre-legacy/bin/java",
+                    apps: [ignoredRuntime]),
+               "window layout pauses for a Java runtime listed by its path although it reports Java's bundle "
+                   + "identifier, and for no other runtime")
+        var ignoredPathWasRead = false
+        _ = WindowLayoutIgnoredApps.matches(bundleID: "com.example.editor",
+                                            executablePath: { ignoredPathWasRead = true; return ignoredRuntime }(),
+                                            apps: ["com.example.game"])
+        suite.expect(!ignoredPathWasRead,
+               "window layout reads the focused program's path only while a program is listed by its path")
         let assignedLayoutShortcutKeys = [
             DefaultsKey.windowLayoutShortcutLeft,
             DefaultsKey.windowLayoutShortcutRight,
@@ -4816,6 +4868,31 @@ enum SwitcherModelFeatureTests {
                                                                       (pid_t(2048), "other")])
         suite.expect(repeatedProcessValues == [1678: "first", 2048: "other"],
                "window enumeration keeps the first value when the system repeats a process")
+        struct UsableApp: Equatable { let pid: pid_t; let isRegular: Bool }
+        func usable(_ apps: [UsableApp], owners: [pid_t],
+                    known: [pid_t: UsableApp] = [:]) -> [UsableApp] {
+            SwitcherSupport.usableApps(apps, windowOwnerPIDs: owners,
+                                       pid: \.pid, isRegular: \.isRegular,
+                                       resolve: { known[$0] })
+        }
+        let deviceHub = UsableApp(pid: 2836, isRegular: true)
+        suite.expect(usable([UsableApp(pid: -1, isRegular: true), UsableApp(pid: 0, isRegular: true)],
+                            owners: []).isEmpty,
+               "switcher apps drop workspace entries with a non-positive process id")
+        suite.expect(usable([UsableApp(pid: -1, isRegular: true)], owners: [2836, 2836],
+                            known: [2836: deviceHub]) == [deviceHub],
+               "switcher apps resolve a window owner missing from the workspace list once")
+        suite.expect(usable([], owners: [4000]).isEmpty,
+               "switcher apps ignore a window owner that cannot be resolved")
+        suite.expect(usable([], owners: [4001], known: [4001: UsableApp(pid: 4001, isRegular: false)]).isEmpty,
+               "switcher apps keep non-regular helper owners excluded")
+        suite.expect(usable([], owners: [-1, 0, 2836], known: [-1: UsableApp(pid: -1, isRegular: true),
+                                                                0: UsableApp(pid: 0, isRegular: true),
+                                                                2836: UsableApp(pid: 5000, isRegular: true)]).isEmpty,
+               "switcher apps never resolve a non-positive owner or an app answering for another pid")
+        suite.expect(usable([deviceHub], owners: [2836], known: [2836: UsableApp(pid: 2836, isRegular: false)])
+                       == [deviceHub],
+               "switcher apps do not resolve an owner the workspace list already holds")
         let groupedSwitcherItems = [
             SwitcherItem.window(id: 1, title: "One", appName: "Alpha", pid: 101,
                                 isOnScreen: true, frame: .zero),
