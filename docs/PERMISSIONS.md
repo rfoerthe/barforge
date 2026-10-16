@@ -6,7 +6,7 @@ You can review or change every grant in System Settings, under Privacy and Secur
 
 | Permission | Optional | Powers |
 |---|---|---|
-| Accessibility | Yes | Scroll direction, Window Layout, the app and window switcher, Dock Preview, Dock click to minimize, middle click, paste as plain text, Finder cut and paste, quit on close, radial menu key actions, optional notch notification mirroring and keyboard feedback |
+| Accessibility | Yes | Scroll direction, Logitech MX mice, Window Layout, the app and window switcher, Dock Preview, Dock click to minimize, middle click, paste as plain text, Finder cut and paste, quit on close, radial menu key actions, optional notch notification mirroring and keyboard feedback |
 | Screen Recording | Yes | Window previews, screenshots, copy text from screen, magnified color picking and screen recordings |
 | System Audio Recording | Yes | Volume mixer, optional live equalizer and system audio capture for recordings |
 | Microphone | Yes | Your voice in a screen recording, only when you turn it on |
@@ -35,6 +35,10 @@ You can review or change every grant in System Settings, under Privacy and Secur
 - **Paste as plain text**, which presses ⌘V for you after stripping the formatting.
 - **Finder cut and paste**, which steps in on ⌘X and ⌘V while Finder is in front.
 - **Quit on close**, which spots when an app's last window goes away.
+- **Logitech MX mice**, which turns the buttons, gestures and thumb wheel of
+  an MX Master 3, 3S or 4 into clicks, key combos and media keys. Talking to
+  the mouse itself through its receiver or Bluetooth needs no permission,
+  and a button set to a key action keeps its own job until access is granted.
 - **Radial menu**, for wheel actions that press a key combo or a media key
   for you and for the optional side button trigger; opening apps, files and
   links with the keyboard shortcut alone needs nothing.

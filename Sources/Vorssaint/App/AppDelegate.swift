@@ -181,6 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
                     .middleClick, .windowMaximizer, .keyboardDebounce, .windowLayout,
                     .textSnippets, .brightness, .radialMenu, .mouseButtonShortcuts,
                     .mouseClickDebounce, .superKey, .quitWindowProtection, .mixer, .musicBlock, .notch,
+                    .logitechMX,
                 ])
             }
             .store(in: &cancellables)
@@ -319,6 +320,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         // Dock's app and window switcher hotkeys persist after quit.
         AppSwitcher.shared.suspend()
         MouseButtonShortcutService.shared.suspend()
+        // Hands the MX Master's controls back before the process goes away.
+        LogitechMXService.shared.suspend()
         MiddleClickService.shared.suspend()
         ScrollInverter.shared.suspend()
         SmoothScrollService.shared.suspend()

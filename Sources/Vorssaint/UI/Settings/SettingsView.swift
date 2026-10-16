@@ -622,6 +622,18 @@ struct UpdatesView: View {
     @AppStorage(DefaultsKey.releaseNotesOnUpdate) private var showWhatsNewAfter = true
 
     var body: some View {
+        if let fork = AppInfo.forkRepository {
+            Section(l10n.s.updatesSection) {
+                Label(String(format: FeatureStrings.forkBuild(l10n.language).updatesOffFormat, fork),
+                      systemImage: "arrow.triangle.branch")
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        } else {
+            updatesSection
+        }
+    }
+
+    private var updatesSection: some View {
         Section(l10n.s.updatesSection) {
             Toggle(l10n.s.autoCheckToggle, isOn: $autoCheck)
                 .onChange(of: autoCheck) { _, value in
@@ -753,6 +765,11 @@ struct AboutSettings: View {
                             .foregroundStyle(.orange)
                             .clipShape(Capsule())
                     }
+                }
+                if let fork = AppInfo.forkRepository {
+                    Text(String(format: FeatureStrings.forkBuild(l10n.language).aboutFormat, fork))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 if AppInfo.isDeveloperBuild, let commit = AppInfo.buildCommit {
                     // Dev-only: which source commit this build came from. Never shipped.

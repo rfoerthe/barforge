@@ -8,7 +8,26 @@ enum AppInfo {
     static let name = "Vorssaint"
     static let copyright = "© 2026 Vorssaint"
     static let websiteURL = URL(string: "https://vorssaint.com")!
-    static let repositoryURL = URL(string: "https://github.com/vorssaint/vorssaint-utils")!
+    static let upstreamRepository = "vorssaint/vorssaint-utils"
+
+    /// "owner/name" of the fork this build came from, stamped into Info.plist
+    /// as `VorssaintForkRepository`. Nil in the official app.
+    static var forkRepository: String? {
+        AppInfoSupport.forkRepository(Bundle.main.object(forInfoDictionaryKey: "VorssaintForkRepository") as? String)
+    }
+
+    static var isForkBuild: Bool { forkRepository != nil }
+
+    /// A fork build links to its own repository.
+    static var repositoryURL: URL {
+        URL(string: "https://github.com/\(forkRepository ?? upstreamRepository)")!
+    }
+
+    /// Only the official app updates itself. A fork build is never offered
+    /// an official release, which would replace it and drop its changes, and
+    /// it cannot install its own: the installer only trusts Vorssaint's
+    /// Developer ID.
+    static var receivesUpdates: Bool { !isDeveloperBuild && !isForkBuild }
     static let coffeeURL = URL(string: "https://buymeacoffee.com/vorssaint")!
     static let discordURL = URL(string: "https://discord.gg/M6BwWH4BJp")!
     static let socialURL = URL(string: "https://x.com/vorssaint")!
@@ -40,5 +59,17 @@ enum AppInfo {
     /// running dev app matches the source you are about to change. nil in the official app.
     static var buildCommit: String? {
         Bundle.main.object(forInfoDictionaryKey: "VorssaintBuildCommit") as? String
+    }
+}
+
+enum AppInfoSupport {
+    /// Accepts only a plain GitHub "owner/name"; anything else is no fork.
+    static func forkRepository(_ raw: String?) -> String? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines) else { return nil }
+        let parts = raw.split(separator: "/", omittingEmptySubsequences: false)
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_."))
+        guard parts.count == 2, parts.allSatisfy({ !$0.isEmpty && $0.unicodeScalars.allSatisfy(allowed.contains) })
+        else { return nil }
+        return raw
     }
 }
