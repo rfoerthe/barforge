@@ -82,6 +82,8 @@ enum ReleaseChangeAliases {
         case .middleClick: return ["middle click", "middle-click", "middle clicks"]
         case .mouseClickDebounce: return ["extra click filter", "extra-click filter", "click filter",
             "mouse debounce", "keyboard and mouse debounce", "worn-button click filtering", "extra clicks"]
+        case .logitechMX: return ["logitech mx", "mx master", "logi options+", "thumb wheel", "smartshift",
+            "gesture button"]
         case .keyboardDebounce: return ["keyboard debounce", "key debounce", "debounce",
             "keyboard and mouse debounce"]
         case .textSnippets: return ["text snippets", "snippets", "snippet"]
@@ -180,7 +182,7 @@ enum ReleaseChangeAliases {
 
     private static let mousePage: [AppFeature] = [.scrollInverter, .scrollHorizontal, .focusFollowsMouse,
         .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts, .middleClick,
-        .mouseClickDebounce]
+        .mouseClickDebounce, .logitechMX]
     private static let monitorMetrics: [AppFeature] = [.monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork,
         .monitorDisk, .monitorPower]
     private static let monitorPage: [AppFeature] = monitorMetrics + [.connectedDevices, .fanControl]

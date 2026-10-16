@@ -338,6 +338,26 @@ final class RadialMenuService: ObservableObject {
         beginSession(for: profile, hold: false)
     }
 
+    /// A Logitech MX control set to the radial menu (the MX Master 4's thumb
+    /// panel by default, where Options+ opens its Actions Ring): opens the
+    /// first wheel as a sticky session, or closes the one that is open.
+    func toggleFromLogitechControl() {
+        let defaults = UserDefaults.standard
+        guard AppFeature.radialMenu.isAvailable,
+              defaults.bool(forKey: DefaultsKey.radialMenuEnabled),
+              let profile = RadialMenuSupport.decodeProfiles(
+                  defaults.data(forKey: DefaultsKey.radialMenuProfiles), defaults: defaults
+              ).first else {
+            NSSound.beep()
+            return
+        }
+        if sessionActive {
+            endSession()
+            return
+        }
+        beginSession(for: profile, hold: false)
+    }
+
     /// The Settings page's try-it button: a sticky session with the saved
     /// placement, exactly like a quick press of the shortcut.
     func presentPreview(for profile: RadialMenuProfile? = nil) {
@@ -763,7 +783,8 @@ final class RadialMenuService: ObservableObject {
         }
     }
 
-    private func run(_ tool: RadialMenuTool) {
+    /// Also reached from Logitech MX controls set to a Vorssaint tool.
+    func run(_ tool: RadialMenuTool) {
         guard tool.isRunnable() else { return }
         // The same beat the quick panel gives screen-touching tools, so the
         // wheel is really gone before anything captures or presents.

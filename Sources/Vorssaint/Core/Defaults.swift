@@ -72,6 +72,8 @@ enum DefaultsKey {
     static let mouseSpacesGestureEnabled = "mouseSpacesGestureEnabled" // hold a button and drag to switch Spaces (issue #1012)
     static let mouseSpacesGestureButton = "mouseSpacesGestureButton"   // button number, 0 while none is chosen
     static let mouseSpacesGestureFollowsDrag = "mouseSpacesGestureFollowsDrag" // the Space moves with the hand, the way natural scrolling does
+    static let logitechMXEnabled = "logitechMXEnabled"    // MX Master 3/3S/4 controls and wheels set from Settings
+    static let logitechMXProfiles = "logitechMXProfiles"  // Data: [LogitechMXModel raw value: LogitechMXProfile] JSON
     static let mouseClickDebounceEnabled = "mouseClickDebounceEnabled"
     static let mouseClickDebounceWindowMs = "mouseClickDebounceWindowMs"
     static let superKeyEnabled = "superKeyEnabled"        // chosen key holds the configured modifiers (issue #330)
@@ -1229,6 +1231,7 @@ enum Defaults {
         DefaultsKey.mouseSpacesGestureEnabled: false,
         DefaultsKey.mouseSpacesGestureButton: 0,
         DefaultsKey.mouseSpacesGestureFollowsDrag: false,
+        DefaultsKey.logitechMXEnabled: false,
         DefaultsKey.mouseClickDebounceEnabled: false,
         DefaultsKey.mouseClickDebounceWindowMs: defaultMouseClickDebounceWindowMs,
         DefaultsKey.superKeyEnabled: false,
