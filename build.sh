@@ -458,6 +458,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/LogitechMX/HIDPPSupport.swift
         Sources/Vorssaint/Services/LogitechMX/LogitechMXSupport.swift
         Sources/Vorssaint/Core/LogitechMXStrings.swift
+        Sources/Vorssaint/Core/ForkBuildStrings.swift
         Sources/Vorssaint/Services/MouseClickDebounce/MouseClickDebounceSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptions.swift

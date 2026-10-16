@@ -27,7 +27,7 @@ final class UpdateService: ObservableObject {
     /// preview. Set alongside `.available`; cleared otherwise.
     @Published private(set) var availableNotes: String?
 
-    private let repository = "vorssaint/vorssaint-utils"
+    private let repository = AppInfo.upstreamRepository
     private var downloadURL: URL?
     /// Size the release advertises for the asset, used to bound the download.
     private var downloadExpectedBytes: Int64?
@@ -75,6 +75,8 @@ final class UpdateService: ObservableObject {
             }
             return
         }
+        // A fork build has nothing to update from; see AppInfo.receivesUpdates.
+        guard AppInfo.receivesUpdates else { return }
         configureAutomaticChecks()
         if autoCheckEnabled {
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in
@@ -111,6 +113,10 @@ final class UpdateService: ObservableObject {
                 availableNotes = nil
             }
             lastChecked = Date()
+            return
+        }
+        guard AppInfo.receivesUpdates else {
+            state = .idle
             return
         }
         if case .checking = state { return }
@@ -193,8 +199,7 @@ final class UpdateService: ObservableObject {
     /// or the panel opens, so a new release surfaces promptly without hammering the
     /// API. The hourly timer is the floor; this makes it feel immediate.
     func checkIfStale(maxAge: TimeInterval = 15 * 60) {
-        if AppInfo.isDeveloperBuild { return }
-        guard autoCheckEnabled else { return }
+        guard AppInfo.receivesUpdates, autoCheckEnabled else { return }
         switch state {
         case .checking, .downloading, .installing: return
         default: break
@@ -206,7 +211,8 @@ final class UpdateService: ObservableObject {
     // MARK: - Download & install
 
     func downloadAndInstall() {
-        if AppInfo.isDeveloperBuild { return }  // never replace the local dev build over itself
+        // Never replace the local dev build or a fork build with an official one.
+        guard AppInfo.receivesUpdates else { return }
         guard let downloadURL else { return }
         // Pre-flight BEFORE spending the download: a translocated app or one
         // running from a read-only volume (the mounted DMG) can never be
