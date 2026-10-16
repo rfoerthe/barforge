@@ -40,6 +40,7 @@ struct MouseSettings: View {
     @AppStorage(DefaultsKey.middleClickEnabled) private var middleClickEnabled = false
     @AppStorage(DefaultsKey.middleClickTapFingers) private var middleClickTapFingers = 0
     @AppStorage(DefaultsKey.mouseClickDebounceEnabled) private var mouseClickDebounceEnabled = false
+    @AppStorage(DefaultsKey.logitechMXEnabled) private var logitechMXEnabled = false
     @AppStorage(DefaultsKey.mouseClickDebounceWindowMs) private var mouseClickDebounceWindow =
         Defaults.defaultMouseClickDebounceWindowMs
     @State private var smoothScrollMoreOptionsExpanded = false
@@ -90,6 +91,9 @@ struct MouseSettings: View {
                 if AppFeature.mouseButtonShortcuts.isAvailable {
                     MouseButtonShortcutsSection()
                 }
+                if AppFeature.logitechMX.isAvailable {
+                    LogitechMXSection()
+                }
                 if AppFeature.mouseClickDebounce.isAvailable {
                     clickDebounceCard
                         .settingsSectionAnchor(.mouseClickDebounce, cornerRadius: 16)
@@ -119,7 +123,7 @@ struct MouseSettings: View {
     /// The mouse features on this page, in page order, for the legend.
     private var legendFeatures: [AppFeature] {
         [.scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration,
-         .mouseNavigation, .mouseButtonShortcuts, .mouseClickDebounce, .middleClick]
+         .mouseNavigation, .mouseButtonShortcuts, .logitechMX, .mouseClickDebounce, .middleClick]
             .filter(\.isAvailable)
     }
 
@@ -136,6 +140,7 @@ struct MouseSettings: View {
         case .mouseNavigation: return mouseNavigationEnabled
         case .mouseButtonShortcuts: return mouseButtonShortcutsEnabled || spacesEnabled
         case .mouseClickDebounce: return mouseClickDebounceEnabled
+        case .logitechMX: return logitechMXEnabled
         case .middleClick: return middleClickEnabled
         default: return false
         }
@@ -548,6 +553,7 @@ struct MouseSettings: View {
             || ((mouseButtonShortcutsEnabled || spacesEnabled)
                 && AppFeature.mouseButtonShortcuts.isAvailable)
             || (mouseClickDebounceEnabled && AppFeature.mouseClickDebounce.isAvailable)
+            || (logitechMXEnabled && AppFeature.logitechMX.isAvailable)
             || (middleClickEnabled && AppFeature.middleClick.isAvailable)
         return anyEngaged && !permissions.accessibility
     }

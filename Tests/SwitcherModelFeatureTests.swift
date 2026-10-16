@@ -2000,7 +2000,10 @@ enum SwitcherModelFeatureTests {
         // per-release decision: this check fails on every version bump so the
         // decision above is made consciously, never by omission.
         let releasePlist = NSDictionary(contentsOfFile: "Resources/Info.plist")
-        let plistVersion = (releasePlist?["CFBundleShortVersionString"] as? String) ?? ""
+        // A fork marks its build with metadata ("3.4.1+mx.1"); the release it
+        // builds on is what the pin is about.
+        let plistVersion = ((releasePlist?["CFBundleShortVersionString"] as? String) ?? "")
+            .components(separatedBy: "+")[0]
         suite.expect(plistVersion == "3.4.1",
                "bumping the app version requires re-deciding the support prompt pin above")
         let plistBuild = (releasePlist?["CFBundleVersion"] as? String) ?? ""

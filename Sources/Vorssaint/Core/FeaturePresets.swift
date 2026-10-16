@@ -152,6 +152,10 @@ extension AppFeature {
              .cameraPreview, .scratchpad, .commandBar, .screenRecorder, .wallpaper, .fanControl,
              .diskImageInstaller, .killProcess, .portManager:
             return .idle
+        // Device reports arrive only while a diverted control is used; the
+        // mouse itself stays in charge of everything else.
+        case .logitechMX:
+            return .idle
         case .appUpdates:
             // The list is on demand; only a background schedule keeps a timer.
             return AppUpdatesSupport.CheckFrequency.sanitized(
