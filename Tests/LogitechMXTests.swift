@@ -79,6 +79,15 @@ enum LogitechMXTests {
     }
 
     private static func decoders(_ suite: TestSuite) {
+        // The usage pairs macOS reports: a Bolt receiver's HID++ interface,
+        // and a Bluetooth MX Master 3 whose primary usage is its keyboard.
+        suite.expect(HIDPP.interface(usagePairs: [(0xFF00, 0x0001), (0xFF00, 0x0002)]) == .receiver,
+                     "a receiver's HID++ collection is found")
+        suite.expect(HIDPP.interface(usagePairs: [(0x0001, 0x0006), (0x0001, 0x0002), (0x0001, 0x0001),
+                                                  (0xFF43, 0x0202)]) == .direct,
+                     "a Bluetooth mouse is found by its HID++ pair even behind a keyboard primary usage")
+        suite.expect(HIDPP.interface(usagePairs: [(0x0001, 0x0006), (0x0001, 0x0002)]) == nil,
+                     "a device without HID++ is not one")
         suite.expect(HIDPP.featureIndex(fromRootReply: [0x0D, 0x06]) == 0x0D
                      && HIDPP.featureIndex(fromRootReply: [0x00, 0x00]) == nil,
                      "feature index 0 means the page is absent")
@@ -138,6 +147,19 @@ enum LogitechMXTests {
                      "the pressure point reads and writes as button plus a big-endian word")
         suite.expect(HIDPP.forceButtonInfo([0x00, 0x01, 0x12, 0x4E, 0x00, 0x10, 0x0E, 0xA5]) == nil,
                      "a maximum below the minimum is no range")
+        // A Bluetooth MX Master 3 (0x1000) and an MX Master 4 (0x1004), as read.
+        suite.expect(HIDPP.batteryStatus([0x14, 0x05, 0x00]) == HIDPP.BatteryState(percent: 20, charging: false, full: false)
+                     && HIDPP.batteryStatus([0x50, 0x00, 0x01])?.charging == true
+                     && HIDPP.batteryStatus([0x64, 0x00, 0x03])?.full == true
+                     && HIDPP.batteryStatus([0x14, 0x05, 0x06]) == nil,
+                     "the MX Master 3's battery reads level and charging, and a fault is no reading")
+        suite.expect(HIDPP.unifiedBatteryReportsPercent([0x0F, 0x03]) && !HIDPP.unifiedBatteryReportsPercent([0x0F, 0x01]),
+                     "the unified battery says whether it reports a percentage")
+        suite.expect(HIDPP.unifiedBattery([0x23, 0x04, 0x00, 0x00], reportsPercent: true) ==
+                     HIDPP.BatteryState(percent: 35, charging: false, full: false)
+                     && HIDPP.unifiedBattery([0x23, 0x04, 0x02, 0x01], reportsPercent: true)?.charging == true
+                     && HIDPP.unifiedBattery([0x23, 0x04, 0x00, 0x00], reportsPercent: false)?.percent == nil,
+                     "the MX Master 4's battery reads a percentage only where it reports one")
         suite.expect(HIDPP.nameChunk(Array("MX Master 4".utf8) + [0, 0, 0, 0, 0], remaining: 11) == "MX Master 4",
                      "the name stops at its length and its padding")
         suite.expect(HIDPP.wantsReconfiguration([0x01, 0x01, 0x00]) && !HIDPP.wantsReconfiguration([0x01, 0x00]),
@@ -157,6 +179,16 @@ enum LogitechMXTests {
                      && LogitechMXModel.identify(name: nil, modelID: 0xB042) == .mxMaster4
                      && LogitechMXModel.identify(name: nil, modelID: 0xB019) == nil,
                      "the model ID only stands in when there is no name")
+
+        let english = LogitechMXStrings.enUS
+        suite.expect(english.name(.gestureButton, on: .mxMaster3) == english.thumbButton
+                     && english.name(.gestureButton, on: .mxMaster3S) == english.thumbButton
+                     && english.name(.gestureButton, on: .mxMaster4) == english.name(.gestureButton)
+                     && english.name(.hapticPanel, on: .mxMaster4) == english.name(.hapticPanel),
+                     "control 0x00C3 is the thumb button on the MX Master 3 and 3S, the gesture button on the 4")
+        suite.expect(LogitechMXControl.gestureButton.symbolName(on: .mxMaster3) != LogitechMXControl.gestureButton.symbolName
+                     && LogitechMXControl.gestureButton.symbolName(on: .mxMaster4) == LogitechMXControl.gestureButton.symbolName,
+                     "the thumb button gets its own symbol")
 
         let none = LogitechMXAssignment(action: .native)
         suite.expect(LogitechMXSupport.reporting(for: none, control: .middleButton, supportsRawXY: true) == (false, false),

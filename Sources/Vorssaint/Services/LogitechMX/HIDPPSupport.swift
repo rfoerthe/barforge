@@ -17,10 +17,32 @@ enum HIDPP {
     static let shortReportID: UInt8 = 0x10
     static let longReportID: UInt8 = 0x11
     static let longReportLength = 20
-    /// Usage page of a receiver's (Bolt, Unifying) HID++ collection.
+    /// Usage page and usage of a receiver's (Bolt, Unifying) long HID++
+    /// collection.
     static let receiverUsagePage = 0xFF00
-    /// Usage page of a mouse paired straight over Bluetooth.
+    static let receiverUsage = 0x0002
+    /// Usage page and usage of the HID++ collection of a mouse paired
+    /// straight over Bluetooth. macOS lists it only among the device's usage
+    /// pairs: the device's primary usage is the keyboard collection.
     static let bluetoothUsagePage = 0xFF43
+    static let bluetoothUsage = 0x0202
+
+    /// How one HID device carries HID++, decided from all its usage pairs
+    /// rather than the primary usage alone.
+    enum Interface: Equatable {
+        case receiver
+        case direct
+    }
+
+    static func interface(usagePairs: [(page: Int, usage: Int)]) -> Interface? {
+        if usagePairs.contains(where: { $0.page == receiverUsagePage && $0.usage == receiverUsage }) {
+            return .receiver
+        }
+        if usagePairs.contains(where: { $0.page == bluetoothUsagePage && $0.usage == bluetoothUsage }) {
+            return .direct
+        }
+        return nil
+    }
     /// A device paired straight to the Mac answers on this index; a receiver
     /// numbers its paired devices 1 through 6.
     static let directDeviceIndex: UInt8 = 0xFF
@@ -34,6 +56,8 @@ enum HIDPP {
     enum Feature: UInt16, CaseIterable {
         case root = 0x0000
         case deviceName = 0x0005
+        case batteryStatus = 0x1000
+        case unifiedBattery = 0x1004
         case wirelessDeviceStatus = 0x1D4B
         case haptic = 0x19B0
         case forceSensingButton = 0x19C0
@@ -418,6 +442,42 @@ enum HIDPP {
     /// Function 3: button(1) value(2).
     static func setForceButton(_ button: UInt8, value: Int) -> [UInt8] {
         [button] + bytes(UInt16(clamping: value))
+    }
+
+    // MARK: - Battery (0x1000 on the MX Master 3, 0x1004 on the 3S and 4)
+
+    struct BatteryState: Equatable {
+        /// Nil when the device only reports coarse levels.
+        let percent: Int?
+        let charging: Bool
+        let full: Bool
+    }
+
+    /// 0x1000 function 0 and event 0: level(1) nextLevel(1) status(1), where
+    /// status 1, 2 and 4 mean charging and 3 means charged.
+    static func batteryStatus(_ payload: [UInt8]) -> BatteryState? {
+        guard payload.count >= 3 else { return nil }
+        let level = Int(payload[0])
+        let status = payload[2]
+        guard status <= 4 else { return nil }
+        return BatteryState(percent: (1...100).contains(level) ? level : nil,
+                            charging: status == 1 || status == 2 || status == 4, full: status == 3)
+    }
+
+    /// 0x1004 function 0: supportedLevels(1) flags(1); bit 1 of the flags
+    /// says the device reports a percentage.
+    static func unifiedBatteryReportsPercent(_ payload: [UInt8]) -> Bool {
+        payload.count >= 2 && payload[1] & 0x02 != 0
+    }
+
+    /// 0x1004 function 1 and event 0: percent(1) level(1) charging(1)
+    /// externalPower(1), where charging 1 and 2 mean charging and 3 complete.
+    static func unifiedBattery(_ payload: [UInt8], reportsPercent: Bool) -> BatteryState? {
+        guard payload.count >= 3 else { return nil }
+        let percent = Int(payload[0])
+        let charging = payload[2]
+        return BatteryState(percent: reportsPercent && percent <= 100 ? percent : nil,
+                            charging: charging == 1 || charging == 2, full: charging == 3)
     }
 
     // MARK: - Wireless status (0x1D4B)

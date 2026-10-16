@@ -250,6 +250,7 @@ enum SettingsDirectory {
                                           FeatureStrings.logitechMX(language).smartShift,
                                           FeatureStrings.logitechMX(language).thumbWheelSection,
                                           FeatureStrings.logitechMX(language).name(.gestureButton),
+                                          FeatureStrings.logitechMX(language).thumbButton,
                                           FeatureStrings.logitechMX(language).pointerSpeed,
                                           FeatureStrings.logitechMX(language).hapticsSection,
                                           FeatureStrings.logitechMX(language).panelForce,

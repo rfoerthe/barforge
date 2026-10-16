@@ -110,6 +110,9 @@ private struct LogitechMXDevicePanel: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            if let battery = device.battery, battery.percent != nil || battery.charging {
+                batteryBadge(battery)
+            }
             if let mode = device.wheelMode {
                 Label(mode == .ratchet ? text.ratchet : text.freeSpin,
                       systemImage: mode == .ratchet ? "gearshape" : "circle.dotted")
@@ -120,6 +123,33 @@ private struct LogitechMXDevicePanel: View {
                     .help(text.wheelMode)
             }
         }
+    }
+
+    /// The charge the mouse last reported, with the system's battery glyph.
+    private func batteryBadge(_ battery: HIDPP.BatteryState) -> some View {
+        let percent = battery.percent ?? (battery.full ? 100 : nil)
+        let symbol: String
+        if battery.charging {
+            symbol = "battery.100percent.bolt"
+        } else {
+            switch percent ?? 50 {
+            case ..<13: symbol = "battery.0percent"
+            case ..<38: symbol = "battery.25percent"
+            case ..<63: symbol = "battery.50percent"
+            case ..<88: symbol = "battery.75percent"
+            default: symbol = "battery.100percent"
+            }
+        }
+        let low = !battery.charging && (percent ?? 100) <= 10
+        return Label(percent.map { "\($0) %" } ?? text.charging, systemImage: symbol)
+            .font(.caption.weight(.medium).monospacedDigit())
+            .foregroundStyle(low ? Color.red : Color.primary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Color.secondary.opacity(0.12), in: Capsule())
+            .help(battery.charging ? "\(text.battery), \(text.charging)" : text.battery)
+            .accessibilityLabel(text.battery)
+            .accessibilityValue(percent.map { "\($0) %" } ?? text.charging)
     }
 
     // MARK: Buttons
@@ -137,10 +167,10 @@ private struct LogitechMXDevicePanel: View {
         let assignment = profile.assignment(for: control)
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
-                Image(systemName: control.symbolName)
+                Image(systemName: control.symbolName(on: device.model))
                     .frame(width: 20)
                     .foregroundStyle(.secondary)
-                Text(text.name(control))
+                Text(text.name(control, on: device.model))
                 Spacer(minLength: 12)
                 actionPicker(selection: Binding(
                     get: { assignment.action.kind },

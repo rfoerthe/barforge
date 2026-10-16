@@ -46,6 +46,9 @@ struct LogitechMXStrings {
     let panelForceLight: String
     let panelForceFirm: String
     let panelForceDefault: String
+    let battery: String
+    let charging: String
+    let thumbButton: String
     let radialMenuOffNote: String
     let controls: [LogitechMXControl: String]
     let actions: [LogitechMXAction.Kind: String]
@@ -54,6 +57,10 @@ struct LogitechMXStrings {
     let thumbActions: [LogitechMXThumbWheelAction: String]
 
     func name(_ control: LogitechMXControl) -> String { controls[control] ?? "" }
+    /// Control 0x00C3 is the thumb button on the MX Master 3 and 3S.
+    func name(_ control: LogitechMXControl, on model: LogitechMXModel) -> String {
+        control == .gestureButton && model.hasThumbButton ? thumbButton : name(control)
+    }
     func name(_ kind: LogitechMXAction.Kind) -> String { actions[kind] ?? kind.rawValue }
     func name(_ preset: LogitechMXGesturePreset) -> String { presets[preset] ?? preset.rawValue }
     func name(_ direction: LogitechMXGestureDirection) -> String { directions[direction] ?? direction.rawValue }
@@ -126,6 +133,9 @@ extension LogitechMXStrings {
         panelForceLight: "Light",
         panelForceFirm: "Firm",
         panelForceDefault: "Default",
+        battery: "Battery",
+        charging: "Charging",
+        thumbButton: "Thumb button",
         radialMenuOffNote: "The radial menu is off. Turn it on to open it from the mouse.",
         controls: [.middleButton: "Middle button", .backButton: "Back button", .forwardButton: "Forward button",
                    .gestureButton: "Gesture button", .modeShiftButton: "Mode shift button",
@@ -193,6 +203,9 @@ extension LogitechMXStrings {
         panelForceLight: "Leicht",
         panelForceFirm: "Fest",
         panelForceDefault: "Standard",
+        battery: "Batterie",
+        charging: "Wird geladen",
+        thumbButton: "Daumentaste",
         radialMenuOffNote: "Das Radialmenü ist aus. Schalte es ein, um es mit der Maus zu öffnen.",
         controls: [.middleButton: "Mittlere Taste", .backButton: "Zurück-Taste", .forwardButton: "Vorwärts-Taste",
                    .gestureButton: "Gestentaste", .modeShiftButton: "Modustaste",
@@ -261,6 +274,9 @@ extension LogitechMXStrings {
         panelForceLight: "Leve",
         panelForceFirm: "Firme",
         panelForceDefault: "Padrão",
+        battery: "Bateria",
+        charging: "Carregando",
+        thumbButton: "Botão do polegar",
         radialMenuOffNote: "O menu radial está desligado. Ligue-o para abri-lo pelo mouse.",
         controls: [.middleButton: "Botão do meio", .backButton: "Botão voltar", .forwardButton: "Botão avançar",
                    .gestureButton: "Botão de gestos", .modeShiftButton: "Botão de modo",
@@ -328,6 +344,9 @@ extension LogitechMXStrings {
         panelForceLight: "Hafif",
         panelForceFirm: "Sert",
         panelForceDefault: "Varsayılan",
+        battery: "Pil",
+        charging: "Şarj oluyor",
+        thumbButton: "Başparmak düğmesi",
         radialMenuOffNote: "Dairesel menü kapalı. Fareyle açmak için menüyü açın.",
         controls: [.middleButton: "Orta düğme", .backButton: "Geri düğmesi", .forwardButton: "İleri düğmesi",
                    .gestureButton: "Hareket düğmesi", .modeShiftButton: "Mod düğmesi",
@@ -396,6 +415,9 @@ extension LogitechMXStrings {
         panelForceLight: "Лёгкое",
         panelForceFirm: "Сильное",
         panelForceDefault: "По умолчанию",
+        battery: "Аккумулятор",
+        charging: "Заряжается",
+        thumbButton: "Кнопка под большим пальцем",
         radialMenuOffNote: "Радиальное меню выключено. Включите его, чтобы открывать мышью.",
         controls: [.middleButton: "Средняя кнопка", .backButton: "Кнопка назад", .forwardButton: "Кнопка вперёд",
                    .gestureButton: "Кнопка жестов", .modeShiftButton: "Кнопка режима колеса",
@@ -465,6 +487,9 @@ extension LogitechMXStrings {
         panelForceLight: "Suave",
         panelForceFirm: "Firme",
         panelForceDefault: "Predeterminado",
+        battery: "Batería",
+        charging: "Cargando",
+        thumbButton: "Botón del pulgar",
         radialMenuOffNote: "El menú radial está desactivado. Actívalo para abrirlo con el ratón.",
         controls: [.middleButton: "Botón central", .backButton: "Botón atrás", .forwardButton: "Botón adelante",
                    .gestureButton: "Botón de gestos", .modeShiftButton: "Botón de modo",
@@ -533,6 +558,9 @@ extension LogitechMXStrings {
         panelForceLight: "Ľahký",
         panelForceFirm: "Pevný",
         panelForceDefault: "Predvolené",
+        battery: "Batéria",
+        charging: "Nabíja sa",
+        thumbButton: "Palcové tlačidlo",
         radialMenuOffNote: "Kruhové menu je vypnuté. Zapnite ho, ak ho chcete otvárať myšou.",
         controls: [.middleButton: "Stredné tlačidlo", .backButton: "Tlačidlo späť", .forwardButton: "Tlačidlo dopredu",
                    .gestureButton: "Tlačidlo gest", .modeShiftButton: "Tlačidlo režimu",
@@ -600,6 +628,9 @@ extension LogitechMXStrings {
         panelForceLight: "Léger",
         panelForceFirm: "Ferme",
         panelForceDefault: "Par défaut",
+        battery: "Batterie",
+        charging: "En charge",
+        thumbButton: "Bouton du pouce",
         radialMenuOffNote: "Le menu radial est désactivé. Activez-le pour l’ouvrir depuis la souris.",
         controls: [.middleButton: "Bouton central", .backButton: "Bouton précédent", .forwardButton: "Bouton suivant",
                    .gestureButton: "Bouton de gestes", .modeShiftButton: "Bouton de mode",
@@ -668,6 +699,9 @@ extension LogitechMXStrings {
         panelForceLight: "Leggero",
         panelForceFirm: "Deciso",
         panelForceDefault: "Predefinito",
+        battery: "Batteria",
+        charging: "In carica",
+        thumbButton: "Tasto del pollice",
         radialMenuOffNote: "Il menu radiale è disattivato. Attivalo per aprirlo dal mouse.",
         controls: [.middleButton: "Tasto centrale", .backButton: "Tasto indietro", .forwardButton: "Tasto avanti",
                    .gestureButton: "Tasto dei gesti", .modeShiftButton: "Tasto modalità",
@@ -736,6 +770,9 @@ extension LogitechMXStrings {
         panelForceLight: "軽い",
         panelForceFirm: "硬い",
         panelForceDefault: "デフォルト",
+        battery: "バッテリー",
+        charging: "充電中",
+        thumbButton: "親指ボタン",
         radialMenuOffNote: "ラジアルメニューがオフです。マウスから開くにはオンにしてください。",
         controls: [.middleButton: "中央ボタン", .backButton: "戻るボタン", .forwardButton: "進むボタン",
                    .gestureButton: "ジェスチャボタン", .modeShiftButton: "モードシフトボタン",
@@ -803,6 +840,9 @@ extension LogitechMXStrings {
         panelForceLight: "가볍게",
         panelForceFirm: "단단하게",
         panelForceDefault: "기본값",
+        battery: "배터리",
+        charging: "충전 중",
+        thumbButton: "엄지 버튼",
         radialMenuOffNote: "방사형 메뉴가 꺼져 있습니다. 마우스로 열려면 켜세요.",
         controls: [.middleButton: "가운데 버튼", .backButton: "뒤로 버튼", .forwardButton: "앞으로 버튼",
                    .gestureButton: "제스처 버튼", .modeShiftButton: "모드 전환 버튼",
@@ -870,6 +910,9 @@ extension LogitechMXStrings {
         panelForceLight: "轻",
         panelForceFirm: "重",
         panelForceDefault: "默认",
+        battery: "电池",
+        charging: "正在充电",
+        thumbButton: "拇指按钮",
         radialMenuOffNote: "径向菜单已关闭。打开它才能用鼠标调出。",
         controls: [.middleButton: "中键", .backButton: "后退键", .forwardButton: "前进键",
                    .gestureButton: "手势按钮", .modeShiftButton: "模式切换按钮",
@@ -936,6 +979,9 @@ extension LogitechMXStrings {
         panelForceLight: "輕",
         panelForceFirm: "重",
         panelForceDefault: "預設",
+        battery: "電池",
+        charging: "充電中",
+        thumbButton: "拇指按鈕",
         radialMenuOffNote: "放射狀選單已關閉。開啟後才能用滑鼠叫出。",
         controls: [.middleButton: "中鍵", .backButton: "上一頁鍵", .forwardButton: "下一頁鍵",
                    .gestureButton: "手勢按鈕", .modeShiftButton: "模式切換按鈕",
@@ -1002,6 +1048,9 @@ extension LogitechMXStrings {
         panelForceLight: "輕",
         panelForceFirm: "重",
         panelForceDefault: "預設",
+        battery: "電池",
+        charging: "充電中",
+        thumbButton: "拇指按鈕",
         radialMenuOffNote: "放射狀選單已關閉。開啟後才能用滑鼠叫出。",
         controls: [.middleButton: "中鍵", .backButton: "上一頁鍵", .forwardButton: "下一頁鍵",
                    .gestureButton: "手勢按鈕", .modeShiftButton: "模式切換按鈕",
@@ -1068,6 +1117,9 @@ extension LogitechMXStrings {
         panelForceLight: "Легке",
         panelForceFirm: "Сильне",
         panelForceDefault: "Типово",
+        battery: "Акумулятор",
+        charging: "Заряджається",
+        thumbButton: "Кнопка під великим пальцем",
         radialMenuOffNote: "Радіальне меню вимкнено. Увімкніть його, щоб відкривати мишею.",
         controls: [.middleButton: "Середня кнопка", .backButton: "Кнопка назад", .forwardButton: "Кнопка вперед",
                    .gestureButton: "Кнопка жестів", .modeShiftButton: "Кнопка режиму коліщатка",

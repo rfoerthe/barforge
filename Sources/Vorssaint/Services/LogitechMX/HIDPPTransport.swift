@@ -17,7 +17,7 @@ final class HIDPPTransport {
     final class Device {
         let hid: IOHIDDevice
         let productID: Int
-        let usagePage: Int
+        let interface: HIDPP.Interface
         let product: String
         fileprivate let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 64)
         fileprivate(set) var isRemoved = false
@@ -26,14 +26,21 @@ final class HIDPPTransport {
         fileprivate init(hid: IOHIDDevice) {
             self.hid = hid
             productID = IOHIDDeviceGetProperty(hid, kIOHIDProductIDKey as CFString) as? Int ?? 0
-            usagePage = IOHIDDeviceGetProperty(hid, kIOHIDPrimaryUsagePageKey as CFString) as? Int ?? 0
             product = IOHIDDeviceGetProperty(hid, kIOHIDProductKey as CFString) as? String ?? ""
+            let pairs = (IOHIDDeviceGetProperty(hid, kIOHIDDeviceUsagePairsKey as CFString) as? [[String: Any]] ?? [])
+                .compactMap { pair -> (page: Int, usage: Int)? in
+                    guard let page = pair[kIOHIDDeviceUsagePageKey] as? Int,
+                          let usage = pair[kIOHIDDeviceUsageKey] as? Int else { return nil }
+                    return (page, usage)
+                }
+            // Matching already required one of the two collections.
+            interface = HIDPP.interface(usagePairs: pairs) ?? .direct
         }
 
         deinit { buffer.deallocate() }
 
         /// A receiver numbers its mice 1…6; a Bluetooth mouse is index 0xFF.
-        var isReceiver: Bool { usagePage == HIDPP.receiverUsagePage }
+        var isReceiver: Bool { interface == .receiver }
 
         var candidateIndices: [UInt8] {
             isReceiver ? HIDPP.receiverDeviceIndices : [HIDPP.directDeviceIndex]
@@ -178,8 +185,13 @@ final class HIDPPTransport {
 
     private func openManager() {
         let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        let matching: [[String: Any]] = [HIDPP.receiverUsagePage, HIDPP.bluetoothUsagePage].map {
-            [kIOHIDVendorIDKey: HIDPP.logitechVendorID, kIOHIDPrimaryUsagePageKey: $0]
+        // Matched on any usage pair, not the primary usage: a Bluetooth MX
+        // Master is one device whose primary usage is its keyboard collection.
+        let matching: [[String: Any]] = [
+            (HIDPP.receiverUsagePage, HIDPP.receiverUsage),
+            (HIDPP.bluetoothUsagePage, HIDPP.bluetoothUsage),
+        ].map {
+            [kIOHIDVendorIDKey: HIDPP.logitechVendorID, kIOHIDDeviceUsagePageKey: $0.0, kIOHIDDeviceUsageKey: $0.1]
         }
         IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
         let context = Unmanaged.passUnretained(self).toOpaque()
@@ -201,6 +213,7 @@ final class HIDPPTransport {
         for device in devices {
             device.isRemoved = true
             IOHIDDeviceRegisterInputReportCallback(device.hid, device.buffer, 64, nil, nil)
+            IOHIDDeviceClose(device.hid, IOOptionBits(kIOHIDOptionsTypeNone))
         }
         devices.removeAll()
         IOHIDManagerUnscheduleFromRunLoop(manager, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue)
@@ -210,6 +223,9 @@ final class HIDPPTransport {
 
     private func deviceMatched(_ hid: IOHIDDevice) {
         guard !devices.contains(where: { $0.hid == hid }) else { return }
+        // Opened outright: the manager's own open did not reach a mouse
+        // paired over Bluetooth, and every output report to it then failed.
+        guard IOHIDDeviceOpen(hid, IOOptionBits(kIOHIDOptionsTypeNone)) == kIOReturnSuccess else { return }
         let device = Device(hid: hid)
         device.transport = self
         devices.append(device)

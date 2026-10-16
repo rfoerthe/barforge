@@ -27,6 +27,7 @@ struct LogitechMXDeviceSnapshot: Identifiable, Equatable {
     var dpi: Int?
     var haptic: HIDPP.HapticState?
     var panelForceValue: Int?
+    var battery: HIDPP.BatteryState?
 }
 
 /// Talks HID++ to MX Master 3, 3S and 4 mice on a receiver or Bluetooth,
@@ -73,6 +74,8 @@ final class LogitechMXService: ObservableObject {
         var haptic: HIDPP.HapticState?
         var panelForce: HIDPP.ForceButtonInfo?
         var panelForceValue: Int?
+        var batteryReportsPercent = false
+        var battery: HIDPP.BatteryState?
         var pressed: Set<UInt16> = []
         var gestures: [UInt16: LogitechMXGestureTracker] = [:]
         var heldMouseButtons: [UInt16: Int] = [:]
@@ -288,7 +291,21 @@ final class LogitechMXService: ObservableObject {
            case let .success(reply) = request(session, force, 1, [0]) {
             session.panelForce = HIDPP.forceButtonInfo(reply)
         }
+        if let battery = session.featureIndex(.unifiedBattery), case let .success(reply) = request(session, battery, 0) {
+            session.batteryReportsPercent = HIDPP.unifiedBatteryReportsPercent(reply)
+        }
+        readBattery(session)
         readState(session)
+    }
+
+    /// The mouse broadcasts every change afterwards; this is the first look.
+    private func readBattery(_ session: Session) {
+        if let battery = session.featureIndex(.unifiedBattery), case let .success(reply) = request(session, battery, 1) {
+            session.battery = HIDPP.unifiedBattery(reply, reportsPercent: session.batteryReportsPercent)
+        } else if let battery = session.featureIndex(.batteryStatus),
+                  case let .success(reply) = request(session, battery, 0) {
+            session.battery = HIDPP.batteryStatus(reply)
+        }
     }
 
     private func readState(_ session: Session) {
@@ -447,6 +464,16 @@ final class LogitechMXService: ObservableObject {
             if event == 0, let rotation = HIDPP.thumbWheelRotation(payload) {
                 thumbWheelTurned(session, rotation: rotation, at: now)
             }
+        case session.featureIndex(.unifiedBattery):
+            if event == 0, let state = HIDPP.unifiedBattery(payload, reportsPercent: session.batteryReportsPercent) {
+                session.battery = state
+                publish()
+            }
+        case session.featureIndex(.batteryStatus):
+            if event == 0, let state = HIDPP.batteryStatus(payload) {
+                session.battery = state
+                publish()
+            }
         case session.featureIndex(.hiResWheel):
             if event == 1, let state = payload.first {
                 session.smartShift?.mode = state == 1 ? .ratchet : .freeSpin
@@ -459,6 +486,7 @@ final class LogitechMXService: ObservableObject {
                     guard let self, !session.device.isRemoved,
                           self.sessions.contains(where: { $0 === session }) else { return }
                     self.apply(session)
+                    self.readBattery(session)
                     self.publish()
                 }
             }
@@ -602,7 +630,7 @@ final class LogitechMXService: ObservableObject {
                 panelForce: session.panelForce?.changeable == true ? session.panelForce : nil,
                 wheelMode: session.smartShift?.mode, smartShiftThreshold: session.smartShift?.threshold,
                 scrollForce: session.smartShift?.torque, dpi: session.dpi, haptic: session.haptic,
-                panelForceValue: session.panelForceValue)
+                panelForceValue: session.panelForceValue, battery: session.battery)
         }
         DispatchQueue.main.async { [weak self] in
             guard let self, self.isRunning else { return }

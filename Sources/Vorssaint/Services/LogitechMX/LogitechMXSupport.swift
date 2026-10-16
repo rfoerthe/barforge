@@ -15,6 +15,11 @@ enum LogitechMXModel: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    /// The MX Master 3 and 3S carry control 0x00C3 as a button under the
+    /// thumb. The MX Master 4 moved it forward as its gesture button and put
+    /// the haptic sense panel where the thumb rests.
+    var hasThumbButton: Bool { self != .mxMaster4 }
+
     var displayName: String {
         switch self {
         case .mxMaster3: return "MX Master 3"
@@ -59,6 +64,11 @@ enum LogitechMXControl: UInt16, CaseIterable, Identifiable {
     case hapticPanel = 0x01A0
 
     var id: UInt16 { rawValue }
+
+    /// The same control sits in a different place on the MX Master 4.
+    func symbolName(on model: LogitechMXModel) -> String {
+        self == .gestureButton && model.hasThumbButton ? "hand.thumbsup" : symbolName
+    }
 
     var symbolName: String {
         switch self {
