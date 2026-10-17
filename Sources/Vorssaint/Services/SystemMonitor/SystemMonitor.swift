@@ -584,11 +584,14 @@ final class SystemMonitor: ObservableObject {
             (panelNeedsPower && defaults.bool(forKey: DefaultsKey.monitorPwrTemperature))
                 || menuPanelNeeds.batteryTemperature
                 || defaults.bool(forKey: DefaultsKey.menuBarBatteryTemperature) || alertBatteryTemperature)
-        if defaults.bool(forKey: AppFeature.fanControl.availabilityKey),
-           Self.fanTelemetryAvailable {
-            plan.needFanSpeed = fullMonitorVisible || menuPanelNeeds.fanSpeed
-                || defaults.bool(forKey: DefaultsKey.menuBarFanSpeed)
-        }
+        // The System card lists fan speeds read-only, so it reads them even
+        // with Fan Control uninstalled.
+        let systemCardFans = menuPanelNeeds.system
+            && defaults.bool(forKey: DefaultsKey.monitorSysFans)
+        let fanControlFans = defaults.bool(forKey: AppFeature.fanControl.availabilityKey)
+            && (fullMonitorVisible || menuPanelNeeds.fanSpeed
+                || defaults.bool(forKey: DefaultsKey.menuBarFanSpeed))
+        plan.needFanSpeed = (systemCardFans || fanControlFans) && Self.fanTelemetryAvailable
         // The island preview in Settings shows the device card too; the
         // panel's System card reads USB only for its device row's count.
         plan.needConnectedDevices = fullMonitorVisible
@@ -619,7 +622,6 @@ final class SystemMonitor: ObservableObject {
             plan.needPeripheralBattery = false
             plan.needBatteryTemperature = false
         }
-        if !available(.fanControl) { plan.needFanSpeed = false }
         if !available(.connectedDevices) { plan.needConnectedDevices = false }
         return plan
     }

@@ -25,6 +25,7 @@ struct MonitorPanelConfig: View {
     @AppStorage(DefaultsKey.monitorSysMemory) private var sysMemory = true
     @AppStorage(DefaultsKey.monitorSysUptime) private var sysUptime = true
     @AppStorage(DefaultsKey.monitorSysConnectedDevices) private var sysConnectedDevices = true
+    @AppStorage(DefaultsKey.monitorSysFans) private var sysFans = true
 
     @AppStorage(DefaultsKey.monitorShowNetwork) private var showNetwork = true
     @AppStorage(DefaultsKey.monitorNetSpeed) private var netSpeed = true
@@ -140,6 +141,10 @@ struct MonitorPanelConfig: View {
                 itemTile(l10n.s.memorySection, symbol: MenuBarMetric.memory.symbolName, value: $sysMemory, available: available,
                          options: AnyView(chartOption($graphMemory)), summary: chartSummary(graphMemory))
             }
+            if SystemMonitor.fanTelemetryAvailable {
+                itemTile(FeatureStrings.fanControl(l10n.language).menuBarTitle, symbol: "fanblades",
+                         value: $sysFans, available: available)
+            }
             itemTile(l10n.s.monitorItemUptime, symbol: "clock", value: $sysUptime, available: available)
             if AppFeature.connectedDevices.isAvailable {
                 itemTile(FeatureStrings.connectedDevices(l10n.language).title, symbol: "cable.connector",
@@ -217,6 +222,9 @@ struct MonitorPanelConfig: View {
                 }
                 if AppFeature.monitorMemory.isAvailable {
                     Toggle(l10n.s.memorySection, isOn: $sysMemory)
+                }
+                if SystemMonitor.fanTelemetryAvailable {
+                    Toggle(FeatureStrings.fanControl(l10n.language).menuBarTitle, isOn: $sysFans)
                 }
                 Toggle(l10n.s.monitorItemUptime, isOn: $sysUptime)
                 if AppFeature.connectedDevices.isAvailable {

@@ -410,6 +410,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/WhatsAppOrganizerStrings.swift
         Sources/Vorssaint/Core/ReleaseNotes.swift
         Sources/Vorssaint/Core/ReleaseDigest.swift
+        Sources/Vorssaint/Core/ForkChangelog.swift
         Sources/Vorssaint/Core/ReleaseChangeAliases.swift
         Sources/Vorssaint/Core/WhatsNewStrings.swift
         Sources/Vorssaint/Core/URLCleaning.swift
@@ -683,6 +684,9 @@ cp Resources/com.vorssaint.utils.fan-control.plist \
     "$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
 cp Resources/Info.plist "$STAGE/Contents/Info.plist"
 cp CHANGELOG.md "$STAGE/Contents/Resources/CHANGELOG.md"
+if [[ -f CHANGELOG-FORK.md ]]; then
+    cp CHANGELOG-FORK.md "$STAGE/Contents/Resources/CHANGELOG-FORK.md"
+fi
 for lproj in Resources/*.lproj(N); do
     cp -R "$lproj" "$STAGE/Contents/Resources/"
 done
