@@ -47,6 +47,7 @@ struct SystemSection: View {
     @AppStorage(DefaultsKey.monitorSysAlerts) private var sysAlerts = true
     @AppStorage(DefaultsKey.monitorSysUptime) private var sysUptime = true
     @AppStorage(DefaultsKey.monitorSysConnectedDevices) private var sysConnectedDevices = true
+    @AppStorage(DefaultsKey.monitorSysFans) private var sysFans = true
     @AppStorage(DefaultsKey.panelSystemOrder) private var systemOrderRaw = ""
     @State private var draggingBlock: Block?
 
@@ -91,7 +92,7 @@ struct SystemSection: View {
 
     /// Card subsections, in order, filtered by the per-item toggles (and whether a
     /// battery exists). Drives divider interleaving so only rendered blocks get one.
-    private enum Block: String, PanelOrderItem { case temps, usage, memory, alerts, uptime, connectedDevices }
+    private enum Block: String, PanelOrderItem { case temps, fans, usage, memory, alerts, uptime, connectedDevices }
 
     // Hub availability per metric family: an unavailable metric leaves the
     // card entirely, including the edit-mode hidden rows.
@@ -116,6 +117,7 @@ struct SystemSection: View {
         case .temps, .usage: return cpuAvailable || gpuAvailable
         case .memory: return memoryAvailable
         case .connectedDevices: return AppFeature.connectedDevices.isAvailable
+        case .fans: return SystemMonitor.fanTelemetryAvailable
         case .alerts, .uptime: return true
         }
     }
@@ -143,6 +145,7 @@ struct SystemSection: View {
         case .alerts: return sysAlerts
         case .uptime: return sysUptime
         case .connectedDevices: return sysConnectedDevices
+        case .fans: return sysFans
         }
     }
 
@@ -157,6 +160,7 @@ struct SystemSection: View {
         sysAlerts = true
         sysUptime = true
         sysConnectedDevices = true
+        sysFans = true
     }
 
     @ViewBuilder
@@ -168,6 +172,7 @@ struct SystemSection: View {
         case .alerts: alertRows(editing: editing)
         case .uptime: uptimeRow(editing: editing)
         case .connectedDevices: connectedDevicesRow(editing: editing)
+        case .fans: fanGrid(editing: editing)
         }
     }
 
@@ -347,6 +352,63 @@ struct SystemSection: View {
             Text(value.map { MetricFormat.temperature($0, unit: displayTemperatureUnit) } ?? "-")
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .monospacedDigit()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.primary.opacity(0.045))
+        )
+    }
+
+    // MARK: Fans
+
+    /// Live speeds only: setting them stays with Fan Control. One cell per
+    /// fan the SMC reports, so the card keeps its height before the first read.
+    @ViewBuilder
+    private func fanGrid(editing: Bool) -> some View {
+        let strings = FeatureStrings.fanControl(l10n.language)
+        if !sysFans {
+            PanelHiddenItemRow(title: strings.menuBarTitle,
+                               systemImage: "fanblades",
+                               isVisible: $sysFans)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    subsectionLabel(strings.menuBarTitle)
+                    Spacer(minLength: 0)
+                    if editing {
+                        PanelInlineHideButton(isVisible: $sysFans)
+                    }
+                }
+                HStack(spacing: 8) {
+                    let speeds = monitor.snapshot.fanSpeeds
+                    ForEach(0..<max(SystemMonitor.fanTelemetryCount, speeds.count), id: \.self) { index in
+                        fanCell(label: String(format: strings.fanNameFormat, index + 1),
+                                value: speeds.indices.contains(index)
+                                    ? String(format: strings.rpmFormat, Int(speeds[index].rounded()))
+                                    : "-")
+                    }
+                }
+            }
+        }
+    }
+
+    private func fanCell(label: String, value: String) -> some View {
+        VStack(spacing: 3) {
+            HStack(spacing: 4) {
+                Image(systemName: "fanblades")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.secondary)
+                Text(label)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+            }
+            Text(value)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 6)

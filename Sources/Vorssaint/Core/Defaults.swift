@@ -455,6 +455,7 @@ enum DefaultsKey {
     static let monitorSysMemory = "monitorSysMemory"
     static let monitorSysAlerts = "monitorSysAlerts"
     static let monitorSysUptime = "monitorSysUptime"
+    static let monitorSysFans = "monitorSysFans"
     static let monitorSysConnectedDevices = "monitorSysConnectedDevices"
     static let monitorNetSpeed = "monitorNetSpeed"
     static let monitorNetApps = "monitorNetApps"
@@ -1683,6 +1684,7 @@ enum Defaults {
         DefaultsKey.monitorSysMemory: true,
         DefaultsKey.monitorSysAlerts: true,
         DefaultsKey.monitorSysUptime: true,
+        DefaultsKey.monitorSysFans: true,
         DefaultsKey.monitorSysConnectedDevices: true,
         DefaultsKey.monitorNetSpeed: true,
         DefaultsKey.monitorNetApps: true,
