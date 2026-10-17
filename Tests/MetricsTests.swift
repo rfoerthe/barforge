@@ -125,6 +125,7 @@ struct MetricsTests {
             }),
             ("utilities", {
                 UtilitiesFeatureTests.run(suite)
+                TextSnippetExpansionTests.run(suite)
                 QuickTogglesAlertTests.run(suite)
                 PortManagerRefreshTests.run(suite)
             }),
