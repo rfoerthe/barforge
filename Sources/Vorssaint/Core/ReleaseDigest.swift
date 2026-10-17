@@ -77,9 +77,9 @@ struct ReleaseDigest {
     /// reads only stable sections, and a beta update skips a stable section
     /// whose betas it already reads here or read before.
     static func versions(from previous: String, to current: String, among listed: [String]) -> [String] {
-        typealias Version = UpdateServiceSupport.SemanticVersion
+        typealias Version = ReleaseOrder
         guard let from = Version(raw: previous), let to = Version(raw: current), to > from else { return [] }
-        func core(_ version: Version) -> [Int] { [version.major, version.minor, version.patch] }
+        func core(_ order: Version) -> [Int] { [order.version.major, order.version.minor, order.version.patch] }
         var seen: Set<String> = []
         let inRange = listed.compactMap { raw -> (raw: String, version: Version)? in
             guard let version = Version(raw: raw), from < version, version <= to,
@@ -87,13 +87,15 @@ struct ReleaseDigest {
             return (raw, version)
         }
         let picked = inRange.filter { entry in
-            guard entry.version.isPrerelease else {
-                if !to.isPrerelease { return true }
-                let readBefore = from.isPrerelease && core(from) == core(entry.version)
-                let readHere = inRange.contains { $0.version.isPrerelease && core($0.version) == core(entry.version) }
+            guard entry.version.version.isPrerelease else {
+                if !to.version.isPrerelease { return true }
+                let readBefore = from.version.isPrerelease && core(from) == core(entry.version)
+                let readHere = inRange.contains {
+                    $0.version.version.isPrerelease && core($0.version) == core(entry.version)
+                }
                 return !readBefore && !readHere
             }
-            return to.isPrerelease
+            return to.version.isPrerelease
         }
         return picked.sorted { $0.version > $1.version }.prefix(maximumVersions).map(\.raw)
     }
@@ -170,7 +172,7 @@ enum WhatsNewInfo {
     /// restored backup's older version cannot replay what was already seen.
     static func pendingVersion(current: String, previous: String?,
                                seen: String?, pending: String?) -> String? {
-        typealias Version = UpdateServiceSupport.SemanticVersion
+        typealias Version = ReleaseOrder
         guard let now = Version(raw: current) else { return nil }
         if let pending, let start = Version(raw: pending) {
             return now > start ? pending : nil
@@ -186,7 +188,7 @@ enum WhatsNewInfo {
     /// The later of a stored version and the running one; one that cannot
     /// be read loses.
     static func later(_ stored: String?, _ current: String) -> String {
-        typealias Version = UpdateServiceSupport.SemanticVersion
+        typealias Version = ReleaseOrder
         guard let stored, let old = Version(raw: stored) else { return current }
         guard let new = Version(raw: current) else { return stored }
         return old > new ? stored : current
