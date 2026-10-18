@@ -43,7 +43,7 @@ enum SpeedTestDirection: Equatable {
 /// Latency is the median TCP handshake time; throughput runs several parallel
 /// connections so one TCP stream's window never caps a fast line. Each value
 /// is published four times a second while it is measured, and a throughput
-/// result is the mean of all those readings. No user data ever leaves the
+/// result is the mean of those readings once the connections have ramped up. No user data ever leaves the
 /// machine (the upload body is zeros).
 ///
 /// Transports are tried in order: when a run fails on one (unreachable, a
@@ -75,6 +75,9 @@ final class SpeedTest: ObservableObject {
         var streams = 8
         /// A transfer that has moved no byte by then has failed.
         var stallTimeout: TimeInterval = 2
+        /// TCP slow start and TLS set-up: readings this early are shown but
+        /// left out of the result.
+        var rampUp: TimeInterval = 2.5
         /// Each of download and upload.
         var duration: TimeInterval = 10
     }
@@ -115,7 +118,7 @@ final class SpeedTest: ObservableObject {
     private var nextStreamID = 0
     private var bytes: Int64 = 0
     private var marks: [SpeedTestMath.Mark] = []
-    private var readings: [Double] = []
+    private var readings: [SpeedTestMath.Reading] = []
 
     init(transports: [SpeedTestTransport] = [HTTPSpeedTestTransport.apple(), HTTPSpeedTestTransport.cloudflare()],
          configuration: Configuration = Configuration(),
@@ -214,7 +217,7 @@ final class SpeedTest: ObservableObject {
         case .download, .upload:
             marks.append(.init(time: elapsed, bytes: bytes))
             if let live = SpeedTestMath.recentMbps(marks, window: 1) {
-                readings.append(live)
+                readings.append(.init(time: elapsed, mbps: live))
                 publishRate(live)
             }
             // Half a tick of slack, so rounding never adds a tick past the end.
@@ -352,7 +355,7 @@ final class SpeedTest: ObservableObject {
         let finished = current
         cancelTick?(); cancelTick = nil
         closeStreams()
-        publishRate(SpeedTestMath.mean(readings))
+        publishRate(SpeedTestMath.resultMbps(readings, rampUp: config.rampUp, tick: config.tick))
         if finished == .download {
             beginTransfer(.upload)
         } else {
@@ -423,9 +426,22 @@ enum SpeedTestMath {
         return mbps(bytes: last.bytes - from.bytes, seconds: last.time - from.time)
     }
 
-    /// The throughput result: the mean of every live reading shown.
+    struct Reading: Equatable {
+        let time: TimeInterval
+        let mbps: Double
+    }
+
     static func mean(_ values: [Double]) -> Double? {
         values.isEmpty ? nil : values.reduce(0, +) / Double(values.count)
+    }
+
+    /// The throughput result: the mean of the readings taken after the
+    /// ramp-up. Half a tick of slack keeps the reading due exactly at the end
+    /// of the ramp-up out despite rounding. A transfer cut short inside the
+    /// ramp-up falls back to every reading it has.
+    static func resultMbps(_ readings: [Reading], rampUp: TimeInterval, tick: TimeInterval) -> Double? {
+        let settled = readings.filter { $0.time > rampUp + tick / 2 }.map(\.mbps)
+        return mean(settled.isEmpty ? readings.map(\.mbps) : settled)
     }
 }
 
