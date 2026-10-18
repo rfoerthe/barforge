@@ -35,6 +35,14 @@ enum SpeedTestTests {
         }
         suite.expect(SpeedTestMath.mean([]) == nil && SpeedTestMath.mean([900, 1000, 1100, 1200]) == 1050,
                      "speed test throughput is the mean of its readings")
+        let readings = (1...12).map { SpeedTestMath.Reading(time: Double($0) * 0.25, mbps: $0 <= 10 ? 100 : 1000) }
+        suite.expect(SpeedTestMath.resultMbps(readings, rampUp: 2.5, tick: 0.25) == 1000
+                      && SpeedTestMath.resultMbps([.init(time: 2.4999999, mbps: 5), .init(time: 2.75, mbps: 7)],
+                                                  rampUp: 2.5, tick: 0.25) == 7,
+                     "speed test leaves readings up to 2.5 s out of the result")
+        suite.expect(SpeedTestMath.resultMbps(Array(readings.prefix(4)), rampUp: 2.5, tick: 0.25) == 100
+                      && SpeedTestMath.resultMbps([], rampUp: 2.5, tick: 0.25) == nil,
+                     "speed test falls back to every reading when cut short inside the ramp-up")
         suite.expect(SpeedTestMath.recentMbps(Array(marks.prefix(4)), window: 1) == 8,
                      "speed test live rate covers the last second")
         suite.expect(SpeedTestScale.fraction(0, upTo: 2500) == 0
@@ -132,13 +140,14 @@ enum SpeedTestTests {
                      "speed test measures latency, download and upload one after the other")
         suite.expect(test.latencyMs == 6, "speed test reports the median handshake without the DNS lookup")
         suite.expect(test.serverName == "A", "speed test names the server that measured")
-        // One ramping second at a quarter of the rate, then steady: the 40
-        // one-second readings are 200 ×4, 350, 500, 650, then 800 (or half of
-        // each for the upload), so the mean includes the ramp.
-        suite.expect(abs((test.downloadMbps ?? 0) - 717.5) < 0.01 && abs((test.uploadMbps ?? 0) - 358.75) < 0.01,
-                     "speed test reports the mean of every reading across all streams")
-        suite.expect(downloads.count >= 2 && abs(downloads.last! - downloads.dropLast().reduce(0, +) / Double(downloads.count - 1)) < 0.01,
-                     "speed test's final value is the mean of the readings it showed")
+        // One ramping second at a quarter of the rate, then steady: the
+        // readings show 200 ×4, 350, 500, 650, then 800 (or half of each for
+        // the upload); the ramp-up's first 2.5 s stay out of the result.
+        suite.expect(abs((test.downloadMbps ?? 0) - 800) < 0.01 && abs((test.uploadMbps ?? 0) - 400) < 0.01,
+                     "speed test reports the mean reading across all streams after the ramp-up")
+        suite.expect(downloads.count == 41 && downloads.prefix(4).allSatisfy { $0 < 201 }
+                      && abs(downloads.last! - downloads.dropLast().suffix(30).reduce(0, +) / 30) < 0.01,
+                     "speed test shows every reading but averages only the 30 after the ramp-up")
         suite.expect(harness.transport.opened(.download) == 8 && harness.transport.opened(.upload) == 8,
                      "speed test runs parallel streams in each direction")
         suite.expect(harness.transport.allClosed, "speed test closes every connection when it ends")
