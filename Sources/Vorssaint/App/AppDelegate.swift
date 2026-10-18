@@ -1551,9 +1551,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(shelfItem)
         }
 
-        let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
-        updatesItem.target = self
-        menu.addItem(updatesItem)
+        // A fork build has nothing to update from; see AppInfo.receivesUpdates.
+        if AppInfo.receivesUpdates {
+            let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
+            updatesItem.target = self
+            menu.addItem(updatesItem)
+        }
 
         menu.addItem(.separator())
 

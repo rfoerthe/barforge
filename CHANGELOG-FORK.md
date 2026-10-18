@@ -13,6 +13,9 @@ Fork builds carry the upstream version plus build metadata, such as `3.4.1+mx.1`
 ### Added
 - The System card lists each fan and its current speed, read-only, without the Fan Control extension. Settings → Monitor → System → Fan speed.
 
+### Fixed
+- The menu bar icon's right-click menu no longer offers Check for updates…, since a fork build does not update itself.
+
 ## [3.4.1+mx.1]
 
 ### Added
