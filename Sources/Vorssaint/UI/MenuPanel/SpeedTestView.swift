@@ -5,7 +5,7 @@ import SwiftUI
 
 /// The on-demand speed test: a start button, then one bar each for latency,
 /// download and upload, filled in order as they are measured and updated
-/// twice a second while they run. Shared by the Network card and the network
+/// four times a second while they run. Shared by the Network card and the network
 /// detail page.
 struct SpeedTestView<Trailing: View>: View {
     @ObservedObject private var speed = SpeedTest.shared
@@ -137,7 +137,7 @@ private struct SpeedTestBar: View {
                         Capsule()
                             .fill(color.opacity(isActive ? 0.75 : 1))
                             .frame(width: max(4, proxy.size.width * fraction))
-                            .animation(.easeOut(duration: 0.45), value: fraction)
+                            .animation(.linear(duration: 0.25), value: fraction)
                     }
                 }
             }
@@ -147,7 +147,7 @@ private struct SpeedTestBar: View {
                 .monospacedDigit()
                 .foregroundStyle(value == nil ? .tertiary : .primary)
                 .contentTransition(.numericText())
-                .animation(.easeOut(duration: 0.2), value: value)
+                .animation(.easeOut(duration: 0.15), value: value)
                 .lineLimit(1)
                 .frame(width: 78, alignment: .trailing)
         }
