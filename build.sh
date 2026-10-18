@@ -546,6 +546,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/Metrics/NetworkSampler.swift
         Sources/Vorssaint/Services/Metrics/NetworkAddressService.swift
         Sources/Vorssaint/Services/Metrics/SpeedTest.swift
+        Sources/Vorssaint/Services/Metrics/SpeedTestTransport.swift
         Sources/Vorssaint/Services/Metrics/PeripheralBatterySampler.swift
         Sources/Vorssaint/Services/Metrics/PeripheralBatterySupport.swift
         Sources/Vorssaint/Services/Metrics/DiskSupport.swift
