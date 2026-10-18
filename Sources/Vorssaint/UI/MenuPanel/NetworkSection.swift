@@ -25,6 +25,9 @@ struct NetworkSection: View {
     @State private var lastAppRefresh = Date.distantPast
     @State private var appRefreshSerial = 0
     @State private var networkMonitoringActive = false
+    /// The apps list starts folded each time the panel opens. Per-app
+    /// traffic is only measured while it is open.
+    @State private var appsExpanded = false
     private let appLimit = 6
 
     var body: some View {
@@ -51,7 +54,7 @@ struct NetworkSection: View {
             .panelCard()
         }
         .onAppear {
-            if netApps {
+            if appsActive {
                 startNetworkMonitoringIfNeeded()
             }
             refreshAppRows(force: true, delay: 0.2)
@@ -59,23 +62,26 @@ struct NetworkSection: View {
         .onReceive(monitor.$snapshot) { _ in
             refreshAppRows(force: false, delay: 0.2)
         }
-        .onChange(of: netApps) { _, visible in
-            if visible {
+        .onChange(of: appsActive) { _, active in
+            if active {
                 startNetworkMonitoringIfNeeded()
                 refreshAppRows(force: true, delay: 0.2)
             } else {
-                appRefreshSerial &+= 1
-                appRows = []
-                appRowsLoading = false
-                stopNetworkMonitoringIfNeeded()
+                stopAppRows()
             }
         }
         .onDisappear {
-            appRefreshSerial &+= 1
-            appRows = []
-            appRowsLoading = false
-            stopNetworkMonitoringIfNeeded()
+            stopAppRows()
         }
+    }
+
+    private var appsActive: Bool { netApps && appsExpanded }
+
+    private func stopAppRows() {
+        appRefreshSerial &+= 1
+        appRows = []
+        appRowsLoading = false
+        stopNetworkMonitoringIfNeeded()
     }
 
     private enum Block: String, PanelOrderItem { case speed, apps, totals, addresses, test }
@@ -141,19 +147,31 @@ struct NetworkSection: View {
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(l10n.s.networkApps)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.tertiary)
-                    Spacer(minLength: 0)
+                    Button {
+                        appsExpanded.toggle()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 8, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                                .rotationEffect(.degrees(appsExpanded ? 90 : 0))
+                            Text(l10n.s.networkApps)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.tertiary)
+                            Spacer(minLength: 0)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                     if editing {
                         PanelInlineHideButton(isVisible: $netApps)
                     }
                 }
-                if appRows.isEmpty {
+                if appsExpanded, appRows.isEmpty {
                     Text(appRowsLoading ? l10n.s.breakdownMeasuring : l10n.s.networkAppsIdle)
                         .font(.system(size: 10.5))
                         .foregroundStyle(.tertiary)
-                } else {
+                } else if appsExpanded {
                     ForEach(appRows) { row in
                         ProcessUsageRow(row: row,
                                         value: networkValue(row),
@@ -315,7 +333,7 @@ struct NetworkSection: View {
     }
 
     private func refreshAppRows(force: Bool, delay: TimeInterval = 0) {
-        guard netApps else { return }
+        guard appsActive else { return }
         if force {
             if let cached = ProcessUsageService.shared.cachedTop(.network, limit: appLimit) {
                 appRows = cached
@@ -331,13 +349,13 @@ struct NetworkSection: View {
         appRefreshSerial &+= 1
         let serial = appRefreshSerial
         let run = {
-            guard self.appRefreshSerial == serial, self.netApps else { return }
+            guard self.appRefreshSerial == serial, self.appsActive else { return }
             self.appRowsLoading = self.appRows.isEmpty
             DispatchQueue.global(qos: .utility).async {
                 let rows = ProcessUsageService.shared.top(.network, limit: appLimit)
                 let isWarmingUp = ProcessUsageService.shared.networkMonitoringIsWarmingUp
                 DispatchQueue.main.async {
-                    guard self.appRefreshSerial == serial, self.netApps else { return }
+                    guard self.appRefreshSerial == serial, self.appsActive else { return }
                     self.appRowsLoading = rows.isEmpty && isWarmingUp
                     if !rows.isEmpty || self.appRows.isEmpty {
                         self.appRows = rows
