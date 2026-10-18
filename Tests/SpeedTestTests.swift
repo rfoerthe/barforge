@@ -1,87 +1,286 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
 
+import Combine
 import Foundation
 
 enum SpeedTestTests {
     static func run(_ suite: TestSuite) {
-        let cases: [(name: String, requests: [String])] = [
-            ("latency-500", ["latency"]),
-            ("latency-non-http", ["latency"]),
-            ("download-404", Array(repeating: "latency", count: 5) + ["download"]),
-            ("download-after-data-503", Array(repeating: "latency", count: 5) + ["download", "download"]),
-            ("upload-503", Array(repeating: "latency", count: 5) + ["download", "upload"]),
-            ("success-204", Array(repeating: "latency", count: 5) + ["download", "upload"]),
-        ]
-        for testCase in cases {
-            let clock = SpeedTestClock()
-            let scheduler = SpeedTestTimeBoxScheduler(clock: clock)
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.protocolClasses = [SpeedTestProtocol.self]
-            configuration.httpAdditionalHeaders = ["X-Test-Scenario": testCase.name]
-            let test = SpeedTest(configuration: configuration, sampleSeconds: 0.1,
-                                 clock: clock.now, scheduleTimeBox: scheduler.schedule)
-            test.start()
-            let deadline = Date().addingTimeInterval(3)
-            var completed = false
-            var firedDownloadTimeBox = false
-            repeat {
-                RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.01))
-                if !firedDownloadTimeBox,
-                   testCase.name == "upload-503" || testCase.name == "success-204",
-                   SpeedTestProtocol.deliveredDownloadData(for: testCase.name) {
-                    firedDownloadTimeBox = scheduler.runNext()
-                }
-                switch test.phase {
-                case .failed, .done: completed = true
-                default: break
-                }
-            } while !completed && Date() < deadline
-            suite.expect(completed, "speed test \(testCase.name) reaches a terminal state")
+        mathChecks(suite)
+        parserChecks(suite)
+        configurationChecks(suite)
+        successChecks(suite)
+        unstableChecks(suite)
+        latencyFailureChecks(suite)
+        rateLimitChecks(suite)
+        stallChecks(suite)
+        cancelChecks(suite)
+        fallbackChecks(suite)
+    }
 
-            let succeeded = testCase.name == "success-204"
-            if succeeded {
-                suite.expect(test.phase == .done && test.latencyMs != nil
-                        && (test.downloadMbps ?? 0) > 0 && test.uploadMbps != nil,
-                       "successful HTTP responses complete every speed test phase")
-            } else {
-                if case .failed = test.phase {
-                    suite.expect(true, "speed test \(testCase.name) reports a failure")
-                } else {
-                    suite.expect(false, "speed test \(testCase.name) reports a failure")
-                }
-                suite.expect(test.uploadMbps == nil,
-                       "speed test \(testCase.name) never publishes an upload result after rejection")
-                if testCase.name != "upload-503" {
-                    suite.expect(test.downloadMbps == nil,
-                           "speed test \(testCase.name) never counts an error body as download traffic")
-                }
-                if testCase.name.hasPrefix("latency-") {
-                    suite.expect(test.latencyMs == nil,
-                           "speed test \(testCase.name) never measures an invalid latency response")
-                }
-            }
+    // MARK: - Pure arithmetic
 
-            let phase = test.phase
-            let latencyMs = test.latencyMs
-            let downloadMbps = test.downloadMbps
-            let uploadMbps = test.uploadMbps
-            if testCase.name.hasPrefix("latency-") {
-                suite.expect(scheduler.count == 0,
-                       "speed test \(testCase.name) fails before scheduling a transfer time box")
-            } else {
-                suite.expect(scheduler.count > 0 && scheduler.allCancelled,
-                       "speed test \(testCase.name) cancels every scheduled transfer time box")
-            }
-            let callbacksCompleted = scheduler.runEveryCallback()
-            drainMainQueue()
-            suite.expect(callbacksCompleted && test.phase == phase && test.latencyMs == latencyMs
-                          && test.downloadMbps == downloadMbps && test.uploadMbps == uploadMbps,
-                   "speed test \(testCase.name) stays terminal after stale time-box callbacks")
-            suite.expect(SpeedTestProtocol.requests(for: testCase.name) == testCase.requests,
-                   "speed test \(testCase.name) stops requesting data at the failed phase")
-            test.cancel()
+    private static func mathChecks(_ suite: TestSuite) {
+        suite.expect(SpeedTestMath.median([]) == nil
+                      && SpeedTestMath.median([9, 5, 7]) == 7
+                      && SpeedTestMath.median([8, 4, 6, 5]) == 5.5,
+                     "speed test latency is the median of its samples")
+
+        // 1 MB/s for two seconds of warm-up, then 100 MB/s.
+        var marks: [SpeedTestMath.Mark] = [.init(time: 0, bytes: 0)]
+        for step in 1...16 {
+            let time = Double(step) / 2
+            let bytes = time <= 2 ? Int64(time * 1_000_000)
+                                  : 2_000_000 + Int64((time - 2) * 100_000_000)
+            marks.append(.init(time: time, bytes: bytes))
         }
+        suite.expect(SpeedTestMath.steadyMbps(marks, warmUp: 2) == 800,
+                     "speed test throughput leaves the slow-start warm-up out")
+        suite.expect(SpeedTestMath.recentMbps(Array(marks.prefix(4)), window: 1) == 8,
+                     "speed test live rate covers the last second")
+        suite.expect(SpeedTestMath.steadyMbps(Array(marks.prefix(4)), warmUp: 2) == 8,
+                     "speed test throughput falls back to the whole span when it ends inside the warm-up")
+        suite.expect(SpeedTestMath.isStable(marks, warmUp: 2, seconds: 3, tolerance: 0.05)
+                      && !SpeedTestMath.isStable(Array(marks.prefix(9)), warmUp: 2, seconds: 3, tolerance: 0.05),
+                     "speed test stops early only after three steady seconds")
+        var jumpy = marks
+        jumpy[jumpy.count - 1] = .init(time: 8, bytes: jumpy[jumpy.count - 2].bytes + 10_000_000)
+        suite.expect(!SpeedTestMath.isStable(jumpy, warmUp: 2, seconds: 3, tolerance: 0.05),
+                     "speed test keeps measuring while the rate still moves")
+        suite.expect(SpeedTestScale.fraction(0, upTo: 2500) == 0
+                      && SpeedTestScale.fraction(1_000_000, upTo: 2500) == 1
+                      && abs(SpeedTestScale.fraction(1000, upTo: 2500) - 0.883) < 0.01,
+                     "speed test bars use a clamped logarithmic scale")
+    }
+
+    private static func parserChecks(_ suite: TestSuite) {
+        var parser = SpeedTestHTTPResponseParser()
+        let head = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\ncontent-length: 10\r\n\r\n"
+        let split = head.index(head.startIndex, offsetBy: 20)
+        var events = parser.consume(Data(head[..<split].utf8))
+        events += parser.consume(Data((String(head[split...]) + "abcd").utf8))
+        events += parser.consume(Data("efghij".utf8))
+        suite.expect(events == [.head(status: 200), .body(4), .body(6), .complete],
+                     "speed test response parser counts only body bytes across split reads")
+
+        var limited = SpeedTestHTTPResponseParser()
+        suite.expect(limited.consume(Data("HTTP/1.1 429 Too Many Requests\r\nContent-Length: 5\r\n\r\n".utf8))
+                        == [.head(status: 429)],
+                     "speed test response parser reports the status before any body")
+
+        var unsized = SpeedTestHTTPResponseParser()
+        suite.expect(unsized.consume(Data("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n".utf8))
+                        == [.head(status: 200), .malformed],
+                     "speed test response parser refuses a success without a length")
+
+        var garbage = SpeedTestHTTPResponseParser()
+        suite.expect(garbage.consume(Data("SSH-2.0-OpenSSH\r\n\r\n".utf8)) == [.malformed],
+                     "speed test response parser rejects a non-HTTP reply")
+        var endless = SpeedTestHTTPResponseParser()
+        suite.expect(endless.consume(Data(repeating: 65, count: 20_000)) == [.malformed],
+                     "speed test response parser bounds an endless header")
+    }
+
+    private static func configurationChecks(_ suite: TestSuite) {
+        func config(download: String, upload: String) -> Data {
+            Data("""
+            { "version": 1, "test_endpoint": "defra1-edge-fx-023.aaplimg.com",
+              "urls": { "large_https_download_url": "\(download)", "https_upload_url": "\(upload)",
+                        "small_https_download_url": "https://mensura.cdn-apple.com/api/v1/gm/small" } }
+            """.utf8)
+        }
+        let apple = SpeedTestEndpoints.appleConfiguration(config(
+            download: "https://mensura.cdn-apple.com/api/v1/gm/large",
+            upload: "https://mensura.cdn-apple.com/api/v1/gm/slurp"))
+        suite.expect(apple?.download.absoluteString == "https://mensura.cdn-apple.com/api/v1/gm/large"
+                      && apple?.upload.absoluteString == "https://mensura.cdn-apple.com/api/v1/gm/slurp",
+                     "speed test reads Apple's networkQuality download and upload URLs")
+        suite.expect(SpeedTestEndpoints.appleConfiguration(config(
+                        download: "https://defra1-edge-fx-023.aaplimg.com/large",
+                        upload: "https://mensura.cdn-apple.com/api/v1/gm/slurp")) != nil,
+                     "speed test accepts an Apple edge host")
+        suite.expect(SpeedTestEndpoints.appleConfiguration(config(
+                        download: "https://example.com/large",
+                        upload: "https://mensura.cdn-apple.com/api/v1/gm/slurp")) == nil
+                      && SpeedTestEndpoints.appleConfiguration(config(
+                        download: "https://mensura.cdn-apple.com/api/v1/gm/large",
+                        upload: "http://mensura.cdn-apple.com/api/v1/gm/slurp")) == nil
+                      && SpeedTestEndpoints.appleConfiguration(config(
+                        download: "https://notapple.com/large",
+                        upload: "https://mensura.cdn-apple.com/api/v1/gm/slurp")) == nil,
+                     "speed test sends traffic only to HTTPS on Apple hosts")
+        suite.expect(SpeedTestEndpoints.appleConfiguration(Data("{}".utf8)) == nil
+                      && SpeedTestEndpoints.appleConfiguration(Data("<html>".utf8)) == nil,
+                     "speed test refuses a malformed Apple configuration")
+    }
+
+    // MARK: - Engine runs
+
+    private static func successChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        // The first handshake pays for DNS and is ignored.
+        harness.transport.latencies = [.success(48)] + [6, 7, 5, 6, 8, 6, 5, 7, 6, 6].map { .success($0) }
+        harness.transport.rate = { direction, age in
+            let steady = direction == .download ? 12_500_000.0 : 6_250_000.0   // per stream: 800 / 400 Mbps over 8
+            return age < 1 ? steady / 4 : steady
+        }
+        var phases: [SpeedTest.Phase] = []
+        var downloads: [Double] = []
+        var uploads: [Double] = []
+        var bag = Set<AnyCancellable>()
+        harness.test.$phase.removeDuplicates().sink { phases.append($0) }.store(in: &bag)
+        harness.test.$downloadMbps.compactMap { $0 }.sink { downloads.append($0) }.store(in: &bag)
+        harness.test.$uploadMbps.compactMap { $0 }.sink { uploads.append($0) }.store(in: &bag)
+
+        harness.test.start()
+        harness.time.advance(by: 30)
+        drainMainQueue()
+
+        let test = harness.test
+        suite.expect(test.phase == .done, "speed test finishes every phase")
+        suite.expect(phases == [.idle, .latency, .download, .upload, .done],
+                     "speed test measures latency, download and upload one after the other")
+        suite.expect(test.latencyMs == 6, "speed test reports the median handshake without the DNS lookup")
+        suite.expect(test.serverName == "A", "speed test names the server that measured")
+        suite.expect(abs((test.downloadMbps ?? 0) - 800) < 0.01 && abs((test.uploadMbps ?? 0) - 400) < 0.01,
+                     "speed test reports the steady throughput of all streams together")
+        suite.expect(harness.transport.opened(.download) == 8 && harness.transport.opened(.upload) == 8,
+                     "speed test runs parallel streams in each direction")
+        suite.expect(harness.transport.allClosed, "speed test closes every connection when it ends")
+        // Twice a second for five seconds each, the first readings still ramping up.
+        suite.expect(downloads.count >= 10 && uploads.count >= 10
+                      && (downloads.first ?? 0) < 400 && (uploads.first ?? 0) < 200,
+                     "speed test publishes live readings twice a second")
+        suite.expect(harness.time.pending == 0, "speed test leaves no timer behind")
+        let downloadSeconds = (harness.transport.downloadClosedAt ?? 0) - harness.transport.downloadOpenedAt
+        suite.expect(downloadSeconds > 4.99 && downloadSeconds < 5.51,
+                     "speed test stops early once a line is steady")
+    }
+
+    private static func unstableChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        harness.transport.latencies = [.success(6)]
+        // Still climbing: the latest second never matches the average.
+        harness.transport.rate = { _, age in 1_000_000 * (1 + age) }
+        harness.test.start()
+        harness.time.advance(by: 14)
+        drainMainQueue()
+        let downloadSeconds = (harness.transport.downloadClosedAt ?? 0) - harness.transport.downloadOpenedAt
+        suite.expect(downloadSeconds > 9.99 && downloadSeconds < 10.01 && harness.test.phase == .upload,
+                     "speed test measures a line that is still changing for the full window")
+        harness.test.cancel()
+        drainMainQueue()
+    }
+
+    private static func latencyFailureChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        harness.transport.latencies = [.failure(.network)]
+        harness.test.start()
+        harness.time.advance(by: 10)
+        drainMainQueue()
+        suite.expect(harness.test.phase == .failed(.network) && harness.test.latencyMs == nil,
+                     "speed test fails when no handshake succeeds")
+        suite.expect(harness.transport.probes == 3 && harness.transport.opened(.download) == 0,
+                     "speed test gives up after three failed handshakes, before any transfer")
+        suite.expect(harness.time.pending == 0, "speed test leaves no timer behind after a failure")
+    }
+
+    private static func rateLimitChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        harness.transport.latencies = [.success(6)]
+        harness.transport.rate = { _, _ in 1_000_000 }
+        harness.test.start()
+        harness.time.advance(by: 3)
+        harness.transport.endFirstStream(.rateLimited)
+        harness.time.advance(by: 15)
+        drainMainQueue()
+        let test = harness.test
+        suite.expect(test.phase == .failed(.rateLimited), "speed test reports a refusing server as rate limited")
+        suite.expect(test.latencyMs == 6 && test.downloadMbps == nil && test.uploadMbps == nil,
+                     "speed test keeps the finished latency but drops the cut-short download")
+        suite.expect(harness.transport.allClosed && harness.transport.opened(.upload) == 0,
+                     "speed test closes every stream and never starts the upload after a refusal")
+        suite.expect(harness.time.pending == 0, "speed test leaves no timer behind after a refusal")
+    }
+
+    private static func stallChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        harness.transport.latencies = [.success(6)]
+        harness.transport.rate = { _, _ in 0 }
+        harness.test.start()
+        harness.time.advance(by: 15)
+        drainMainQueue()
+        suite.expect(harness.test.phase == .failed(.network) && harness.test.downloadMbps == nil,
+                     "speed test fails a download that never moves a byte")
+        suite.expect(harness.transport.allClosed, "speed test closes the stalled streams")
+    }
+
+    private static func cancelChecks(_ suite: TestSuite) {
+        let harness = Harness()
+        harness.transport.latencies = [.success(6)]
+        harness.transport.rate = { _, _ in 1_000_000 }
+        harness.test.start()
+        harness.time.advance(by: 4)
+        drainMainQueue()
+        suite.expect(harness.test.phase == .download && harness.test.downloadMbps != nil,
+                     "speed test shows the download while it runs")
+        harness.test.cancel()
+        harness.time.advance(by: 0)
+        harness.time.advance(by: 20)
+        drainMainQueue()
+        let test = harness.test
+        suite.expect(test.phase == .idle && test.latencyMs == 6 && test.downloadMbps == nil && test.uploadMbps == nil,
+                     "speed test cancel keeps finished values and drops the live one")
+        suite.expect(harness.transport.allClosed && harness.transport.opened(.upload) == 0
+                      && harness.time.pending == 0,
+                     "speed test cancel closes every connection and timer")
+    }
+
+    private static func fallbackChecks(_ suite: TestSuite) {
+        let unreachable = Harness(names: ["A", "B"])
+        unreachable.transports[0].latencies = [.failure(.network)]
+        unreachable.transports[1].rate = { _, _ in 2_000_000 }
+        unreachable.test.start()
+        unreachable.time.advance(by: 30)
+        drainMainQueue()
+        suite.expect(unreachable.test.phase == .done && unreachable.test.serverName == "B"
+                      && unreachable.test.latencyMs == 6 && unreachable.test.downloadMbps.map { abs($0 - 128) < 0.01 } == true,
+                     "speed test falls back to the next server when the first is unreachable")
+        suite.expect(unreachable.transports[0].probes == 3 && unreachable.transports[0].opened(.download) == 0
+                      && unreachable.transports[1].opened(.download) == 8 && unreachable.transports[1].opened(.upload) == 8,
+                     "speed test moves every measurement to the fallback server")
+
+        let refused = Harness(names: ["A", "B"])
+        refused.transports[0].prepareFailure = .badResponse
+        refused.transports[1].rate = { _, _ in 1_000_000 }
+        refused.test.start()
+        refused.time.advance(by: 30)
+        drainMainQueue()
+        suite.expect(refused.test.phase == .done && refused.test.serverName == "B"
+                      && refused.transports[0].probes == 0,
+                     "speed test falls back when the first server's configuration fails")
+
+        let limited = Harness(names: ["A", "B"])
+        limited.transports[0].rate = { _, _ in 1_000_000 }
+        limited.transports[1].rate = { _, _ in 1_000_000 }
+        limited.test.start()
+        limited.time.advance(by: 3)
+        limited.transports[0].endFirstStream(.rateLimited)
+        limited.time.advance(by: 30)
+        drainMainQueue()
+        suite.expect(limited.test.phase == .done && limited.test.serverName == "B"
+                      && limited.transports[0].allClosed && limited.transports[0].opened(.upload) == 0,
+                     "speed test starts over on the next server when one refuses traffic")
+        suite.expect(limited.time.pending == 0, "speed test leaves no timer behind after a fallback")
+
+        let both = Harness(names: ["A", "B"])
+        both.transports[0].latencies = [.failure(.network)]
+        both.transports[1].prepareFailure = .network
+        both.test.start()
+        both.time.advance(by: 30)
+        drainMainQueue()
+        suite.expect(both.test.phase == .failed(.network) && both.test.serverName == nil,
+                     "speed test fails once every server has failed")
     }
 
     private static func drainMainQueue() {
@@ -93,135 +292,195 @@ enum SpeedTestTests {
     }
 }
 
-private final class SpeedTestClock {
-    private let lock = NSLock()
-    private var value: CFAbsoluteTime = 1_000
+private final class Harness {
+    let queue = DispatchQueue(label: "SpeedTestTests")
+    let time: VirtualTime
+    let transports: [FakeSpeedTransport]
+    let test: SpeedTest
 
-    func now() -> CFAbsoluteTime {
-        lock.withLock { value }
-    }
+    var transport: FakeSpeedTransport { transports[0] }
 
-    func advance(by interval: TimeInterval) {
-        lock.withLock { value += interval }
+    init(names: [String] = ["A"]) {
+        time = VirtualTime(queue: queue)
+        let time = self.time
+        let queue = self.queue
+        let transports = names.map { FakeSpeedTransport(name: $0, queue: queue, time: time) }
+        self.transports = transports
+        time.beforeStep = { seconds in transports.forEach { $0.deliver(for: seconds) } }
+        test = SpeedTest(transports: transports, queue: queue, clock: time.now, scheduler: time.schedule)
     }
 }
 
-private final class SpeedTestTimeBoxScheduler {
-    private struct Callback {
-        let queue: OperationQueue
-        let delay: TimeInterval
+/// A virtual clock and scheduler: `advance` runs every due action in order on
+/// the measurement queue, letting the fake streams move bytes in between.
+private final class VirtualTime {
+    private struct Entry {
+        let id: Int
+        let due: TimeInterval
         let action: () -> Void
-        var cancelled = false
-        var hasRun = false
     }
 
     private let lock = NSLock()
-    private let clock: SpeedTestClock
-    private var callbacks: [Callback] = []
+    private let queue: DispatchQueue
+    private var current: TimeInterval = 100
+    private var entries: [Entry] = []
+    private var nextID = 0
+    var beforeStep: (TimeInterval) -> Void = { _ in }
 
-    init(clock: SpeedTestClock) {
-        self.clock = clock
+    init(queue: DispatchQueue) {
+        self.queue = queue
     }
 
-    var count: Int {
-        lock.withLock { callbacks.count }
-    }
+    func now() -> TimeInterval { lock.withLock { current } }
 
-    var allCancelled: Bool {
-        lock.withLock { callbacks.allSatisfy(\.cancelled) }
-    }
+    var pending: Int { lock.withLock { entries.count } }
 
-    func schedule(on queue: OperationQueue, after delay: TimeInterval,
-                  action: @escaping () -> Void) -> () -> Void {
-        let index = lock.withLock {
-            callbacks.append(Callback(queue: queue, delay: delay, action: action))
-            return callbacks.index(before: callbacks.endIndex)
+    func schedule(_ delay: TimeInterval, _ action: @escaping () -> Void) -> () -> Void {
+        let id: Int = lock.withLock {
+            nextID += 1
+            entries.append(Entry(id: nextID, due: current + delay, action: action))
+            return nextID
         }
         return { [weak self] in
-            self?.lock.withLock { self?.callbacks[index].cancelled = true }
+            guard let self else { return }
+            self.lock.withLock { self.entries.removeAll { $0.id == id } }
         }
     }
 
-    func runNext() -> Bool {
-        let callback: Callback? = lock.withLock {
-            guard let index = callbacks.firstIndex(where: { !$0.hasRun }) else { return nil }
-            callbacks[index].hasRun = true
-            return callbacks[index]
+    func advance(by seconds: TimeInterval) {
+        let target = now() + seconds
+        while true {
+            settle()
+            let next: Entry? = lock.withLock {
+                guard let index = entries.indices.min(by: {
+                    (entries[$0].due, entries[$0].id) < (entries[$1].due, entries[$1].id)
+                }), entries[index].due <= target + 1e-9 else { return nil }
+                return entries.remove(at: index)
+            }
+            guard let next else { break }
+            let step = next.due - now()
+            if step > 0 {
+                beforeStep(step)
+                lock.withLock { current = next.due }
+            }
+            queue.sync { next.action() }
         }
-        guard let callback else { return false }
-        return run(callback)
+        let rest = target - now()
+        if rest > 0 {
+            beforeStep(rest)
+            lock.withLock { current = target }
+        }
+        settle()
     }
 
-    func runEveryCallback() -> Bool {
-        let pending = lock.withLock { callbacks }
-        var completed = true
-        for callback in pending {
-            completed = run(callback) && completed
-        }
-        return completed
-    }
-
-    private func run(_ callback: Callback) -> Bool {
-        clock.advance(by: callback.delay)
-        let completed = DispatchSemaphore(value: 0)
-        callback.queue.addOperation {
-            callback.action()
-            completed.signal()
-        }
-        return completed.wait(timeout: .now() + 1) == .success
+    /// Lets chains of asynchronous callbacks (a lookup answering, then a
+    /// probe answering) land and schedule before time moves on.
+    private func settle() {
+        for _ in 0..<8 { queue.sync {} }
     }
 }
 
-private final class SpeedTestProtocol: URLProtocol {
-    private static let lock = NSLock()
-    private static var recordedRequests: [String: [String]] = [:]
-    private static var downloadsWithData: Set<String> = []
+private final class FakeSpeedTransport: SpeedTestTransport {
+    final class Connection: SpeedTestConnection {
+        let direction: SpeedTestDirection?
+        let openedAt: TimeInterval
+        let onBytes: (Int) -> Void
+        let onEnd: (SpeedTestFailure?) -> Void
+        var closedAt: TimeInterval?
+        private let time: VirtualTime
 
-    static func requests(for scenario: String) -> [String] {
-        lock.lock()
-        defer { lock.unlock() }
-        return recordedRequests[scenario] ?? []
-    }
-
-    static func deliveredDownloadData(for scenario: String) -> Bool {
-        lock.withLock { downloadsWithData.contains(scenario) }
-    }
-
-    override class func canInit(with request: URLRequest) -> Bool { true }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
-
-    override func startLoading() {
-        let scenario = request.value(forHTTPHeaderField: "X-Test-Scenario") ?? ""
-        let url = request.url!
-        let phase = url.path == "/__up" ? "upload" : url.query == "bytes=0" ? "latency" : "download"
-        Self.lock.lock()
-        Self.recordedRequests[scenario, default: []].append(phase)
-        let downloadCount = Self.recordedRequests[scenario, default: []].filter { $0 == "download" }.count
-        Self.lock.unlock()
-
-        if scenario == "latency-non-http" {
-            client?.urlProtocol(self, didReceive: URLResponse(url: url, mimeType: nil,
-                                                            expectedContentLength: 0, textEncodingName: nil),
-                                cacheStoragePolicy: .notAllowed)
-            client?.urlProtocolDidFinishLoading(self)
-            return
+        init(direction: SpeedTestDirection?, time: VirtualTime,
+             onBytes: @escaping (Int) -> Void = { _ in }, onEnd: @escaping (SpeedTestFailure?) -> Void = { _ in }) {
+            self.direction = direction
+            self.time = time
+            self.openedAt = time.now()
+            self.onBytes = onBytes
+            self.onEnd = onEnd
         }
-        let rejects = scenario.hasPrefix(phase + "-")
-            && (scenario != "download-after-data-503" || downloadCount > 1)
-        let status = rejects ? (Int(scenario.split(separator: "-").last!) ?? 500)
-            : (phase == "download" ? 200 : 204)
-        let response = HTTPURLResponse(url: url, statusCode: status, httpVersion: "HTTP/1.1", headerFields: nil)!
-        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        if rejects || phase == "download" {
-            client?.urlProtocol(self, didLoad: Data(repeating: 42, count: 1_024))
-            if phase == "download" {
-                _ = Self.lock.withLock { Self.downloadsWithData.insert(scenario) }
+
+        func cancel() {
+            if closedAt == nil { closedAt = time.now() }
+        }
+    }
+
+    let name: String
+    private let queue: DispatchQueue
+    private let time: VirtualTime
+    var prepareFailure: SpeedTestFailure?
+    // Touched only on `queue` (the engine calls in there; the test hops onto it).
+    private var streams: [Connection] = []
+    private var probeConnections: [Connection] = []
+    var latencies: [Result<Double, SpeedTestFailure>] = [.success(6)]
+    var rate: (SpeedTestDirection, TimeInterval) -> Double = { _, _ in 0 }
+
+    init(name: String, queue: DispatchQueue, time: VirtualTime) {
+        self.name = name
+        self.queue = queue
+        self.time = time
+    }
+
+    var probes: Int { queue.sync { probeConnections.count } }
+
+    func opened(_ direction: SpeedTestDirection) -> Int {
+        queue.sync { streams.filter { $0.direction == direction }.count }
+    }
+
+    var allClosed: Bool {
+        queue.sync { (streams + probeConnections).allSatisfy { $0.closedAt != nil || $0.direction == nil } }
+    }
+
+    var downloadOpenedAt: TimeInterval {
+        queue.sync { streams.first { $0.direction == .download }?.openedAt ?? 0 }
+    }
+
+    var downloadClosedAt: TimeInterval? {
+        queue.sync { streams.first { $0.direction == .download }?.closedAt }
+    }
+
+    func prepare(on queue: DispatchQueue, completion: @escaping (SpeedTestFailure?) -> Void) -> SpeedTestConnection {
+        let lookup = Connection(direction: nil, time: time)
+        let failure = prepareFailure
+        queue.async {
+            if lookup.closedAt == nil { completion(failure) }
+        }
+        return lookup
+    }
+
+    func probeLatency(on queue: DispatchQueue,
+                      completion: @escaping (Result<Double, SpeedTestFailure>) -> Void) -> SpeedTestConnection {
+        let result = latencies.count > 1 ? latencies.removeFirst() : latencies[0]
+        let probe = Connection(direction: nil, time: time)
+        probeConnections.append(probe)
+        queue.async {
+            if probe.closedAt == nil { completion(result) }
+        }
+        return probe
+    }
+
+    func openStream(_ direction: SpeedTestDirection, on queue: DispatchQueue,
+                    onBytes: @escaping (Int) -> Void,
+                    onEnd: @escaping (SpeedTestFailure?) -> Void) -> SpeedTestConnection {
+        let stream = Connection(direction: direction, time: time, onBytes: onBytes, onEnd: onEnd)
+        streams.append(stream)
+        return stream
+    }
+
+    /// Moves each open stream's bytes for the next `seconds` of virtual time.
+    func deliver(for seconds: TimeInterval) {
+        let now = time.now()
+        queue.sync {
+            for stream in streams where stream.closedAt == nil {
+                guard let direction = stream.direction else { continue }
+                let count = Int(rate(direction, now - stream.openedAt) * seconds)
+                if count > 0 { stream.onBytes(count) }
             }
         }
-        if rejects || phase != "download" || scenario == "download-after-data-503" {
-            client?.urlProtocolDidFinishLoading(self)
-        }
     }
 
-    override func stopLoading() {}
+    func endFirstStream(_ failure: SpeedTestFailure?) {
+        queue.sync {
+            guard let stream = streams.first(where: { $0.closedAt == nil && $0.direction != nil }) else { return }
+            stream.onEnd(failure)
+        }
+    }
 }
