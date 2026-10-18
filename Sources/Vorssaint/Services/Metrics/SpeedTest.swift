@@ -41,10 +41,10 @@ enum SpeedTestDirection: Equatable {
 /// A user-triggered internet speed test, measured one value after the other
 /// the way broadband reference tests do: latency, then download, then upload.
 /// Latency is the median TCP handshake time; throughput runs several parallel
-/// connections so one TCP stream's window never caps a fast line, and the
-/// result leaves out the slow-start warm-up. Each value is published twice a
-/// second while it is measured. No user data ever leaves the machine (the
-/// upload body is zeros).
+/// connections so one TCP stream's window never caps a fast line. Each value
+/// is published four times a second while it is measured, and a throughput
+/// result is the mean of those readings once the connections have ramped up. No user data ever leaves the
+/// machine (the upload body is zeros).
 ///
 /// Transports are tried in order: when a run fails on one (unreachable, a
 /// changed configuration, a server refusing traffic), it starts over on the
@@ -66,21 +66,20 @@ final class SpeedTest: ObservableObject {
     }
 
     struct Configuration {
-        var tick: TimeInterval = 0.5
+        var tick: TimeInterval = 0.25
         var latencySamples = 20
         /// Back to back: a pause lets Wi-Fi doze and adds a millisecond or so.
         var latencySpacing: TimeInterval = 0
         var latencyMaxDuration: TimeInterval = 4
         var latencyMaxFailures = 3
         var streams = 8
-        /// TCP slow start and TLS set-up, left out of the result.
-        var warmUp: TimeInterval = 2
-        var minDuration: TimeInterval = 5
-        var maxDuration: TimeInterval = 10
-        /// Steady once each of the last `stableSeconds` one-second rates is
-        /// within this fraction of the steady average.
-        var stableTolerance = 0.05
-        var stableSeconds = 3
+        /// A transfer that has moved no byte by then has failed.
+        var stallTimeout: TimeInterval = 2
+        /// TCP slow start and TLS set-up: readings this early are shown but
+        /// left out of the result.
+        var rampUp: TimeInterval = 2.5
+        /// Each of download and upload.
+        var duration: TimeInterval = 10
     }
 
     @Published private(set) var phase: Phase = .idle
@@ -109,6 +108,7 @@ final class SpeedTest: ObservableObject {
     private var current: Phase = .idle
     private var phaseStart: TimeInterval = 0
     private var cancelTick: (() -> Void)?
+    private var ticks = 0
     private var cancelProbeDelay: (() -> Void)?
     private var probe: SpeedTestConnection?
     private var probedOnce = false
@@ -118,6 +118,7 @@ final class SpeedTest: ObservableObject {
     private var nextStreamID = 0
     private var bytes: Int64 = 0
     private var marks: [SpeedTestMath.Mark] = []
+    private var readings: [SpeedTestMath.Reading] = []
 
     init(transports: [SpeedTestTransport] = [HTTPSpeedTestTransport.apple(), HTTPSpeedTestTransport.cloudflare()],
          configuration: Configuration = Configuration(),
@@ -185,10 +186,18 @@ final class SpeedTest: ObservableObject {
         publish { $0.phase = phase }
     }
 
-    private func startTicking() {
+    /// Ticks land on whole multiples of `tick` after the phase start, so a
+    /// late callback never pushes every later reading back; one that is
+    /// more than half a tick behind skips ahead instead of bunching up.
+    private func startTicking(restart: Bool = false) {
         cancelTick?()
+        if restart { ticks = 0 }
+        ticks += 1
+        let now = clock()
+        while phaseStart + Double(ticks) * config.tick < now - config.tick / 2 { ticks += 1 }
+        let delay = max(0, phaseStart + Double(ticks) * config.tick - now)
         let run = activeRun
-        cancelTick = schedule(config.tick) { [weak self] in
+        cancelTick = schedule(delay) { [weak self] in
             guard let self, self.activeRun == run else { return }
             self.tick()
         }
@@ -208,17 +217,15 @@ final class SpeedTest: ObservableObject {
         case .download, .upload:
             marks.append(.init(time: elapsed, bytes: bytes))
             if let live = SpeedTestMath.recentMbps(marks, window: 1) {
+                readings.append(.init(time: elapsed, mbps: live))
                 publishRate(live)
             }
-            if elapsed >= config.maxDuration
-                || (elapsed >= config.minDuration
-                    && SpeedTestMath.isStable(marks, warmUp: config.warmUp,
-                                              seconds: config.stableSeconds,
-                                              tolerance: config.stableTolerance)) {
+            // Half a tick of slack, so rounding never adds a tick past the end.
+            if elapsed + config.tick / 2 >= config.duration {
                 finishTransfer()
                 return
             }
-            if elapsed >= config.warmUp + config.tick, bytes == 0 {
+            if elapsed >= config.stallTimeout + config.tick, bytes == 0 {
                 fail(.network)
                 return
             }
@@ -261,7 +268,7 @@ final class SpeedTest: ObservableObject {
         latencyFailures = 0
         latencySamples = []
         phaseStart = clock()   // the configuration lookup is not latency time
-        startTicking()
+        startTicking(restart: true)
         probeLatency()
     }
 
@@ -310,6 +317,7 @@ final class SpeedTest: ObservableObject {
     private func beginTransfer(_ direction: SpeedTestDirection) {
         bytes = 0
         marks = [.init(time: 0, bytes: 0)]
+        readings = []
         enter(direction == .download ? .download : .upload)
         let run = activeRun
         let phase = current
@@ -324,7 +332,7 @@ final class SpeedTest: ObservableObject {
                 self.streamEnded(id, failure: failure)
             })
         }
-        startTicking()
+        startTicking(restart: true)
     }
 
     private func streamEnded(_ id: Int, failure: SpeedTestFailure?) {
@@ -335,10 +343,8 @@ final class SpeedTest: ObservableObject {
             return
         }
         guard streams.isEmpty else { return }
-        // Every stream is gone: keep the result if the steady window has data.
-        let elapsed = clock() - phaseStart
-        if elapsed > config.warmUp, bytes > 0 {
-            marks.append(.init(time: elapsed, bytes: bytes))
+        // Every stream is gone: keep the readings taken so far, if any.
+        if !readings.isEmpty, bytes > 0 {
             finishTransfer()
         } else {
             fail(failure ?? .network)
@@ -349,8 +355,7 @@ final class SpeedTest: ObservableObject {
         let finished = current
         cancelTick?(); cancelTick = nil
         closeStreams()
-        let mbps = SpeedTestMath.steadyMbps(marks, warmUp: config.warmUp)
-        publishRate(mbps)
+        publishRate(SpeedTestMath.resultMbps(readings, rampUp: config.rampUp, tick: config.tick))
         if finished == .download {
             beginTransfer(.upload)
         } else {
@@ -421,30 +426,22 @@ enum SpeedTestMath {
         return mbps(bytes: last.bytes - from.bytes, seconds: last.time - from.time)
     }
 
-    /// The result: everything moved after the warm-up, over the time it took.
-    /// A run too short to have a steady window falls back to its whole span.
-    static func steadyMbps(_ marks: [Mark], warmUp: TimeInterval) -> Double? {
-        guard let last = marks.last, let first = marks.first, last.time > first.time else { return nil }
-        var from = marks.first { $0.time >= warmUp } ?? first
-        if last.time - from.time < 1 { from = first }
-        return mbps(bytes: last.bytes - from.bytes, seconds: last.time - from.time)
+    struct Reading: Equatable {
+        let time: TimeInterval
+        let mbps: Double
     }
 
-    /// True when each of the last `seconds` one-second rates sits within
-    /// `tolerance` of the steady average, so measuring longer would not move
-    /// the result (and would only spend the server's patience).
-    static func isStable(_ marks: [Mark], warmUp: TimeInterval, seconds: Int, tolerance: Double) -> Bool {
-        guard let last = marks.last, last.time - warmUp >= Double(seconds),
-              let steady = steadyMbps(marks, warmUp: warmUp), steady > 0 else { return false }
-        for second in 0..<seconds {
-            let end = last.time - Double(second)
-            guard let to = marks.last(where: { $0.time <= end + 0.001 }),
-                  let from = marks.last(where: { $0.time <= end - 1 + 0.001 }),
-                  to.time > from.time else { return false }
-            let rate = mbps(bytes: to.bytes - from.bytes, seconds: to.time - from.time)
-            if abs(rate - steady) > steady * tolerance { return false }
-        }
-        return true
+    static func mean(_ values: [Double]) -> Double? {
+        values.isEmpty ? nil : values.reduce(0, +) / Double(values.count)
+    }
+
+    /// The throughput result: the mean of the readings taken after the
+    /// ramp-up. Half a tick of slack keeps the reading due exactly at the end
+    /// of the ramp-up out despite rounding. A transfer cut short inside the
+    /// ramp-up falls back to every reading it has.
+    static func resultMbps(_ readings: [Reading], rampUp: TimeInterval, tick: TimeInterval) -> Double? {
+        let settled = readings.filter { $0.time > rampUp + tick / 2 }.map(\.mbps)
+        return mean(settled.isEmpty ? readings.map(\.mbps) : settled)
     }
 }
 

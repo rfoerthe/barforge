@@ -10,7 +10,6 @@ enum SpeedTestTests {
         parserChecks(suite)
         configurationChecks(suite)
         successChecks(suite)
-        unstableChecks(suite)
         latencyFailureChecks(suite)
         rateLimitChecks(suite)
         stallChecks(suite)
@@ -34,19 +33,18 @@ enum SpeedTestTests {
                                   : 2_000_000 + Int64((time - 2) * 100_000_000)
             marks.append(.init(time: time, bytes: bytes))
         }
-        suite.expect(SpeedTestMath.steadyMbps(marks, warmUp: 2) == 800,
-                     "speed test throughput leaves the slow-start warm-up out")
+        suite.expect(SpeedTestMath.mean([]) == nil && SpeedTestMath.mean([900, 1000, 1100, 1200]) == 1050,
+                     "speed test throughput is the mean of its readings")
+        let readings = (1...12).map { SpeedTestMath.Reading(time: Double($0) * 0.25, mbps: $0 <= 10 ? 100 : 1000) }
+        suite.expect(SpeedTestMath.resultMbps(readings, rampUp: 2.5, tick: 0.25) == 1000
+                      && SpeedTestMath.resultMbps([.init(time: 2.4999999, mbps: 5), .init(time: 2.75, mbps: 7)],
+                                                  rampUp: 2.5, tick: 0.25) == 7,
+                     "speed test leaves readings up to 2.5 s out of the result")
+        suite.expect(SpeedTestMath.resultMbps(Array(readings.prefix(4)), rampUp: 2.5, tick: 0.25) == 100
+                      && SpeedTestMath.resultMbps([], rampUp: 2.5, tick: 0.25) == nil,
+                     "speed test falls back to every reading when cut short inside the ramp-up")
         suite.expect(SpeedTestMath.recentMbps(Array(marks.prefix(4)), window: 1) == 8,
                      "speed test live rate covers the last second")
-        suite.expect(SpeedTestMath.steadyMbps(Array(marks.prefix(4)), warmUp: 2) == 8,
-                     "speed test throughput falls back to the whole span when it ends inside the warm-up")
-        suite.expect(SpeedTestMath.isStable(marks, warmUp: 2, seconds: 3, tolerance: 0.05)
-                      && !SpeedTestMath.isStable(Array(marks.prefix(9)), warmUp: 2, seconds: 3, tolerance: 0.05),
-                     "speed test stops early only after three steady seconds")
-        var jumpy = marks
-        jumpy[jumpy.count - 1] = .init(time: 8, bytes: jumpy[jumpy.count - 2].bytes + 10_000_000)
-        suite.expect(!SpeedTestMath.isStable(jumpy, warmUp: 2, seconds: 3, tolerance: 0.05),
-                     "speed test keeps measuring while the rate still moves")
         suite.expect(SpeedTestScale.fraction(0, upTo: 2500) == 0
                       && SpeedTestScale.fraction(1_000_000, upTo: 2500) == 1
                       && abs(SpeedTestScale.fraction(1000, upTo: 2500) - 0.883) < 0.01,
@@ -142,34 +140,27 @@ enum SpeedTestTests {
                      "speed test measures latency, download and upload one after the other")
         suite.expect(test.latencyMs == 6, "speed test reports the median handshake without the DNS lookup")
         suite.expect(test.serverName == "A", "speed test names the server that measured")
+        // One ramping second at a quarter of the rate, then steady: the
+        // readings show 200 ×4, 350, 500, 650, then 800 (or half of each for
+        // the upload); the ramp-up's first 2.5 s stay out of the result.
         suite.expect(abs((test.downloadMbps ?? 0) - 800) < 0.01 && abs((test.uploadMbps ?? 0) - 400) < 0.01,
-                     "speed test reports the steady throughput of all streams together")
+                     "speed test reports the mean reading across all streams after the ramp-up")
+        suite.expect(downloads.count == 41 && downloads.prefix(4).allSatisfy { $0 < 201 }
+                      && abs(downloads.last! - downloads.dropLast().suffix(30).reduce(0, +) / 30) < 0.01,
+                     "speed test shows every reading but averages only the 30 after the ramp-up")
         suite.expect(harness.transport.opened(.download) == 8 && harness.transport.opened(.upload) == 8,
                      "speed test runs parallel streams in each direction")
         suite.expect(harness.transport.allClosed, "speed test closes every connection when it ends")
-        // Twice a second for five seconds each, the first readings still ramping up.
-        suite.expect(downloads.count >= 10 && uploads.count >= 10
+        // Four times a second for ten seconds each, the first readings still ramping up.
+        suite.expect(downloads.count >= 40 && uploads.count >= 40
                       && (downloads.first ?? 0) < 400 && (uploads.first ?? 0) < 200,
-                     "speed test publishes live readings twice a second")
+                     "speed test publishes live readings four times a second")
         suite.expect(harness.time.pending == 0, "speed test leaves no timer behind")
         let downloadSeconds = (harness.transport.downloadClosedAt ?? 0) - harness.transport.downloadOpenedAt
-        suite.expect(downloadSeconds > 4.99 && downloadSeconds < 5.51,
-                     "speed test stops early once a line is steady")
-    }
-
-    private static func unstableChecks(_ suite: TestSuite) {
-        let harness = Harness()
-        harness.transport.latencies = [.success(6)]
-        // Still climbing: the latest second never matches the average.
-        harness.transport.rate = { _, age in 1_000_000 * (1 + age) }
-        harness.test.start()
-        harness.time.advance(by: 14)
-        drainMainQueue()
-        let downloadSeconds = (harness.transport.downloadClosedAt ?? 0) - harness.transport.downloadOpenedAt
-        suite.expect(downloadSeconds > 9.99 && downloadSeconds < 10.01 && harness.test.phase == .upload,
-                     "speed test measures a line that is still changing for the full window")
-        harness.test.cancel()
-        drainMainQueue()
+        let uploadSeconds = (harness.transport.uploadClosedAt ?? 0) - harness.transport.uploadOpenedAt
+        suite.expect(downloadSeconds > 9.99 && downloadSeconds < 10.01
+                      && uploadSeconds > 9.99 && uploadSeconds < 10.01,
+                     "speed test measures download and upload for ten seconds each")
     }
 
     private static func latencyFailureChecks(_ suite: TestSuite) {
@@ -435,6 +426,14 @@ private final class FakeSpeedTransport: SpeedTestTransport {
 
     var downloadClosedAt: TimeInterval? {
         queue.sync { streams.first { $0.direction == .download }?.closedAt }
+    }
+
+    var uploadOpenedAt: TimeInterval {
+        queue.sync { streams.first { $0.direction == .upload }?.openedAt ?? 0 }
+    }
+
+    var uploadClosedAt: TimeInterval? {
+        queue.sync { streams.first { $0.direction == .upload }?.closedAt }
     }
 
     func prepare(on queue: DispatchQueue, completion: @escaping (SpeedTestFailure?) -> Void) -> SpeedTestConnection {
