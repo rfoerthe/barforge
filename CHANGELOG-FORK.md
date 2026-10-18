@@ -14,7 +14,7 @@ Fork builds carry the upstream version plus build metadata, such as `3.4.1+mx.1`
 - The System card lists each fan and its current speed, read-only, without the Fan Control extension. Settings → Monitor → System → Fan speed.
 
 ### Changed
-- The speed test in the Network card measures latency, download and upload one after the other, each as a bar with its value in ms or Mbps, updated twice a second while it runs. Results on fast fibre lines now match breitbandmessung.de: about 6 ms, 1060 and 545 Mbps on a 1000/500 line, where the test showed 65 ms, 394 and 198 Mbps before. It measures against Apple's networkQuality servers and falls back to Cloudflare when they do not answer, and a running test can be stopped.
+- The speed test in the Network card measures latency, download and upload one after the other, each as a bar with its value in ms or Mbps, updated four times a second while it runs; download and upload take about ten seconds each. Results on fast fibre lines now match breitbandmessung.de: about 6 ms, 1060 and 545 Mbps on a 1000/500 line, where the test showed 65 ms, 394 and 198 Mbps before. It measures against Apple's networkQuality servers and falls back to Cloudflare when they do not answer, and a running test can be stopped.
 - The Network card's apps using network list starts folded behind an arrow, like the CPU apps list. Per-app traffic is measured only while the list is open.
 
 ### Fixed
