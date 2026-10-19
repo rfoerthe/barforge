@@ -138,7 +138,10 @@ notarize() {
 echo "▸ Building…"
 ./build.sh
 codesign --verify --deep --strict -R="$APP_REQUIREMENT" "$APP"
-if ! codesign -dv "$APP" 2>&1 | grep -q 'flags=.*runtime'; then
+# Read the details first: grep -q stops at the match, codesign then dies of
+# SIGPIPE, and pipefail would report a correctly signed app as unsigned.
+SIGNATURE="$(codesign -dv "$APP" 2>&1)"
+if [[ "$SIGNATURE" != *"flags="*"runtime"* ]]; then
     echo "✗ $APP is not signed with the hardened runtime." >&2
     exit 1
 fi
