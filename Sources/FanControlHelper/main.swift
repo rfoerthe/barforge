@@ -577,6 +577,10 @@ private final class FanControlListenerDelegate: NSObject, NSXPCListenerDelegate 
 
 private func runSelfTest() -> Bool {
     guard FanControlIdentifiers.helperID.hasSuffix(".fan-control"),
+          FanControlSigning.teamID("ABCDE12345") == "ABCDE12345",
+          ["", "abcde12345", "ABCDE1234", "ABCDE1234\"", "ABCDE123456"]
+            .allSatisfy({ FanControlSigning.teamID($0) == nil }),
+          FanControlSigning.teamID(FanControlIdentifiers.teamID) != nil,
           FanControlPolicy.coolingDuration == 900,
           FanControlPolicy.validCoolingLevel(FanControlPolicy.defaultCoolingLevel),
           FanControlPolicy.validConfiguration(.curve([FanControlConfiguration.defaultCurve])),
