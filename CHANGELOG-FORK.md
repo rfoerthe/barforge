@@ -18,6 +18,7 @@ Fork builds carry the upstream version plus build metadata, such as `3.4.1+mx.1`
 - The Network card's apps using network list starts folded behind an arrow, like the CPU apps list. Per-app traffic is measured only while the list is open.
 
 ### Fixed
+- Fan Control works in a build signed with a Developer ID other than the official one, such as a signed build of this fork. The app and its helper now trust the team that signed them instead of a fixed one.
 - The menu bar icon's right-click menu no longer offers Check for updates…, since a fork build does not update itself.
 
 ## [3.4.1+mx.1]
