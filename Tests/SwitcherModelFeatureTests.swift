@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -2376,13 +2377,13 @@ enum SwitcherModelFeatureTests {
                "an app the person switched to while the panel was open keeps activation")
         suite.expect(!StatusItemAnchorSupport.shouldReturnActivation(to: 501, ownPID: 900, frontmostPID: 900,
                                                                      ownWindowIsKey: true, closeReason: .escape),
-               "a Vorssaint window that took focus from the panel keeps Vorssaint active")
+               "a Barforge window that took focus from the panel keeps Barforge active")
         suite.expect(!StatusItemAnchorSupport.shouldReturnActivation(to: nil, ownPID: 900, frontmostPID: 900,
                                                                      ownWindowIsKey: false, closeReason: .escape),
-               "a panel opened while Vorssaint was already in front has nothing to hand back")
+               "a panel opened while Barforge was already in front has nothing to hand back")
         suite.expect(!StatusItemAnchorSupport.shouldReturnActivation(to: 900, ownPID: 900, frontmostPID: 900,
                                                                      ownWindowIsKey: false, closeReason: .escape),
-               "Vorssaint never hands activation back to itself")
+               "Barforge never hands activation back to itself")
         suite.expect(!StatusItemAnchorSupport.shouldReturnActivation(to: 501, ownPID: 900, frontmostPID: nil,
                                                                      ownWindowIsKey: false, closeReason: .escape),
                "no known frontmost app means nothing is taken from anyone")
@@ -2396,7 +2397,7 @@ enum SwitcherModelFeatureTests {
         }
         suite.expect(!StatusItemAnchorSupport.shouldReturnActivation(to: 501, ownPID: 900, frontmostPID: 900,
                                                                      ownWindowIsKey: false, closeReason: nil),
-               "a close Vorssaint did not ask for leaves activation alone")
+               "a close Barforge did not ask for leaves activation alone")
 
         let showing: Set<UInt64> = [3, 7]
         suite.expect(StatusItemAnchorSupport.handbackWouldSwitchDesktop(windowSpaces: [[1], [2]],
@@ -2424,7 +2425,7 @@ enum SwitcherModelFeatureTests {
                "another app becoming active while the panel is open replaces the remembered app")
         suite.expect(StatusItemAnchorSupport.panelActivationSource(after: .appActivated(900), current: 501,
                                                                    isOwnApp: ownApp) == 501,
-               "Vorssaint taking activation back from the panel keeps the remembered app")
+               "Barforge taking activation back from the panel keeps the remembered app")
         suite.expect(StatusItemAnchorSupport.panelActivationSource(after: .appActivated(777), current: nil,
                                                                    isOwnApp: ownApp) == 777,
                "an app activated after the remembered one was dropped becomes the one to return to")
@@ -4374,8 +4375,8 @@ enum SwitcherModelFeatureTests {
                "a click after hiding lets the Dock bring the app back")
         suite.expect(DockClickSupport.repeatDecision(lastAction: .hide, elapsed: 0.1) == .swallow,
                "an accidental double-click never hides and immediately reopens the app")
-        suite.expect(DockClickSupport.isOwnBundleIdentifier("com.vorssaint.utils")
-                && DockClickSupport.isOwnBundleIdentifier("com.vorssaint.utils.dev")
+        suite.expect(DockClickSupport.isOwnBundleIdentifier("de.foerther.barforge")
+                && DockClickSupport.isOwnBundleIdentifier("de.foerther.barforge.dev")
                 && !DockClickSupport.isOwnBundleIdentifier("com.example.editor")
                 && !DockClickSupport.isOwnBundleIdentifier(nil),
                "Dock clicks never target either build of this app")
@@ -6600,7 +6601,7 @@ enum SwitcherModelFeatureTests {
                "App Switcher leaves unrelated middle-mouse-up events alone")
         let searchRecords = [
             SwitcherSearchRecord(id: "alpha", title: "Inbox", appName: "Alpha"),
-            SwitcherSearchRecord(id: "beta", title: "Vorssaint Roadmap", appName: "Beta"),
+            SwitcherSearchRecord(id: "beta", title: "Barforge Roadmap", appName: "Beta"),
             SwitcherSearchRecord(id: "gamma", title: "Café notes", appName: "Gamma"),
         ]
         suite.expect(SwitcherSupport.filteredSearchIDs(records: searchRecords, query: "") == ["alpha", "beta", "gamma"],

@@ -7,7 +7,8 @@ upstream [vorssaint/vorssaint-utils](https://github.com/vorssaint/vorssaint-util
 
 Before you hand a build to anyone else, read [TRADEMARKS.md](../TRADEMARKS.md):
 a redistributed fork needs its own name, icon, bundle identifier and signing
-identity.
+identity. This fork ships as Barforge with its own anvil icon and the bundle
+identifier `de.foerther.barforge`; the signing identity is your Developer ID.
 
 ## One-time setup
 
@@ -53,7 +54,7 @@ automatically, with the hardened runtime and a secure timestamp), checks that
 it is signed by your team, notarizes and staples it, packages the DMG, signs,
 notarizes and staples that too, and finally checks that Gatekeeper reports
 `source=Notarized Developer ID` for both. The result is
-`dist/Vorssaint-<version>.dmg` with a `.sha256` file next to it.
+`dist/Barforge-<version>.dmg` with a `.sha256` file next to it.
 
 `--skip-notarize` signs without notarizing, for a quick check on your own Mac.
 `--allow-dirty` builds from uncommitted changes. With several Developer ID

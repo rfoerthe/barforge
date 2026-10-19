@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -791,6 +792,15 @@ struct AboutSettings: View {
                     appDelegate()?.showUpdateHighlights(isReview: true)
                 }
                 Link(l10n.s.viewOnGitHub, destination: AppInfo.repositoryURL)
+            }
+            if AppInfo.isForkBuild {
+                Text(FeatureStrings.forkBuild(l10n.language).attribution)
+                    .font(.caption2)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: 420)
+                Link("GPL-3.0-or-later", destination: AppInfo.licenseURL)
+                    .font(.caption2)
             }
             Text(AppInfo.copyright)
                 .font(.caption2)

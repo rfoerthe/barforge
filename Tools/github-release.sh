@@ -1,6 +1,6 @@
 #!/bin/zsh
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 Vorssaint
+# Copyright (C) 2026 Roland Foerther
 
 # Publishes a DMG from dist/ as a GitHub release of this fork. Lists the DMGs
 # that have a .sha256 file next to them, lets you pick exactly one, checks the
@@ -39,7 +39,7 @@ for arg in "$@"; do
     esac
 done
 
-APP_NAME="Vorssaint"
+APP_NAME="Barforge"
 CHANGELOG="CHANGELOG-FORK.md"
 GIT_REMOTE="${GIT_REMOTE:-origin}"
 WORK=""
@@ -193,7 +193,7 @@ awk -v hdr="## [$VERSION]" 'index($0,hdr)==1{g=1;next} /^## \[/&&g{exit} g{print
 [[ -n "$(tr -d '[:space:]' < "$NOTES_FILE")" ]] || die "The $CHANGELOG entry for $VERSION is empty."
 cat >> "$NOTES_FILE" <<EOF
 
-Signed with an Apple Developer ID and notarized by Apple. Requires macOS 14 or later. Open the .dmg below and drag $APP_NAME to Applications. This is a build of the $REPO fork, not an official $APP_NAME release.
+Signed with an Apple Developer ID and notarized by Apple. Requires macOS 14 or later. Open the .dmg below and drag $APP_NAME to Applications. $APP_NAME is an unofficial fork of Vorssaint, built from $REPO. It is not an official Vorssaint release and is not endorsed by the Vorssaint project.
 EOF
 
 # ── Release ──────────────────────────────────────────────────────────────────

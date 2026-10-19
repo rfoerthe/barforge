@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -2353,6 +2354,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     private func showSupportUpdateIntroIfNeeded() -> Bool {
+        guard !AppInfo.isForkBuild else { return false }
         // Stable patches share one invitation, even if the first installed
         // version in this release series is a hotfix.
         guard SupportUpdateIntroInfo.shouldShow(
@@ -2364,7 +2366,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     private func showSupportUpdateIntro(isReview: Bool = false) {
-        guard !isTerminating, isReview || !AppInfo.isBeta else { return }
+        guard !isTerminating, !AppInfo.isForkBuild, isReview || !AppInfo.isBeta else { return }
         closePopover()
         if let window = supportIntroWindow {
             NSApp.activate(ignoringOtherApps: true)

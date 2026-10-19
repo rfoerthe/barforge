@@ -121,7 +121,7 @@ enum ClipboardFeatureTests {
         source.lookup = []
         source.candidates = ["com.apple.Safari"]
         suite.expect(sourceCheck(declared: "com.vorssaint.utils").bundleID == nil,
-                     "text Vorssaint copies itself, such as recognized text, is not credited to the app in front")
+                     "text Barforge copies itself, such as recognized text, is not credited to the app in front")
         source.candidates = ["com.apple.Safari"]
         suite.expect(sourceCheck(declared: "com.apple.Notes").bundleID == "com.apple.Notes",
                      "an app that names itself on the pasteboard is believed over the app in front")
@@ -1447,7 +1447,7 @@ enum ClipboardFeatureTests {
         ClipboardHistoryImageEditorTests.run(suite)
         ClipboardHistoryAccessTests.run(suite)
 
-        let pasteboardAccess = GeneralPasteboardAccess(label: "Vorssaint.Tests.PasteboardAccess")
+        let pasteboardAccess = GeneralPasteboardAccess(label: "Barforge.Tests.PasteboardAccess")
         let pasteboardGroup = DispatchGroup()
         let pasteboardStateLock = NSLock()
         var activePasteboardOperations = 0

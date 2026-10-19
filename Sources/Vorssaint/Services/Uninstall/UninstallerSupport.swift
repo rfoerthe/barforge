@@ -792,6 +792,7 @@ enum UninstallerSupport {
         let lowered = id.lowercased()
         return lowered == "com.vorssaint" || lowered.hasPrefix("com.vorssaint.")
             || lowered.hasPrefix("vorss.")
+            || lowered == "de.foerther.barforge" || lowered.hasPrefix("de.foerther.barforge.")
     }
 
     private static func stripKnownSuffix(_ rawName: String) -> String {

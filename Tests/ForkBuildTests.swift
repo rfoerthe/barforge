@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -32,6 +32,9 @@ enum ForkBuildTests {
                 suite.expect(format.components(separatedBy: "%@").count == 2 && !format.contains("\u{2014}"),
                              "fork notices take the repository once (\(language.rawValue))")
             }
+            suite.expect(text.attribution.contains("Vorssaint") && text.attribution.contains("GPL-3.0-or-later")
+                         && !text.attribution.contains("%@"),
+                         "the fork names the original project and its license (\(language.rawValue))")
         }
     }
 }

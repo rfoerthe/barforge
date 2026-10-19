@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AVKit
@@ -135,7 +136,7 @@ struct UpdateShowcaseIntroView: View {
                 .keyboardShortcut(.cancelAction)
                 Spacer()
                 Button(l10n.s.obContinue) {
-                    step = .support
+                    if AppInfo.isForkBuild { onClose() } else { step = .support }
                 }
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(.borderedProminent)

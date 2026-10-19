@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 import Security
@@ -16,9 +17,9 @@ enum FanControlIdentifiers {
     static let teamID = FanControlSigning.teamID(FanControlSigning.ownTeamID()) ?? officialTeamID
 
     #if VORSSAINT_DEVELOPMENT
-    static let appBundleID = "com.vorssaint.utils.dev"
+    static let appBundleID = "de.foerther.barforge.dev"
     #else
-    static let appBundleID = "com.vorssaint.utils"
+    static let appBundleID = "de.foerther.barforge"
     #endif
 
     static let helperID = "\(appBundleID).fan-control"
