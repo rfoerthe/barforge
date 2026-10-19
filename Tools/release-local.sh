@@ -160,7 +160,11 @@ codesign --verify --strict -R="$DMG_REQUIREMENT" "$DMG"
 # ── Verify what a user downloads ─────────────────────────────────────────────
 echo "▸ Verifying…"
 MOUNT="$(mktemp -d)"
-hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG" >/dev/null
+if diskutil image -h >/dev/null 2>&1; then
+    diskutil image attach --nobrowse --readOnly --mountPoint "$MOUNT" "$DMG" >/dev/null
+else
+    hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG" >/dev/null
+fi
 codesign --verify --deep --strict -R="$APP_REQUIREMENT" "$MOUNT/$APP_NAME.app"
 if (( NOTARIZE )); then
     xcrun stapler validate "$DMG"

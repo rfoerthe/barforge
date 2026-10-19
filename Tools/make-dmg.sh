@@ -50,29 +50,44 @@ cp build/dmg-background.png "$STAGING/.background/background.png"
 
 echo "▸ Creating writable image…"
 WORK="$(mktemp -d)"
-RW="$WORK/rw.dmg"
+# macOS 27 deprecates hdiutil's create and attach in favour of diskutil image,
+# which writes a sparse bundle with an APFS volume. Older systems, the macos-26
+# CI runners among them, only have hdiutil.
+if diskutil image -h >/dev/null 2>&1; then
+    RW="$WORK/rw.sparsebundle"
+    create_image() {
+        diskutil image create from "$STAGING" "$RW" --format UDSB --volumeName "$VOLUME"
+    }
+    attach_image() { diskutil image attach --nobrowse "$RW"; }
+else
+    RW="$WORK/rw.dmg"
+    create_image() {
+        hdiutil create -volname "$VOLUME" -srcfolder "$STAGING" -fs HFS+ -format UDRW -ov "$RW"
+    }
+    attach_image() { hdiutil attach "$RW" -nobrowse; }
+fi
 # Clear any stale mount left by a previous attempt on the same runner.
 hdiutil detach "/Volumes/$VOLUME" -force 2>/dev/null || true
-# hdiutil can fail transiently on CI runners; retry a few times. No -quiet, so a
-# real error is visible in the build log rather than swallowed.
+# Image creation can fail transiently on CI runners; retry a few times. No
+# -quiet, so a real error is visible in the build log rather than swallowed.
 created=0
 for attempt in 1 2 3; do
-    if hdiutil create -volname "$VOLUME" -srcfolder "$STAGING" -fs HFS+ -format UDRW -ov "$RW"; then
+    if create_image; then
         created=1
         break
     fi
-    echo "  hdiutil create failed (attempt $attempt of 3), retrying…" >&2
-    rm -f "$RW"
+    echo "  disk image creation failed (attempt $attempt of 3), retrying…" >&2
+    rm -rf "$RW"
     sleep 3
 done
 if [[ $created -ne 1 ]]; then
     echo "✗ Could not create the disk image after 3 attempts" >&2
     exit 1
 fi
-ATTACH_OUTPUT="$(hdiutil attach "$RW" -nobrowse)"
+ATTACH_OUTPUT="$(attach_image)"
 MOUNT="$(printf '%s\n' "$ATTACH_OUTPUT" | awk '/\/Volumes\// {print substr($0, index($0, "/Volumes/")); exit}')"
 if [[ -z "$MOUNT" || ! -d "$MOUNT" ]]; then
-    echo "✗ Could not find mounted volume in hdiutil output" >&2
+    echo "✗ Could not find mounted volume in the attach output" >&2
     printf '%s\n' "$ATTACH_OUTPUT" >&2
     exit 1
 fi
