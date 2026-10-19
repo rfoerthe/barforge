@@ -60,6 +60,32 @@ notarizes and staples that too, and finally checks that Gatekeeper reports
 identities installed, choose one with `SIGNING_IDENTITY`; a different keychain
 profile goes in `NOTARY_PROFILE`.
 
+## Publishing on GitHub
+
+Before you publish, give the version a dated entry in
+[CHANGELOG-FORK.md](../CHANGELOG-FORK.md), `## [3.4.1+mx.1] - 2026-10-19`, and
+push that commit. Then:
+
+```bash
+./Tools/github-release.sh
+```
+
+The script lists the DMGs in `dist/` that have a `.sha256` file next to them
+and asks you to pick one. It checks the checksum and that Gatekeeper accepts
+the DMG and the app inside as notarized, and reads the version from the app.
+Unless the tag `v<version>` exists already, it tags HEAD, which must be clean,
+pushed and carry the same version in `Resources/Info.plist`. After you confirm,
+it pushes the tag, creates a draft release with the DMG and its `.sha256`
+attached and the changelog entry as notes, checks that GitHub reports the same
+SHA-256 for both files, and publishes it. Versions with `-alpha.`, `-beta.` or
+`-rc.` become pre-releases; all others are marked as the latest release.
+
+`--dry-run` runs every check and shows the tag, the release and its notes
+without changing anything. `--yes` skips the confirmation. The release goes to
+the repository of the `origin` remote; choose another with `GIT_REMOTE` or
+`GITHUB_REPO`. Upstream is refused, since its releases come from the release
+workflow.
+
 ## Team ID
 
 Nothing in the source names your Team ID. Fan Control's app and helper each
