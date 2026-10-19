@@ -114,7 +114,7 @@ echo "  identity: $IDENTITY"
 # Submits a zip/dmg, waits for the verdict and prints Apple's log when it is
 # not accepted, since notarytool's own exit status does not say so reliably.
 notarize() {
-    local target="$1" submit="$1" result status id
+    local target="$1" submit="$1" result verdict id
     if [[ "$target" == *.app ]]; then
         submit="$WORK/$(basename "$target").zip"
         rm -f "$submit"
@@ -124,10 +124,10 @@ notarize() {
     result="$WORK/notary.json"
     xcrun notarytool submit "$submit" --keychain-profile "$NOTARY_PROFILE" \
         --wait --output-format json > "$result"
-    status="$(plutil -extract status raw -o - "$result" 2>/dev/null || echo unknown)"
+    verdict="$(plutil -extract status raw -o - "$result" 2>/dev/null || echo unknown)"
     id="$(plutil -extract id raw -o - "$result" 2>/dev/null || true)"
-    if [[ "$status" != "Accepted" ]]; then
-        echo "✗ Notarization of $(basename "$target") ended with status: $status" >&2
+    if [[ "$verdict" != "Accepted" ]]; then
+        echo "✗ Notarization of $(basename "$target") ended with status: $verdict" >&2
         [[ -n "$id" ]] && xcrun notarytool log "$id" --keychain-profile "$NOTARY_PROFILE" >&2 || true
         exit 1
     fi
