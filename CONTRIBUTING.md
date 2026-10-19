@@ -130,5 +130,5 @@ Barforge is a fork of Vorssaint and may not use its name or icon
   `// Copyright (C) 2026 Roland Foerther`. A file from upstream that the fork
   changes beyond the rename keeps `Copyright (C) 2026 Vorssaint` and gets the
   fork's line below it. Never remove or replace upstream's line.
-- Record fork changes in [CHANGELOG-FORK.md](CHANGELOG-FORK.md); CHANGELOG.md
+- Record fork changes in [CHANGELOG-BARFORGE.md](CHANGELOG-BARFORGE.md); CHANGELOG.md
   stays identical to upstream.

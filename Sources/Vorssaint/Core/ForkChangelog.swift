@@ -3,7 +3,7 @@
 
 import Foundation
 
-/// A fork keeps its own changes in CHANGELOG-FORK.md so CHANGELOG.md stays
+/// A fork keeps its own changes in CHANGELOG-BARFORGE.md so CHANGELOG.md stays
 /// identical to upstream. The app reads both as one changelog: each fork
 /// release ("3.4.1+mx.2") is a version block of its own, placed right before
 /// the upstream release it builds on, and the fork's unreleased entries join
@@ -42,7 +42,7 @@ enum ForkChangelog {
     }
 
     static func bundled() -> String? {
-        guard let url = Bundle.main.url(forResource: "CHANGELOG-FORK", withExtension: "md") else { return nil }
+        guard let url = Bundle.main.url(forResource: "CHANGELOG-BARFORGE", withExtension: "md") else { return nil }
         return try? String(contentsOf: url, encoding: .utf8)
     }
 

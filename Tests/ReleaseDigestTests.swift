@@ -50,7 +50,7 @@ enum ReleaseDigestTests {
         }
     }
 
-    /// A fork's CHANGELOG-FORK.md joins the upstream changelog: its releases
+    /// A fork's CHANGELOG-BARFORGE.md joins the upstream changelog: its releases
     /// sit before the release they build on, and What's New orders fork
     /// builds after it and after each other.
     private static func checkForkChangelog(_ suite: TestSuite) {
@@ -144,11 +144,11 @@ enum ReleaseDigestTests {
                      "a fork build names the release it builds on")
 
         if let real = try? String(contentsOfFile: "CHANGELOG.md", encoding: .utf8),
-           let realFork = try? String(contentsOfFile: "CHANGELOG-FORK.md", encoding: .utf8) {
+           let realFork = try? String(contentsOfFile: "CHANGELOG-BARFORGE.md", encoding: .utf8) {
             let all = ForkChangelog.merged(real, fork: realFork)
             let forkVersions = ReleaseNotes.allVersions(changelog: realFork)
             suite.expect(forkVersions.allSatisfy { ReleaseNotes.allVersions(changelog: all).contains($0) },
-                         "every release in CHANGELOG-FORK.md reaches the merged changelog")
+                         "every release in CHANGELOG-BARFORGE.md reaches the merged changelog")
             for version in forkVersions {
                 suite.expect(ForkChangelog.baseVersion(of: version) != nil,
                              "fork release \(version) carries build metadata")

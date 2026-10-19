@@ -6,7 +6,7 @@
 # that have a .sha256 file next to them, lets you pick exactly one, checks the
 # checksum, the signature and the notarization, reads the version from the app
 # inside, tags the commit as v<version>, and creates the release with the DMG
-# and its .sha256 attached and the notes from CHANGELOG-FORK.md. The release is
+# and its .sha256 attached and the notes from CHANGELOG-BARFORGE.md. The release is
 # created as a draft and published only after GitHub reports the same SHA-256
 # for every asset, so it also works with immutable releases switched on.
 #
@@ -14,7 +14,7 @@
 # and a DMG from Tools/release-local.sh.
 #
 # Without an existing tag, the script tags HEAD: the working tree must be clean,
-# HEAD must already be pushed, and its Resources/Info.plist and CHANGELOG-FORK.md
+# HEAD must already be pushed, and its Resources/Info.plist and CHANGELOG-BARFORGE.md
 # must carry the DMG's version, the changelog entry with a date.
 #
 # Options:
@@ -40,7 +40,7 @@ for arg in "$@"; do
 done
 
 APP_NAME="Barforge"
-CHANGELOG="CHANGELOG-FORK.md"
+CHANGELOG="CHANGELOG-BARFORGE.md"
 GIT_REMOTE="${GIT_REMOTE:-origin}"
 WORK=""
 MOUNT=""

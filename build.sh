@@ -686,8 +686,8 @@ cp Resources/de.foerther.barforge.fan-control.plist \
     "$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
 cp Resources/Info.plist "$STAGE/Contents/Info.plist"
 cp CHANGELOG.md "$STAGE/Contents/Resources/CHANGELOG.md"
-if [[ -f CHANGELOG-FORK.md ]]; then
-    cp CHANGELOG-FORK.md "$STAGE/Contents/Resources/CHANGELOG-FORK.md"
+if [[ -f CHANGELOG-BARFORGE.md ]]; then
+    cp CHANGELOG-BARFORGE.md "$STAGE/Contents/Resources/CHANGELOG-BARFORGE.md"
 fi
 for lproj in Resources/*.lproj(N); do
     cp -R "$lproj" "$STAGE/Contents/Resources/"

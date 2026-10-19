@@ -16,7 +16,7 @@
   <a href="#install">Install</a> ·
   <a href="#everything-it-does">Features</a> ·
   <a href="#private-by-default">Privacy</a> ·
-  <a href="CHANGELOG-FORK.md">Fork changelog</a> ·
+  <a href="CHANGELOG-BARFORGE.md">Barforge changelog</a> ·
   <a href="https://github.com/rfoerthe/vorssaint-utils/issues">Issues</a>
 </p>
 
@@ -26,7 +26,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-blue" alt="License GPL 3.0 or later"></a>
 </p>
 
-> **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [fork changelog](CHANGELOG-FORK.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/vorssaint-utils/issues), not upstream.
+> **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [Barforge changelog](CHANGELOG-BARFORGE.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/vorssaint-utils/issues), not upstream.
 
 <p align="center">
   <img src="docs/assets/readme/panel-mixer.png" width="196" alt="Volume mixer with per app sliders, one app boosted past 100 percent">

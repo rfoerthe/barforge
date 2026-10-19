@@ -64,7 +64,7 @@ profile goes in `NOTARY_PROFILE`.
 ## Publishing on GitHub
 
 Before you publish, give the version a dated entry in
-[CHANGELOG-FORK.md](../CHANGELOG-FORK.md), `## [3.4.1+mx.1] - 2026-10-19`, and
+[CHANGELOG-BARFORGE.md](../CHANGELOG-BARFORGE.md), `## [3.4.1+mx.1] - 2026-10-19`, and
 push that commit. Then:
 
 ```bash
