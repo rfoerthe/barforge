@@ -6,7 +6,7 @@
 // - the app iconset and .icns from the rendered icon artwork
 //   (Resources/Brand/AppIcon-Default.png)
 // - the menu bar template glyph and BrandMark from the anvil silhouette
-//   (Resources/Brand/logo.png)
+//   (Resources/Brand/logo.png), with a window cut through its waist
 // The silhouette in logo.png and in Resources/Brand/AppIcon.icon is traced
 // from the artwork's outline, and the .icon's Faces layer from its lit top and
 // bevels; change them together. The build cannot read
@@ -75,6 +75,13 @@ func bitmapCanvas(_ px: Int, _ py: Int) -> NSBitmapImageRep? {
                      bytesPerRow: 0, bitsPerPixel: 0)
 }
 
+/// The window cut through the anvil's waist, in logo.png pixels (y down).
+/// One flat color gives the mark no faces to tell its parts apart, so the
+/// opening breaks up the solid body. Centered between the waist's arcs, whose
+/// innermost points sit at x 447 and 726, leaving walls ~2 pt thick in the
+/// menu bar; it stops short of the foot (y 633) and of the heel's underside.
+let waistWindow = (rect: CGRect(x: 520, y: 400, width: 134, height: 190), radius: CGFloat(22))
+
 /// Draws the trimmed mark fitted into `target`, preserving aspect ratio.
 func drawMark(into target: CGRect) {
     let scale = min(target.width / sourceRect.width, target.height / sourceRect.height)
@@ -84,6 +91,18 @@ func drawMark(into target: CGRect) {
                       width: size.width, height: size.height)
     logo.draw(in: rect, from: sourceRect, operation: .sourceOver, fraction: 1,
               respectFlipped: false, hints: [.interpolation: NSImageInterpolation.high.rawValue])
+
+    // Measured from the trimmed top-left like the mark; drawing is bottom-up.
+    // Snapped to whole pixels so the small menu bar glyph keeps crisp edges.
+    let window = CGRect(x: rect.minX + (waistWindow.rect.minX - bounds.minX) * scale,
+                        y: rect.maxY - (waistWindow.rect.maxY - bounds.minY) * scale,
+                        width: waistWindow.rect.width * scale,
+                        height: waistWindow.rect.height * scale)
+        .integral
+    NSGraphicsContext.current?.compositingOperation = .clear
+    NSBezierPath(roundedRect: window, xRadius: waistWindow.radius * scale,
+                 yRadius: waistWindow.radius * scale).fill()
+    NSGraphicsContext.current?.compositingOperation = .sourceOver
 }
 
 // MARK: - App icon
