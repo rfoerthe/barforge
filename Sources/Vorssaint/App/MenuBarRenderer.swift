@@ -65,7 +65,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         case .peripheralBattery: return strings.monitorShowPeripheralBattery
         case .connectedDevices: return FeatureStrings.connectedDevices(L10n.shared.language).title
         case .power: return strings.monitorShowPowerLabel
-        case .fanSpeed: return FeatureStrings.fanControl(L10n.shared.language).menuBarTitle
+        case .fanSpeed: return FeatureStrings.fanSpeed(L10n.shared.language).title
         }
     }
 
@@ -87,19 +87,19 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         defaults.set(raw, forKey: DefaultsKey.menuBarMetricOrder)
     }
 
-    /// The hub feature this metric belongs to; temperatures ride with their
-    /// parent metric. A pinned metric whose feature is off in the hub stays
-    /// pinned in defaults but stops rendering (and sampling) until it returns.
+    /// The hub feature this metric belongs to; temperatures and fan speeds
+    /// ride with their parent metric. A pinned metric whose feature is off in
+    /// the hub stays pinned in defaults but stops rendering (and sampling)
+    /// until it returns.
     var feature: AppFeature {
         switch self {
-        case .cpu, .cpuTemperature: return .monitorCPU
+        case .cpu, .cpuTemperature, .fanSpeed: return .monitorCPU
         case .gpu, .gpuTemperature: return .monitorGPU
         case .memory: return .monitorMemory
         case .network: return .monitorNetwork
         case .diskUsage, .diskActivity: return .monitorDisk
         case .connectedDevices: return .connectedDevices
         case .battery, .batteryTime, .batteryTemperature, .peripheralBattery, .power: return .monitorPower
-        case .fanSpeed: return .fanControl
         }
     }
 
@@ -589,7 +589,7 @@ enum MenuBarRenderer {
                                                 pressure: nil)])
                 }
             case .fanSpeed:
-                if let value = FanControlPolicy.menuBarValue(for: snapshot.fanSpeeds) {
+                if let value = FanTelemetry.menuBarValue(for: snapshot.fanSpeeds) {
                     let minimumValue = Array(repeating: "20000", count: snapshot.fanSpeeds.count)
                         .joined(separator: "/")
                     groups.append([.metricBlock(label: "RPM",
@@ -679,7 +679,7 @@ enum MenuBarRenderer {
             return 6       // symbol + " 99"
         case (_, .fanSpeed):
             let count = max(1, SystemMonitor.fanTelemetryCount)
-            return FanControlPolicy.menuBarWidthUnits(fanCount: count)
+            return FanTelemetry.menuBarWidthUnits(fanCount: count)
         }
     }
 

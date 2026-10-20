@@ -73,8 +73,8 @@ struct NotchSystemView: View {
                               value: power?.systemWatts.map(MetricFormat.wattsCompact),
                               detail: power?.externalConnected == true ? power?.adapterWatts.map(MetricFormat.watts) : nil))
         }
-        if AppFeature.fanControl.isAvailable, !snapshot.fanSpeeds.isEmpty {
-            let strings = FeatureStrings.fanControl(l10n.language)
+        if AppFeature.monitorCPU.isAvailable, !snapshot.fanSpeeds.isEmpty {
+            let strings = FeatureStrings.fanSpeed(l10n.language)
             cards.append(Card(kind: .fan, title: strings.title, symbol: "fanblades",
                               value: snapshot.fanSpeeds.first.map { String(format: strings.rpmFormat, Int($0.rounded())) }))
         }

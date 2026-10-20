@@ -364,19 +364,19 @@ struct SystemSection: View {
 
     // MARK: Fans
 
-    /// Live speeds only: setting them stays with Fan Control. One cell per
-    /// fan the SMC reports, so the card keeps its height before the first read.
+    /// Live speeds only. One cell per fan the SMC reports, so the card keeps
+    /// its height before the first read.
     @ViewBuilder
     private func fanGrid(editing: Bool) -> some View {
-        let strings = FeatureStrings.fanControl(l10n.language)
+        let strings = FeatureStrings.fanSpeed(l10n.language)
         if !sysFans {
-            PanelHiddenItemRow(title: strings.menuBarTitle,
+            PanelHiddenItemRow(title: strings.title,
                                systemImage: "fanblades",
                                isVisible: $sysFans)
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    subsectionLabel(strings.menuBarTitle)
+                    subsectionLabel(strings.title)
                     Spacer(minLength: 0)
                     if editing {
                         PanelInlineHideButton(isVisible: $sysFans)

@@ -12,7 +12,7 @@ enum MetricDetailKind: String, Equatable, Identifiable {
 
     var panelSection: PanelSectionID {
         switch self {
-        case .cpu, .gpu, .memory, .connectedDevices:
+        case .cpu, .gpu, .memory, .fan, .connectedDevices:
             return .system
         case .network:
             return .network
@@ -20,8 +20,6 @@ enum MetricDetailKind: String, Equatable, Identifiable {
             return .disk
         case .battery, .power:
             return .power
-        case .fan:
-            return .fanControl
         }
     }
 
@@ -77,7 +75,7 @@ enum MetricDetailKind: String, Equatable, Identifiable {
         case .disk: return s.diskSection
         case .battery: return s.batteryLabel
         case .power: return s.powerSection
-        case .fan: return FeatureStrings.fanControl(L10n.shared.language).menuBarTitle
+        case .fan: return FeatureStrings.fanSpeed(L10n.shared.language).title
         case .connectedDevices: return FeatureStrings.connectedDevices(L10n.shared.language).title
         }
     }
@@ -429,9 +427,9 @@ struct MetricDetailView: View {
             }
             return rows
         case .fan:
-            let strings = FeatureStrings.fanControl(l10n.language)
+            let strings = FeatureStrings.fanSpeed(l10n.language)
             guard !snapshot.fanSpeeds.isEmpty else {
-                return [row(strings.menuBarTitle, l10n.s.monitorUnavailable)]
+                return [row(strings.title, l10n.s.monitorUnavailable)]
             }
             return snapshot.fanSpeeds.enumerated().map { index, rpm in
                 row(String(format: strings.fanNameFormat, index + 1),
@@ -475,7 +473,7 @@ struct MetricDetailView: View {
         case .power:
             return snapshot.power?.systemWatts.map(MetricFormat.wattsCompact) ?? "-"
         case .fan:
-            let strings = FeatureStrings.fanControl(l10n.language)
+            let strings = FeatureStrings.fanSpeed(l10n.language)
             guard let rpm = snapshot.fanSpeeds.first else { return "-" }
             return String(format: strings.rpmFormat, Int(rpm.rounded()))
         case .connectedDevices:
@@ -511,9 +509,9 @@ struct MetricDetailView: View {
         case .power:
             return powerSubtitle(snapshot.power)
         case .fan:
-            let strings = FeatureStrings.fanControl(l10n.language)
+            let strings = FeatureStrings.fanSpeed(l10n.language)
             return snapshot.fanSpeeds.isEmpty
-                ? strings.menuBarTitle
+                ? strings.title
                 : String(format: strings.fanNameFormat, 1)
         case .connectedDevices:
             let count = snapshot.connectedDevices.count

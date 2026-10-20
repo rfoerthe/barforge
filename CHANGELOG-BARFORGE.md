@@ -21,7 +21,7 @@ Based on Vorssaint 3.4.1.
 ### Added
 - Logitech MX Master 3, 3S and 4 mice can give every button, the gesture or thumb button and the thumb wheel an action, with gesture sets for windows, media, zoom and panning, over a Bolt or Unifying receiver or Bluetooth. Settings → Mouse & Trackpad → Logitech MX mice.
 - The same panel sets pointer speed and a second speed to switch to, SmartShift and its sensitivity, scrolling force and wheel direction, and on the MX Master 4 haptic feedback and the haptic sense panel's pressure point. Each connected mouse shows its battery charge.
-- The System card lists each fan and its current speed, read-only, without the Fan Control extension. Settings → Monitor → System → Fan speed.
+- The System card lists each fan and its current speed. Settings → Monitor → System → Fan speed.
 
 ### Changed
 - Barforge needs macOS 26 Tahoe or later.
@@ -33,5 +33,5 @@ Based on Vorssaint 3.4.1.
 - The speed test in the Network card measures latency, download and upload one after the other, each as a bar with its value in ms or Mbps, updated four times a second while it runs; download and upload take about ten seconds each, and their result is the mean of the readings after the first 2.5 seconds of ramp-up. Results on fast fibre lines now match breitbandmessung.de: about 6 ms, 1000 to 1060 and 545 Mbps on a 1000/500 line, where the test showed 65 ms, 394 and 198 Mbps before. It measures against Apple's networkQuality servers and falls back to Cloudflare when they do not answer, and a running test can be stopped.
 - The Network card's apps using network list starts folded behind an arrow, like the CPU apps list. Per-app traffic is measured only while the list is open.
 
-### Fixed
-- Fan Control works in a build signed with a Developer ID other than Vorssaint's, such as Barforge's. The app and its helper trust the team that signed them instead of a fixed one.
+### Removed
+- Fan Control. Barforge no longer sets fan speeds or temperature curves and ships no privileged fan helper, so it never asks to add a background item for one and never writes to the SMC. Fan speeds stay visible, read-only, in the System card, the menu bar and the Dynamic Island; outside the System card they follow the CPU monitor in Settings → Features. Leftover Fan Control settings are deleted on first launch.

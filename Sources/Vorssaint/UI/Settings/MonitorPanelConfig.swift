@@ -143,7 +143,7 @@ struct MonitorPanelConfig: View {
                          options: AnyView(chartOption($graphMemory)), summary: chartSummary(graphMemory))
             }
             if SystemMonitor.fanTelemetryAvailable {
-                itemTile(FeatureStrings.fanControl(l10n.language).menuBarTitle, symbol: "fanblades",
+                itemTile(FeatureStrings.fanSpeed(l10n.language).title, symbol: "fanblades",
                          value: $sysFans, available: available)
             }
             itemTile(l10n.s.monitorItemUptime, symbol: "clock", value: $sysUptime, available: available)
@@ -225,7 +225,7 @@ struct MonitorPanelConfig: View {
                     Toggle(l10n.s.memorySection, isOn: $sysMemory)
                 }
                 if SystemMonitor.fanTelemetryAvailable {
-                    Toggle(FeatureStrings.fanControl(l10n.language).menuBarTitle, isOn: $sysFans)
+                    Toggle(FeatureStrings.fanSpeed(l10n.language).title, isOn: $sysFans)
                 }
                 Toggle(l10n.s.monitorItemUptime, isOn: $sysUptime)
                 if AppFeature.connectedDevices.isAvailable {

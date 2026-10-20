@@ -585,14 +585,12 @@ final class SystemMonitor: ObservableObject {
             (panelNeedsPower && defaults.bool(forKey: DefaultsKey.monitorPwrTemperature))
                 || menuPanelNeeds.batteryTemperature
                 || defaults.bool(forKey: DefaultsKey.menuBarBatteryTemperature) || alertBatteryTemperature)
-        // The System card lists fan speeds read-only, so it reads them even
-        // with Fan Control uninstalled.
         let systemCardFans = menuPanelNeeds.system
             && defaults.bool(forKey: DefaultsKey.monitorSysFans)
-        let fanControlFans = defaults.bool(forKey: AppFeature.fanControl.availabilityKey)
+        let otherFans = defaults.bool(forKey: AppFeature.monitorCPU.availabilityKey)
             && (fullMonitorVisible || menuPanelNeeds.fanSpeed
                 || defaults.bool(forKey: DefaultsKey.menuBarFanSpeed))
-        plan.needFanSpeed = (systemCardFans || fanControlFans) && Self.fanTelemetryAvailable
+        plan.needFanSpeed = (systemCardFans || otherFans) && Self.fanTelemetryAvailable
         // The island preview in Settings shows the device card too; the
         // panel's System card reads USB only for its device row's count.
         plan.needConnectedDevices = fullMonitorVisible
@@ -1072,13 +1070,13 @@ final class SystemMonitor: ObservableObject {
         guard let client = SMCClient(),
               let countKey = client.key(named: "FNum"),
               let countValue = client.readValue(countKey),
-              let count = FanControlPolicy.fanCount(from: countValue) else { return 0 }
+              let count = FanTelemetry.fanCount(from: countValue) else { return 0 }
         let readings = (0..<count).map { index -> Double? in
             guard let key = client.key(named: "F\(index)Ac") else { return nil }
             return client.readValue(key)
         }
-        guard FanControlPolicy.telemetryReadings(expectedCount: count,
-                                                 readings: readings) != nil else { return 0 }
+        guard FanTelemetry.readings(expectedCount: count,
+                                    readings: readings) != nil else { return 0 }
         return count
     }()
 
@@ -1086,8 +1084,8 @@ final class SystemMonitor: ObservableObject {
 
     private func readFanSpeeds() -> [Double]? {
         guard let smc, !fanKeys.isEmpty else { return nil }
-        return FanControlPolicy.telemetryReadings(expectedCount: fanKeys.count,
-                                                  readings: fanKeys.map { smc.readValue($0) })
+        return FanTelemetry.readings(expectedCount: fanKeys.count,
+                                     readings: fanKeys.map { smc.readValue($0) })
     }
 
     private func cpuTemperature() -> Double? {

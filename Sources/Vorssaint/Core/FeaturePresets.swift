@@ -150,7 +150,7 @@ extension AppFeature {
         case .mouseAcceleration, .spacesOrder, .pastePlain, .soundOutputSwitcher, .audioPriority, .micMute,
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,
-             .cameraPreview, .scratchpad, .commandBar, .screenRecorder, .wallpaper, .fanControl,
+             .cameraPreview, .scratchpad, .commandBar, .screenRecorder, .wallpaper,
              .diskImageInstaller, .killProcess, .portManager:
             return .idle
         // Device reports arrive only while a diverted control is used; the
