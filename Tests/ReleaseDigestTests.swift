@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
-// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -17,7 +16,6 @@ enum ReleaseDigestTests {
         checkNewFeatures(suite)
         checkSections(suite)
         checkRealChangelog(suite)
-        checkForkChangelog(suite)
     }
 
     /// The repository's own CHANGELOG.md, as the next releases will ship it:
@@ -47,112 +45,6 @@ enum ReleaseDigestTests {
                          "every entry of \(from) → \(to) lands in a row")
             suite.expect(sections.rows.allSatisfy { Set($0.changes).count == $0.changes.count },
                          "no row of \(from) → \(to) lists an entry twice")
-        }
-    }
-
-    /// A fork's CHANGELOG-BARFORGE.md joins the upstream changelog: its releases
-    /// sit before the release they build on, and What's New orders fork
-    /// builds after it and after each other.
-    private static func checkForkChangelog(_ suite: TestSuite) {
-        let upstream = """
-        # Changelog
-
-        ## [Unreleased]
-
-        ### Added
-        - Upstream work in progress.
-
-        ## [3.4.2-beta.1] - 2026-10-20
-
-        ### Added
-        - A newer upstream beta.
-
-        ## [3.4.1] - 2026-10-08
-
-        ### Summary
-        Upstream summary.
-
-        ### Added
-        - Upstream entry.
-        """
-        let fork = """
-        # Fork Changelog
-
-        ## [Unreleased]
-
-        ### Added
-        - Fork work in progress.
-
-        ## [3.4.1+mx.2]
-
-        ### Added
-        - Second fork entry.
-
-        ## [3.4.1+mx.1]
-
-        ### Changed
-        - First fork entry.
-        """
-        let merged = ForkChangelog.merged(upstream, fork: fork)
-        suite.expect(ForkChangelog.merged(upstream, fork: nil) == upstream,
-                     "without a fork changelog the upstream one is read as it is")
-        suite.expect(ReleaseNotes.allVersions(changelog: merged)
-                        == ["3.4.2-beta.1", "3.4.1+mx.2", "3.4.1+mx.1", "3.4.1"],
-                     "fork releases sit newest first before the release they build on")
-        suite.expect(ReleaseNotes.notes(for: "Unreleased", changelog: merged).sections.flatMap(\.bulletItems)
-                        == ["Upstream work in progress.", "Fork work in progress."],
-                     "the fork's unreleased entries join upstream's")
-
-        let order = ["3.4.0", "3.4.1-beta.5", "3.4.1", "3.4.1+mx.1", "3.4.1+mx.2", "3.4.1+mx.10", "3.4.2-beta.1"]
-            .compactMap(ReleaseOrder.init(raw:))
-        suite.expect(order.count == 7 && zip(order, order.dropFirst()).allSatisfy { $0 < $1 },
-                     "What's New orders fork builds after their release and after each other")
-        suite.expect(!UpdateServiceSupport.isNewer("3.4.1+mx.2", than: "3.4.1"),
-                     "updates still take a fork build for the release it builds on")
-
-        let listed = ReleaseNotes.allVersions(changelog: merged)
-        let ranges: [(String, String, [String])] = [
-            ("3.4.1", "3.4.1+mx.1", ["3.4.1+mx.1"]),
-            ("3.4.1+mx.1", "3.4.1+mx.2", ["3.4.1+mx.2"]),
-            ("3.4.0", "3.4.1+mx.2", ["3.4.1+mx.2", "3.4.1+mx.1", "3.4.1"]),
-            ("3.4.1+mx.2", "3.4.1+mx.2", []),
-        ]
-        for (from, to, expected) in ranges {
-            let versions = ReleaseDigest.versions(from: from, to: to, among: listed)
-            suite.expect(versions == expected, "\(from) → \(to) covers \(expected), got \(versions)")
-        }
-        let digest = ReleaseDigest.make(from: "3.4.1", to: "3.4.1+mx.2", changelog: merged)
-        suite.expect(digest.changes.map(\.text) == ["Second fork entry.", "First fork entry."],
-                     "an update between fork builds lists the fork's entries")
-        suite.expect(WhatsNewInfo.pendingVersion(current: "3.4.1+mx.2", previous: "3.4.1+mx.1",
-                                                 seen: nil, pending: nil) == "3.4.1+mx.1"
-                        && WhatsNewInfo.pendingVersion(current: "3.4.1+mx.1", previous: "3.4.1",
-                                                       seen: nil, pending: nil) == "3.4.1"
-                        && WhatsNewInfo.pendingVersion(current: "3.4.1+mx.1", previous: "3.4.1+mx.1",
-                                                       seen: nil, pending: nil) == nil,
-                     "a new fork build queues What's New, the same build does not")
-        suite.expect(WhatsNewInfo.later("3.4.1", "3.4.1+mx.1") == "3.4.1+mx.1",
-                     "a fork build counts as seen after the release it builds on")
-
-        let combined = ForkChangelog.combined(ReleaseNotes.notes(for: "3.4.1+mx.2", changelog: merged),
-                                              base: ReleaseNotes.notes(for: "3.4.1", changelog: merged))
-        suite.expect(combined.sections.map(\.title) == ["Summary", "Added"]
-                        && combined.sections[1].bulletItems == ["Second fork entry.", "Upstream entry."],
-                     "Settings lists a fork build's entries first, under the release's own headings")
-        suite.expect(ForkChangelog.baseVersion(of: "3.4.1+mx.2") == "3.4.1"
-                        && ForkChangelog.baseVersion(of: "3.4.1") == nil,
-                     "a fork build names the release it builds on")
-
-        if let real = try? String(contentsOfFile: "CHANGELOG.md", encoding: .utf8),
-           let realFork = try? String(contentsOfFile: "CHANGELOG-BARFORGE.md", encoding: .utf8) {
-            let all = ForkChangelog.merged(real, fork: realFork)
-            let forkVersions = ReleaseNotes.allVersions(changelog: realFork)
-            suite.expect(forkVersions.allSatisfy { ReleaseNotes.allVersions(changelog: all).contains($0) },
-                         "every release in CHANGELOG-BARFORGE.md reaches the merged changelog")
-            for version in forkVersions {
-                suite.expect(ForkChangelog.baseVersion(of: version) != nil,
-                             "fork release \(version) carries build metadata")
-            }
         }
     }
 

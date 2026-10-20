@@ -20,6 +20,12 @@ enum AppInfo {
 
     static var isForkBuild: Bool { forkRepository != nil }
 
+    /// The upstream release a fork build is made from, stamped into Info.plist
+    /// as `BarforgeUpstreamVersion`, since the fork numbers its own versions.
+    static var upstreamVersion: String? {
+        Bundle.main.object(forInfoDictionaryKey: "BarforgeUpstreamVersion") as? String
+    }
+
     /// A fork build links to its own repository.
     static var repositoryURL: URL {
         URL(string: "https://github.com/\(forkRepository ?? upstreamRepository)")!

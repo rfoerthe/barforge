@@ -132,3 +132,7 @@ Barforge is a fork of Vorssaint and may not use its name or icon
   fork's line below it. Never remove or replace upstream's line.
 - Record fork changes in [CHANGELOG-BARFORGE.md](CHANGELOG-BARFORGE.md); CHANGELOG.md
   stays identical to upstream.
+- Barforge has its own version line (`CFBundleShortVersionString`, 1.0.0
+  onwards). `BarforgeUpstreamVersion` in `Resources/Info.plist` names the
+  Vorssaint release it is made from: update it with every upstream merge, and
+  keep Barforge's version when the merge brings upstream's.

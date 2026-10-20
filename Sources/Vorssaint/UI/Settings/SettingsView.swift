@@ -772,6 +772,11 @@ struct AboutSettings: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                if let upstream = AppInfo.upstreamVersion {
+                    Text(String(format: FeatureStrings.forkBuild(l10n.language).basedOnFormat, upstream))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 if AppInfo.isDeveloperBuild, let commit = AppInfo.buildCommit {
                     // Dev-only: which source commit this build came from. Never shipped.
                     Text(commit)

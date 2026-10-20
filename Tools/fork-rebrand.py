@@ -68,6 +68,8 @@ PHRASES = [
 # The bare name, not inside an identifier or a path. ASCII classes on purpose:
 # Japanese, Chinese and Korean text runs straight into the name.
 NAME = re.compile(r"(?<![A-Za-z0-9_/])" + OLD + r"(?![A-Za-z0-9_/])")
+# "Vorssaint/\(version)" in a user agent: the literal text ends at the slash.
+AGENT = re.compile(r"(?<![A-Za-z0-9_/])" + OLD + r"/$")
 LEGACY = OLD + " Utils"
 PLACEHOLDER = "\0LEGACY\0"
 
@@ -77,11 +79,13 @@ def rebrand(text):
     for old, new in PHRASES:
         text = text.replace(old, new)
     text = NAME.sub(NEW, text)
+    text = AGENT.sub(NEW + "/", text)
     return text.replace(PLACEHOLDER, LEGACY)
 
 
 def leftovers(text):
-    return NAME.findall(text.replace(LEGACY, PLACEHOLDER))
+    text = text.replace(LEGACY, PLACEHOLDER)
+    return NAME.findall(text) + AGENT.findall(text)
 
 
 QUOTE = re.compile(r'(#*)("""|")')

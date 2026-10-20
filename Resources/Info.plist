@@ -41,7 +41,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.4.1+mx.1</string>
+	<string>1.0.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
@@ -84,5 +84,7 @@
 	<string>NSApplication</string>
 	<key>VorssaintForkRepository</key>
 	<string>rfoerthe/vorssaint-utils</string>
+	<key>BarforgeUpstreamVersion</key>
+	<string>3.4.1</string>
 </dict>
 </plist>

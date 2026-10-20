@@ -2067,10 +2067,9 @@ enum SwitcherModelFeatureTests {
         // per-release decision: this check fails on every version bump so the
         // decision above is made consciously, never by omission.
         let releasePlist = NSDictionary(contentsOfFile: "Resources/Info.plist")
-        // A fork marks its build with metadata ("3.4.1+mx.1"); the release it
-        // builds on is what the pin is about.
-        let plistVersion = ((releasePlist?["CFBundleShortVersionString"] as? String) ?? "")
-            .components(separatedBy: "+")[0]
+        // Barforge numbers its own versions; the Vorssaint release it is made
+        // from is what the pin is about.
+        let plistVersion = (releasePlist?["BarforgeUpstreamVersion"] as? String) ?? ""
         suite.expect(plistVersion == "3.4.1",
                "bumping the app version requires re-deciding the support prompt pin above")
         let plistBuild = (releasePlist?["CFBundleVersion"] as? String) ?? ""

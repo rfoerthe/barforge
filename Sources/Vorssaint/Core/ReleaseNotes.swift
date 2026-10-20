@@ -11,11 +11,6 @@ struct ReleaseNotes {
 
     static var current: ReleaseNotes {
         let direct = notes(for: AppInfo.version)
-        // A fork build lists its own entries and then the release it builds on.
-        if let base = ForkChangelog.baseVersion(of: AppInfo.version) {
-            let combined = ForkChangelog.combined(direct, base: notes(for: base))
-            if !combined.sections.isEmpty { return combined }
-        }
         if !direct.sections.isEmpty { return direct }
         let unreleased = notes(for: "Unreleased")
         if !unreleased.sections.isEmpty { return unreleased }
@@ -69,9 +64,10 @@ struct ReleaseNotes {
     }
 
     static func bundledChangelog() -> String? {
-        guard let url = Bundle.main.url(forResource: "CHANGELOG", withExtension: "md"),
-              let changelog = try? String(contentsOf: url, encoding: .utf8) else { return nil }
-        return ForkChangelog.merged(changelog, fork: ForkChangelog.bundled())
+        // A fork has its own version line, so its own changelog is the one to read.
+        if let fork = ForkChangelog.bundled() { return fork }
+        guard let url = Bundle.main.url(forResource: "CHANGELOG", withExtension: "md") else { return nil }
+        return try? String(contentsOf: url, encoding: .utf8)
     }
 
     private static func parse(version: String, changelog: String) -> ReleaseNotes? {

@@ -22,15 +22,21 @@ enum ForkBuildTests {
         suite.expect(AppInfoSupport.forkRepository(fork) == "rfoerthe/vorssaint-utils",
                      "this fork stamps its repository into the bundle")
         let parsed = UpdateServiceSupport.SemanticVersion(raw: version)
-        suite.expect(version.contains("+") && parsed?.isPrerelease == false
-                     && parsed == UpdateServiceSupport.SemanticVersion(raw: version.components(separatedBy: "+")[0]),
-                     "the fork marks its version with build metadata, so it is neither a beta nor a newer release")
+        suite.expect(parsed != nil && !version.contains("+") && parsed?.isPrerelease == false,
+                     "Barforge numbers its own releases with a plain version (\(version))")
+        let upstream = info?["BarforgeUpstreamVersion"] as? String ?? ""
+        suite.expect(UpdateServiceSupport.SemanticVersion(raw: upstream) != nil && !upstream.contains("+"),
+                     "the bundle names the Vorssaint release it is made from (\(upstream))")
+        let changelog = (try? String(contentsOfFile: "CHANGELOG-BARFORGE.md", encoding: .utf8)) ?? ""
+        let listed = ReleaseNotes.notes(for: version, changelog: changelog).sections.isEmpty
+            ? ReleaseNotes.notes(for: "Unreleased", changelog: changelog) : ReleaseNotes.notes(for: version, changelog: changelog)
+        suite.expect(!listed.sections.isEmpty, "What's New has Barforge notes for \(version)")
 
         for language in AppLanguage.allCases {
             let text = FeatureStrings.forkBuild(language)
-            for format in [text.aboutFormat, text.updatesOffFormat] {
+            for format in [text.aboutFormat, text.updatesOffFormat, text.basedOnFormat] {
                 suite.expect(format.components(separatedBy: "%@").count == 2 && !format.contains("\u{2014}"),
-                             "fork notices take the repository once (\(language.rawValue))")
+                             "fork notices take their value once (\(language.rawValue))")
             }
             suite.expect(text.attribution.contains("Vorssaint") && text.attribution.contains("GPL-3.0-or-later")
                          && !text.attribution.contains("%@"),
