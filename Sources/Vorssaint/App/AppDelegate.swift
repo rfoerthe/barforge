@@ -1534,7 +1534,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(shelfItem)
         }
 
-        // A fork build has nothing to update from; see AppInfo.receivesUpdates.
+        // Only a build that can install an update offers to look for one; see AppInfo.receivesUpdates.
         if AppInfo.receivesUpdates {
             let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
             updatesItem.target = self
@@ -1686,12 +1686,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     // MARK: - Windows
 
     func openSettingsWindow() {
-        // Intentionally does NOT close the panel: the panel uses applicationDefined
-        // dismissal, so it stays open beside Settings for a live preview.
-        // Capture the destination before activation changes the key window.
+        // Capture the destination before activation changes the key window
+        // and before the panel leaves.
         let targetScreen = (popover.isShown
             ? popoverAnchor?.screen ?? popover.contentViewController?.view.window?.screen
             : nil) ?? NSScreen.withMouse
+        // Settings takes over from the panel, so only the window stays on
+        // screen. The panel can still be opened again beside it.
+        closePopover()
         let createdWindow = settingsWindow == nil
         if settingsWindow == nil {
             let host = NSHostingController(rootView: SettingsView())
@@ -1776,7 +1778,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     private func positionSettingsWindow(_ window: NSWindow, force: Bool, on targetScreen: NSScreen? = nil) {
         window.contentView?.layoutSubtreeIfNeeded()
-        let popoverWindow = popover.isShown ? popover.contentViewController?.view.window : nil
+        // A panel on its way out no longer pushes the window aside.
+        let popoverWindow = popoverIsOpen ? popover.contentViewController?.view.window : nil
         let screen = targetScreen.flatMap { $0.isStillAttached ? $0 : nil } ?? popoverWindow?.screen ?? window.screen
         let visible = screen?.visibleFrame ?? NSScreen.pointerVisibleFrame
         let shouldCenter = force || screen?.displayID != window.screen?.displayID || !visible.intersects(window.frame)

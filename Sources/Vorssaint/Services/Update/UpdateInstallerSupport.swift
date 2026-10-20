@@ -1,7 +1,35 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
+
+/// The Developer ID an update must be signed with: the bundle identifier and
+/// Team ID of the running app. Both go into the installer's code signing
+/// requirements, so only plain identifier characters are accepted.
+struct UpdateSigner: Equatable {
+    let bundleID: String
+    let teamID: String
+
+    init?(bundleID: String?, teamID: String?) {
+        guard let bundleID, let teamID,
+              bundleID.range(of: #"^[A-Za-z0-9][A-Za-z0-9.-]*$"#, options: .regularExpression) != nil,
+              teamID.range(of: #"^[A-Z0-9]{10}$"#, options: .regularExpression) != nil
+        else { return nil }
+        self.bundleID = bundleID
+        self.teamID = teamID
+    }
+
+    /// What the DMG must satisfy: signed by the team's Developer ID.
+    var dmgRequirement: String {
+        "anchor apple generic and certificate leaf[subject.OU] = \"\(teamID)\""
+    }
+
+    /// What the app inside must satisfy: the same app, signed by the same team.
+    var appRequirement: String {
+        "identifier \"\(bundleID)\" and \(dmgRequirement)"
+    }
+}
 
 /// Pure helpers for the self-update installer: the shell script text, the
 /// quoting for its elevated (admin) variant and the parsing of the result
@@ -22,8 +50,9 @@ enum UpdateInstallerSupport {
     /// Arguments: $1 app path, $2 dmg path, $3 pid to wait for,
     /// $4 result marker path, $5 uid to relaunch as (used when running as
     /// root, where a plain `open` could launch the app as root), $6 expected
-    /// version from the trusted release tag.
-    static func installerScript() -> String {
+    /// version from the trusted release tag. `signer` is who the DMG and the
+    /// app inside must be signed by.
+    static func installerScript(signer: UpdateSigner) -> String {
         """
         #!/bin/sh
         APP="$1"; DMG="$2"; PID="$3"; RESULT="$4"; ASUSER="$5"; EXPECTED_VERSION="$6"
@@ -63,7 +92,7 @@ enum UpdateInstallerSupport {
         }
         while kill -0 "$PID" 2>/dev/null; do sleep 0.3; done
         note fail-dmg-verify
-        DMG_VERIFY_REQ='anchor apple generic and certificate leaf[subject.OU] = "3D485NHW29"'
+        DMG_VERIFY_REQ='\(signer.dmgRequirement)'
         if ! /usr/bin/codesign -v --strict -R="$DMG_VERIFY_REQ" "$DMG" 2>/dev/null; then
             /bin/rm -f "$DMG"
             finalize
@@ -120,7 +149,7 @@ enum UpdateInstallerSupport {
                     elif /usr/sbin/spctl -a -t exec "$STAGE" >/dev/null 2>&1; then
                         GATEKEEPER_OK=1
                     fi
-                    VERIFY_REQ='identifier "com.vorssaint.utils" and anchor apple generic and certificate leaf[subject.OU] = "3D485NHW29"'
+                    VERIFY_REQ='\(signer.appRequirement)'
                     note fail-verify
                     if /usr/bin/codesign -v --deep --strict -R="$VERIFY_REQ" "$STAGE" 2>/dev/null \
                         && [ "$GATEKEEPER_OK" = 1 ]; then
@@ -182,8 +211,9 @@ enum UpdateInstallerSupport {
                                        pid: Int32,
                                        resultPath: String,
                                        uid: uid_t,
-                                       expectedVersion: String) -> String {
-        let script = shellSingleQuoted(installerScript())
+                                       expectedVersion: String,
+                                       signer: UpdateSigner) -> String {
+        let script = shellSingleQuoted(installerScript(signer: signer))
         let args = [appPath, dmgPath, "\(pid)", resultPath, "\(uid)", expectedVersion]
             .map(shellSingleQuoted)
             .joined(separator: " ")

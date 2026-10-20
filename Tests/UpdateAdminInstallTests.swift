@@ -54,7 +54,8 @@ enum UpdateAdminInstallContract {
             AdminShell.answer = nil
             let service = Service()
             service.launchAdminInstaller(appPath: "/Applications/Vorssaint.app", dmgPath: "/tmp/update.dmg",
-                                         pid: 42, resultPath: "/tmp/update-result", expectedVersion: "9.9.9")
+                                         pid: 42, resultPath: "/tmp/update-result", expectedVersion: "9.9.9",
+                                         signer: UpdateSigner(bundleID: "com.vorssaint.utils", teamID: "3D485NHW29")!)
             suite.expect(events == ["prompt"],
                          "the brightness overlay leaves the screen before the prompt holds the main thread")
             AdminShell.answer?(granted)

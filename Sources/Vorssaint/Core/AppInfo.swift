@@ -3,6 +3,7 @@
 // Copyright (C) 2026 Roland Foerther
 
 import Foundation
+import Security
 
 /// Static identity of the app, shared by UI, notifications and tooling.
 enum AppInfo {
@@ -31,11 +32,37 @@ enum AppInfo {
         URL(string: "https://github.com/\(forkRepository ?? upstreamRepository)")!
     }
 
-    /// Only the official app updates itself. A fork build is never offered
-    /// an official release, which would replace it and drop its changes, and
-    /// it cannot install its own: the installer only trusts Vorssaint's
-    /// Developer ID.
-    static var receivesUpdates: Bool { !isDeveloperBuild && !isForkBuild }
+    /// Where updates come from: a fork build follows its own releases, so an
+    /// official release never replaces it and drops its changes.
+    static var updateRepository: String { forkRepository ?? upstreamRepository }
+
+    /// The Developer ID this app is signed with. The installer accepts only an
+    /// update signed by the same team under the same bundle identifier.
+    /// Nil for an ad-hoc or self-signed build, which cannot update itself.
+    static let updateSigner: UpdateSigner? = {
+        var code: SecCode?
+        var staticCode: SecStaticCode?
+        var info: CFDictionary?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
+              SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
+              SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation),
+                                            &info) == errSecSuccess,
+              let info = info as? [String: Any],
+              let signer = UpdateSigner(bundleID: info[kSecCodeInfoIdentifier as String] as? String,
+                                        teamID: info[kSecCodeInfoTeamIdentifier as String] as? String)
+        else { return nil }
+        // The team in the signature counts only when Apple issued it.
+        var requirement: SecRequirement?
+        guard SecRequirementCreateWithString(signer.appRequirement as CFString, [], &requirement) == errSecSuccess,
+              let requirement,
+              SecCodeCheckValidity(code, [], requirement) == errSecSuccess
+        else { return nil }
+        return signer
+    }()
+
+    /// The local dev build never updates itself; any other build does when it
+    /// carries a Developer ID signature the installer can hold the update to.
+    static var receivesUpdates: Bool { !isDeveloperBuild && updateSigner != nil }
     static let coffeeURL = URL(string: "https://buymeacoffee.com/vorssaint")!
     static let discordURL = URL(string: "https://discord.gg/M6BwWH4BJp")!
     static let socialURL = URL(string: "https://x.com/vorssaint")!

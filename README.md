@@ -149,7 +149,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 
 Grab the disk image from the [releases page](https://github.com/rfoerthe/barforge/releases) and drag Barforge into Applications. Barforge has no Homebrew cask: `brew install --cask vorssaint` installs the original app, not this fork.
 
-Builds are signed with an Apple Developer ID and notarized, so macOS opens them without a fuss. Barforge does not update itself; new versions come from the releases page.
+Builds are signed with an Apple Developer ID and notarized, so macOS opens them without a fuss. Barforge updates itself from this fork's releases and installs only a version signed with the same Developer ID, so a Vorssaint release never replaces it.
 
 Barforge has its own bundle identifier, `de.foerther.barforge`, so it shares no settings or permissions with Vorssaint. Run only one of the two at a time.
 

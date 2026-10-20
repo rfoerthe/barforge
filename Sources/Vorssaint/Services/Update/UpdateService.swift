@@ -28,7 +28,7 @@ final class UpdateService: ObservableObject {
     /// preview. Set alongside `.available`; cleared otherwise.
     @Published private(set) var availableNotes: String?
 
-    private let repository = AppInfo.upstreamRepository
+    private let repository = AppInfo.updateRepository
     private var downloadURL: URL?
     /// Size the release advertises for the asset, used to bound the download.
     private var downloadExpectedBytes: Int64?
@@ -76,7 +76,7 @@ final class UpdateService: ObservableObject {
             }
             return
         }
-        // A fork build has nothing to update from; see AppInfo.receivesUpdates.
+        // A build without a Developer ID cannot install anything; see AppInfo.receivesUpdates.
         guard AppInfo.receivesUpdates else { return }
         configureAutomaticChecks()
         if autoCheckEnabled {
@@ -212,7 +212,7 @@ final class UpdateService: ObservableObject {
     // MARK: - Download & install
 
     func downloadAndInstall() {
-        // Never replace the local dev build or a fork build with an official one.
+        // Never replace the local dev build, nor a build no signer can vouch for.
         guard AppInfo.receivesUpdates else { return }
         guard let downloadURL else { return }
         // Pre-flight BEFORE spending the download: a translocated app or one
@@ -324,7 +324,8 @@ final class UpdateService: ObservableObject {
         let pid = ProcessInfo.processInfo.processIdentifier
         let fm = FileManager.default
 
-        guard let resultURL = Self.installResultURL, let expectedVersion = offered else {
+        guard let resultURL = Self.installResultURL, let expectedVersion = offered,
+              let signer = AppInfo.updateSigner else {
             abortInstall(dmgPath: dmgPath, offered: offered)
             return
         }
@@ -338,22 +339,25 @@ final class UpdateService: ObservableObject {
         if fm.isWritableFile(atPath: appDirectory),
            !UpdateInstallerSupport.shouldForceAdminInstall(afterFailureCode: lastFailure) {
             launchUserInstaller(appPath: appPath, dmgPath: dmgPath, pid: pid,
-                                resultPath: resultURL.path, expectedVersion: expectedVersion)
+                                resultPath: resultURL.path, expectedVersion: expectedVersion,
+                                signer: signer)
         } else {
             // Either the folder is not writable, or the last attempt died at
             // the copy/swap step: retry with admin rights instead of failing
             // the same way twice.
             launchAdminInstaller(appPath: appPath, dmgPath: dmgPath, pid: pid,
-                                 resultPath: resultURL.path, expectedVersion: expectedVersion)
+                                 resultPath: resultURL.path, expectedVersion: expectedVersion,
+                                 signer: signer)
         }
     }
 
     private func launchUserInstaller(appPath: String, dmgPath: String, pid: Int32,
-                                     resultPath: String, expectedVersion: String) {
+                                     resultPath: String, expectedVersion: String,
+                                     signer: UpdateSigner) {
         let scriptURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("vorssaint-update-\(pid)-\(UUID().uuidString).sh")
         do {
-            try UpdateInstallerSupport.installerScript()
+            try UpdateInstallerSupport.installerScript(signer: signer)
                 .write(to: scriptURL, atomically: true, encoding: .utf8)
         } catch {
             failInstall(dmgPath: dmgPath, message: error.localizedDescription)
@@ -384,13 +388,15 @@ final class UpdateService: ObservableObject {
     /// its own session so the prompt returns while the installer waits for our
     /// exit — and so it survives that exit.
     private func launchAdminInstaller(appPath: String, dmgPath: String, pid: Int32,
-                                      resultPath: String, expectedVersion: String) {
+                                      resultPath: String, expectedVersion: String,
+                                      signer: UpdateSigner) {
         let command = UpdateInstallerSupport.elevatedInstallCommand(appPath: appPath,
                                                                     dmgPath: dmgPath,
                                                                     pid: pid,
                                                                     resultPath: resultPath,
                                                                     uid: getuid(),
-                                                                    expectedVersion: expectedVersion)
+                                                                    expectedVersion: expectedVersion,
+                                                                    signer: signer)
         // The in-process authorization holds the main thread until it is
         // answered, and the system dialog never appears while the Extra
         // Brightness overlay is on screen (#1917). Once the request waits,
