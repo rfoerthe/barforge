@@ -267,16 +267,32 @@ struct DiscordMark: View {
     }
 }
 
-/// Squircle badge with the mark on the space gradient — the app's face in the
-/// About tab and onboarding.
+/// The app icon artwork (Resources/Brand/AppIcon-Default.png, the same
+/// picture as the README logo) at full resolution — the app's face in the
+/// About tab, the panel header, onboarding and What's New.
 struct BrandBadge: View {
     var size: CGFloat
 
+    private static let icon: NSImage? = {
+        guard let url = Bundle.main.url(forResource: "BrandIcon", withExtension: "png") else { return nil }
+        return NSImage(contentsOf: url)
+    }()
+
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
-                .fill(Theme.spaceGradient)
-            BrandMark(width: size * 0.8)
+        Group {
+            if let icon = Self.icon {
+                Image(nsImage: icon)
+                    .interpolation(.high)
+                    .antialiased(true)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                ZStack {
+                    RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
+                        .fill(Theme.spaceGradient)
+                    BrandMark(width: size * 0.8)
+                }
+            }
         }
         .frame(width: size, height: size)
     }

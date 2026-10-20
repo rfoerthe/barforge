@@ -33,9 +33,13 @@ enum ForkBuildTests {
                      "the changelog entry for \(version) is based on the bundle's Vorssaint \(upstream)")
         let shipped = ForkChangelog.releaseNotes(for: version, fork: changelog, upstream: upstreamChangelog,
                                                  fallbackBase: upstream)
+        // A release on the same base as the one before brings no Vorssaint notes.
+        let bringsUpstream = !ForkChangelog.upstreamVersions(
+            from: ForkChangelog.previousBase(before: version, in: changelog),
+            to: upstream, upstream: upstreamChangelog).isEmpty
         suite.expect(shipped.sections.contains { !$0.title.hasPrefix("Vorssaint ") }
-                     && shipped.sections.contains { $0.title.hasPrefix("Vorssaint \(upstream) · ") },
-                     "the release notes for \(version) list Barforge's entries and Vorssaint \(upstream)'s")
+                     && shipped.sections.contains { $0.title.hasPrefix("Vorssaint \(upstream) · ") } == bringsUpstream,
+                     "the release notes for \(version) list Barforge's entries, and Vorssaint \(upstream)'s when it brings them")
         checkChangelogs(suite)
 
         for language in AppLanguage.allCases {

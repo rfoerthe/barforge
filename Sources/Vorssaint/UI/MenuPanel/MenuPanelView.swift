@@ -180,7 +180,9 @@ struct MenuPanelView: View {
         VStack(alignment: .leading, spacing: 12) {
             UpdateBanner()
                 .reportHeight($updateBannerHeight)
-            header
+            if AppInfo.isBeta {
+                MenuPanelHeader()
+            }
             sectionNavigation
 
             OverlayScrollView(measuredHeight: $navigableContentHeight) {
@@ -202,7 +204,9 @@ struct MenuPanelView: View {
         VStack(alignment: .leading, spacing: 12) {
             UpdateBanner()
                 .reportHeight($updateBannerHeight)
-            header
+            if AppInfo.isBeta {
+                MenuPanelHeader()
+            }
 
             if let selectedMetric {
                 metricNavigationHeader(selectedMetric)
@@ -259,7 +263,10 @@ struct MenuPanelView: View {
         let bannerHeight = updates.state.showsMenuPanelBanner
             ? (max(updateBannerHeight, 48) + 12)
             : 0
-        return 180 + bannerHeight
+        // The header row (36 pt plus the stack's 12 pt gap) only exists in
+        // beta builds, for the badge and the feedback button.
+        let headerHeight: CGFloat = AppInfo.isBeta ? 48 : 0
+        return 132 + headerHeight + bannerHeight
     }
 
     private var estimatedNavigableContentHeight: CGFloat {
@@ -415,10 +422,6 @@ struct MenuPanelView: View {
         CleaningModeManager.shared.activate()
     }
 
-    private var header: some View {
-        MenuPanelHeader()
-    }
-
     private var footer: some View {
         HStack(spacing: 8) {
             footerButton(l10n.s.panelSettings,
@@ -468,49 +471,37 @@ struct MenuPanelView: View {
     }
 }
 
+/// The beta badge and the feedback button; only beta builds show this row.
 private struct MenuPanelHeader: View {
-    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var l10n = L10n.shared
 
     var body: some View {
-        ZStack {
-            BrandMark(width: 48, tint: markTint)
-                .frame(height: 28)
-                .accessibilityHidden(true)
+        HStack {
+            Text(l10n.s.betaBadgeLabel.uppercased())
+                .font(.system(size: 9, weight: .bold))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.orange.opacity(0.18))
+                .foregroundStyle(.orange)
+                .clipShape(Capsule())
 
-            if AppInfo.isBeta {
-                HStack {
-                    Text(l10n.s.betaBadgeLabel.uppercased())
-                        .font(.system(size: 9, weight: .bold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.orange.opacity(0.18))
-                        .foregroundStyle(.orange)
-                        .clipShape(Capsule())
+            Spacer()
 
-                    Spacer()
-
-                    Button {
-                        appDelegate()?.openFeedbackWindow()
-                    } label: {
-                        Image(systemName: "bubble.left.and.text.bubble.right")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.secondary)
-                            .padding(4)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help(FeatureStrings.feedback(l10n.language).openButton)
-                }
+            Button {
+                appDelegate()?.openFeedbackWindow()
+            } label: {
+                Image(systemName: "bubble.left.and.text.bubble.right")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .padding(4)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .help(FeatureStrings.feedback(l10n.language).openButton)
         }
         .frame(height: 28)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity)
-    }
-
-    private var markTint: Color {
-        colorScheme == .light ? Color(white: 0.03) : .white
     }
 }
 
