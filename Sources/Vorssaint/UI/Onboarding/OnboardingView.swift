@@ -146,7 +146,7 @@ private struct WelcomeStep: View {
             ZStack {
                 Theme.spaceGradient
                 VStack(spacing: 10) {
-                    BrandMark(width: 130)
+                    BrandBadge(size: 104)
                     Text(AppInfo.name)
                         .font(.system(size: 26, weight: .bold))
                         .foregroundStyle(.white)
@@ -513,7 +513,7 @@ private struct DoneStep: View {
             ZStack {
                 Theme.spaceGradient
                 VStack(spacing: 14) {
-                    BrandMark(width: 150)
+                    BrandBadge(size: 116)
                     Text(l10n.s.obStepDoneTitle)
                         .font(.system(size: 26, weight: .bold))
                         .foregroundStyle(.white)

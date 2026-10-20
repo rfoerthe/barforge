@@ -267,9 +267,6 @@ private struct MenuBarPanelMiniature: View {
 
     private var panel: some View {
         VStack(spacing: 8) {
-            BrandMark(width: 32, tint: colorScheme == .light ? Color(white: 0.03) : .white)
-                .frame(height: 18)
-                .accessibilityHidden(true)
             tabStrip
             openTab
             footer

@@ -609,6 +609,8 @@ fi
 printf 'APPL????' > "$STAGE/Contents/PkgInfo"
 cp build/AppIcon.icns "$STAGE/Contents/Resources/AppIcon.icns"
 cp build/MenuBarIcon.png build/MenuBarIcon@2x.png build/BrandMark.png "$STAGE/Contents/Resources/"
+# The full-resolution icon artwork for BrandBadge, the app's face in its windows.
+cp Resources/Brand/AppIcon-Default.png "$STAGE/Contents/Resources/BrandIcon.png"
 if [[ -f build/Assets.car ]]; then
     cp build/Assets.car "$STAGE/Contents/Resources/Assets.car"
 fi

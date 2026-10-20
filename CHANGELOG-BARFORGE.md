@@ -18,6 +18,8 @@ CHANGELOG.md.
 
 ### Changed
 - The menu bar icon and the in-app mark show the anvil with a window through its waist, so the one-color mark no longer reads as a solid blot. The app icon stays as it is.
+- The About tab, onboarding and What's New show the full-resolution app icon, the same picture as the README logo, instead of the one-color mark on a dark tile.
+- The menu bar panel no longer shows the mark above its tabs, so the panel starts right with the tab bar.
 
 ## [1.0.0] - 2026-10-20
 
