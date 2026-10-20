@@ -28,10 +28,12 @@ trap cleanup EXIT
 trap 'exit 1' INT TERM HUP
 
 # Flags: --dev builds the local-only "Barforge (Developer)" variant (its own
-# bundle id, so it coexists with the official app); --install puts it in /Applications.
+# bundle id, so it coexists with the official app); --install puts it in /Applications;
+# --clean removes the build artifacts and does nothing else.
 DEV=0
 INSTALL=0
 TEST=0
+CLEAN=0
 TEST_ARGS=()
 for arg in "$@"; do
     case "$arg" in
@@ -40,8 +42,27 @@ for arg in "$@"; do
         --test)    TEST=1 ;;
         --test-suite=*) TEST=1; TEST_ARGS+=("--suite=${arg#*=}") ;;
         --list-tests) TEST=1; TEST_ARGS+=(--list) ;;
+        --clean)   CLEAN=1 ;;
     esac
 done
+
+# build/ holds everything this script makes; .build/ is SwiftPM's and the
+# editor's cache from Package.swift. dist/ stays: its disk images are signed and
+# notarized releases. Staged bundles leave LaunchServices first, so no stale
+# app entry points at a deleted path.
+if (( CLEAN )); then
+    if (( $# > 1 )); then
+        echo "--clean does nothing else; run it on its own." >&2
+        exit 2
+    fi
+    for bundle in build/stage/*.app(N) build/stage.noindex/*.app(N); do
+        /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+            -u "$PWD/$bundle" >/dev/null 2>&1 || true
+    done
+    rm -rf build .build
+    echo "✓ Removed build/ and .build/"
+    exit 0
+fi
 
 if (( DEV )); then
     APP_NAME="Barforge (Developer)"

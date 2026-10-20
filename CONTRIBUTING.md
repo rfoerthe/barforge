@@ -22,7 +22,8 @@ cd vorssaint-utils
 To install and launch the separate Developer app, use `./build.sh --dev --install`.
 It has its own preferences and permissions and does not replace the official app.
 A plain `./build.sh` builds the optimized variant used by CI; its health check is
-`./build/Barforge --selftest`.
+`./build/Barforge --selftest`. `./build.sh --clean` removes `build/` and `.build/`
+and does nothing else; signed disk images in `dist/` stay.
 
 ### Stable signing
 

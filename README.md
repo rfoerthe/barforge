@@ -190,6 +190,7 @@ git clone https://github.com/rfoerthe/vorssaint-utils.git
 cd vorssaint-utils
 ./build.sh --dev            # build the separate Developer variant
 ./build.sh --dev --install  # install and launch it
+./build.sh --clean          # remove the build artifacts
 ```
 
 Xcode 26 or its Command Line Tools, with Swift 6.2 or newer, are the only requirement. The [contributing guide](CONTRIBUTING.md) covers the layout and conventions. The GPL covers the source, while the Vorssaint name, icon and look belong to the Vorssaint project ([TRADEMARKS.md](TRADEMARKS.md)), which is why this fork carries its own name and icon. After merging from upstream, run `python3 Tools/fork-rebrand.py` so new text shows Barforge too.
