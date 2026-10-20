@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -43,17 +44,6 @@ enum PanelMetricColor {
 
     static func pink(for scheme: ColorScheme) -> Color {
         scheme == .light ? Color(red: 0.68, green: 0.06, blue: 0.34) : .pink
-    }
-}
-
-private struct NotchPresentationKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
-extension EnvironmentValues {
-    var notchPresentation: Bool {
-        get { self[NotchPresentationKey.self] }
-        set { self[NotchPresentationKey.self] = newValue }
     }
 }
 
@@ -131,8 +121,8 @@ extension View {
     /// The rounded card background used by every panel section. A card
     /// holding a list of rows is not padded: each row brings its own insets,
     /// so hover highlights and separators can reach the card's edges.
-    func panelCard(interactive: Bool = true, padded: Bool = true) -> some View {
-        modifier(PanelCardModifier(interactive: interactive, padded: padded))
+    func panelCard(padded: Bool = true) -> some View {
+        modifier(PanelCardModifier(padded: padded))
     }
 
     /// A restrained glass base for the menu panel: still translucent, but with a
@@ -144,15 +134,10 @@ extension View {
 }
 
 private struct PanelCardModifier: ViewModifier {
-    var interactive: Bool
     var padded = true
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.notchPresentation) private var notchPresentation
 
     func body(content: Content) -> some View {
-        if notchPresentation {
-            content.padding(padded ? 12 : 0).modifier(NotchControlSurface(cornerRadius: 18, interactive: interactive))
-        } else {
         content
             .padding(padded ? 10 : 0)
             .background(
@@ -163,14 +148,11 @@ private struct PanelCardModifier: ViewModifier {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .strokeBorder(PanelSurface.border(for: colorScheme), lineWidth: 0.7)
             )
-        }
     }
 }
 
 private struct PanelGlassSurface: View {
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.notchPresentation) private var notchPresentation
-    @Environment(\.notchGlassSurface) private var notchGlassSurface
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @AppStorage(DefaultsKey.liquidGlassEnabled) private var liquidGlassEnabled = false
 
@@ -184,9 +166,7 @@ private struct PanelGlassSurface: View {
         // the outline AppKit already draws. Where the popover still insets its
         // content, the panel is a card inside the balloon instead; see
         // PanelSurface.popoverHostsFullSizeContent.
-        if notchPresentation {
-            Rectangle().fill(notchGlassSurface ? Color.clear : .black)
-        } else if PanelSurface.popoverHostsFullSizeContent {
+        if PanelSurface.popoverHostsFullSizeContent {
             surface.ignoresSafeArea()
         } else {
             insetSurface

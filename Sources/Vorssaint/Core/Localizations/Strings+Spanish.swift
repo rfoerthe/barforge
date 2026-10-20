@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "Posición",
         shelfDockMenuBar: "Debajo del icono de la barra de menús",
         shelfDockTopCenter: "Arriba, en el centro de la pantalla",
-        shelfDockIslandNote: "Mientras el Dynamic Island está activado ocupa el centro superior.",
         shelfCollapse: "Contraer",
         shelfBehaviorTitle: "Después de usar",
         shelfCloseAfterDrop: "Cerrar después de soltar en otra app",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "Un centro de utilidades para tu Mac.\nEnergía, monitor del sistema, desplazamiento y un selector de ventanas, directamente en la barra de menús.",
         versionPrefix: "Versión",
         reviewIntro: "Ver la introducción",
-        reviewHighlights: "Ver novedades de la versión",
         viewOnGitHub: "Ver en GitHub",
 
         obContinue: "Continuar",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "Código QR",
         qrResultCopy: "Copiar",
         qrResultOpen: "Abrir enlace",
-        highlightsTitle: "Novedades de esta versión",
         highlightsTitleClipboardRedesign: "Portapapeles rediseñado",
         highlightsTitleWindowLayout: "Organización de ventanas",
         highlightsTitleQuitProtection: "Protección de ⌘Q y ⌘W",

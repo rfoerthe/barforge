@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -160,14 +161,13 @@ enum ReleaseDigestTests {
         let digest = ReleaseDigest.make(from: "3.4.0", to: "3.4.2", changelog: changelog)
         suite.expect(digest.versions == ["3.4.2", "3.4.1"], "the digest covers the versions after the previous one")
         suite.expect(digest.summary == "The window switcher wraps rows.", "the newest summary leads")
-        suite.expect(digest.changes.map(\.version) == ["3.4.2", "3.4.2", "3.4.2", "3.4.2", "3.4.1", "3.4.1"],
-                     "credits, restated highlights, repeated entries and restated releases are left out")
-        suite.expect(digest.changes.map(\.kind) == [.new, .fixed, .fixed, .fixed, .changed, .changed],
+        suite.expect(digest.changes.map(\.version) == ["3.4.2", "3.4.2", "3.4.2"],
+                     "credits, restated highlights, repeated entries, restated releases and removed features are left out")
+        suite.expect(digest.changes.map(\.kind) == [.new, .fixed, .fixed],
                      "each entry keeps its section's kind")
-        suite.expect(digest.changes.map(\.features)
-                        == [[.switcher], [], [.notchLyrics], [.keepAwake], [.notch, .notchCalendar], [.notch, .notchMascot]],
+        suite.expect(digest.changes.map(\.features) == [[.switcher], [], [.keepAwake]],
                      "entries are sorted into their features, app-wide ones into none")
-        suite.expect(digest.changes.map(\.isAppWide) == [false, true, false, true, false, false],
+        suite.expect(digest.changes.map(\.isAppWide) == [false, true, true],
                      "an entry that also changes the menu bar panel concerns everyone")
         let preview = ReleaseDigest.make(from: "3.4.2", to: "3.4.2", changelog: changelog, includeUnreleased: true)
         suite.expect(preview.versions == ["Unreleased"] && preview.changes.first?.features == [.portManager],
@@ -196,13 +196,10 @@ enum ReleaseDigestTests {
             ("Added", "The window switcher can limit how many items sit in a row and wraps the rest. Settings → Window switcher → Options → Maximum columns.", [.switcher]),
             ("Fixed", "Dock clicks and Dock Preview act on the right instance when an app runs as several processes.", [.dockPreview, .dockClick]),
             ("Fixed", "Settings → Features no longer jumps or goes blank when a feature is installed or removed while scrolled down.", []),
-            ("Fixed", "AI Agents follows OpenCode 2, including databases upgraded from OpenCode 1 and the cost of compactions.", [.notchAgents]),
             ("Changed", "App sliders in the Volume mixer follow perceived loudness, so 50% sounds clearly quieter. Saved levels keep how loud each app plays.", [.mixer]),
             ("Changed", "Command Bar opens and searches faster, with the same matching and ranking rules.", [.commandBar]),
             ("Changed", "Save as GIF and Copy as GIF work for recordings of any length.", [.screenRecorder]),
             ("Fixed", "Mouse navigation handles quick changes between Back and Forward when the app's menu state has not caught up.", [.mouseNavigation]),
-            ("Fixed", "Watch reads the complete percentage, including values above 999%, spaces between thousands and negative signs.", [.notchWatch]),
-            ("Dynamic Island", "Calendar adds countdowns to the events you choose, the time left in the current event, week numbers and a choice of calendars.", [.notch, .notchCalendar]),
             ("Fixed", "Uninstalling the last copy of an app clears its Command Bar shortcuts, aliases, pins and hidden entries.", [.commandBar]),
             ("Fixed", "Brightness keys keep their press and release together when displays reconnect or the pointer changes displays.", [.brightness]),
         ]
@@ -210,14 +207,26 @@ enum ReleaseDigestTests {
             let found = ReleaseChangeAliases.features(inBullet: text, section: section)
             suite.expect(found == expected, "\"\(text.prefix(48))…\" is about \(expected), got \(found)")
         }
-        suite.expect(ReleaseChangeAliases.features(inBullet: "Downloads keep a calendar of timers.", section: "Fixed").isEmpty,
+        suite.expect(ReleaseChangeAliases.features(inBullet: "Downloads keep a calendar of timers.", section: "Fixed").isEmpty
+                        && !ReleaseChangeAliases.isAboutRemovedFeature("Downloads keep a calendar of timers.", section: "Fixed"),
                      "common words name an island extension only in an island context")
         suite.expect(ReleaseChangeAliases.features(inBullet: "You can watch the wheel notch turn.", section: "Fixed").isEmpty,
                      "plain words and ignored phrases are not features")
-        suite.expect(ReleaseChangeAliases.features(
-                        inBullet: "A companion rests beside the camera and can carry the Command Bar out of the island.",
-                        section: "Dynamic Island") == [.notch, .notchMascot],
-                     "tools named as part of the island are not what changed")
+        let removed: [(String, String)] = [
+            ("Fixed", "AI Agents follows OpenCode 2, including databases upgraded from OpenCode 1 and the cost of compactions."),
+            ("Fixed", "Watch reads the complete percentage, including values above 999%, spaces between thousands and negative signs."),
+            ("Dynamic Island", "Calendar adds countdowns to the events you choose, the time left in the current event, week numbers and a choice of calendars."),
+            ("Dynamic Island", "A companion rests beside the camera and can carry the Command Bar out of the island."),
+            ("Fixed", "Lyrics lookup handles differences in titles."),
+        ]
+        for (section, text) in removed {
+            suite.expect(ReleaseChangeAliases.isAboutRemovedFeature(text, section: section),
+                         "\"\(text.prefix(48))…\" is about a feature Barforge does not have")
+        }
+        suite.expect(!ReleaseChangeAliases.isAboutRemovedFeature("Clipboard history pins survive in the island.", section: "Fixed")
+                        && ReleaseChangeAliases.features(inBullet: "Clipboard history pins survive in the island.", section: "Fixed")
+                        == [.clipboardHistory],
+                     "an entry that also names a remaining feature stays, filed under that feature")
         suite.expect(ReleaseChangeAliases.mentionsAppWide("The menu bar panel lists tools one line each.")
                         && !ReleaseChangeAliases.mentionsAppWide("The menu bar battery icon shows the time left."),
                      "only parts every person has make an entry app-wide")
@@ -272,14 +281,12 @@ enum ReleaseDigestTests {
             return SettingsSidebarItem(id: id, destination: destination, title: title, icon: "circle")
         }
         let items = [item(.page(.general), "General"), item(.page(.features), "Features"),
-                     item(.page(.notch), "Dynamic Island"), item(.page(.monitor), "System Monitor"),
+                     item(.page(.monitor), "System Monitor"),
                      item(.feature(.switcher), "Window switcher"), item(.feature(.mixer), "Volume mixer")]
         func change(_ text: String, _ kind: ReleaseChangeKind, _ features: [AppFeature]) -> ReleaseChange {
             ReleaseChange(text: text, kind: kind, version: "3.4.2", features: features)
         }
         let switcher = change("switcher", .new, [.switcher])
-        let lyrics = change("lyrics", .fixed, [.notchLyrics])
-        let island = change("island", .changed, [.notch, .notchCalendar])
         let general = change("general", .fixed, [])
         let gpu = change("gpu", .fixed, [.monitorGPU])
         let devices = change("devices", .fixed, [.connectedDevices])
@@ -288,36 +295,27 @@ enum ReleaseDigestTests {
         var panel = change("panel", .changed, [.keepAwake])
         panel.alsoAppWide = true
         let digest = ReleaseDigest(previousVersion: "3.4.1", version: "3.4.2", versions: ["3.4.2"], summary: nil,
-                                   changes: [switcher, lyrics, island, general, gpu, devices, ports, installer, panel])
-        let installed: Set<AppFeature> = [.switcher, .notch, .notchLyrics, .monitorGPU, .diskImageInstaller]
+                                   changes: [switcher, general, gpu, devices, ports, installer, panel])
+        let installed: Set<AppFeature> = [.switcher, .monitorGPU, .diskImageInstaller]
         let sections = WhatsNewSupport.sections(
             digest: digest, newFeatures: [.portManager], sidebarItems: items,
             isAvailable: { installed.contains($0) }, title: { $0.rawValue }, generalTitle: "General")
         suite.expect(sections.newFeatures.map(\.id) == [.newFeature(.portManager)]
                         && sections.newFeatures.first?.changes == [ports],
                      "new features come first with the entries that name them")
-        suite.expect(sections.yourFeatures.map(\.id) == [.settings(.page(.notch)), .settings(.page(.monitor)),
+        suite.expect(sections.yourFeatures.map(\.id) == [.settings(.page(.monitor)),
                                                          .settings(.feature(.switcher)),
                                                          .feature(.diskImageInstaller), .general],
                      "installed features follow the Settings order, app-wide changes last")
-        suite.expect(sections.yourFeatures.first?.changes == [lyrics, island],
-                     "Dynamic Island's row gathers its installed extensions")
         suite.expect(sections.yourFeatures.first { $0.id == .settings(.feature(.switcher)) }?.changes == [switcher, ports],
                      "an entry naming a new feature still shows under the installed one beside it")
         suite.expect(sections.notInstalled.map(\.id)
-                        == [.notInstalled(.keepAwake), .notInstalled(.notchCalendar), .notInstalled(.connectedDevices)],
+                        == [.notInstalled(.keepAwake), .notInstalled(.connectedDevices)],
                      "features this Mac does not have are listed one by one")
         suite.expect(sections.yourFeatures.last?.changes == [general, panel],
                      "an entry about a missing feature that also changes the whole app stays in General")
-        suite.expect(sections.hasContentForYou && sections.changesForYou.count == 8,
+        suite.expect(sections.hasContentForYou && sections.changesForYou.count == 6,
                      "the overview counts each entry for this Mac once")
-        let withoutIsland = WhatsNewSupport.sections(
-            digest: ReleaseDigest(previousVersion: "3.4.1", version: "3.4.2", versions: ["3.4.2"], summary: nil,
-                                  changes: [lyrics]),
-            newFeatures: [], sidebarItems: items, isAvailable: { $0 == .notchLyrics }, title: { $0.rawValue },
-            generalTitle: "General")
-        suite.expect(!withoutIsland.hasContentForYou && withoutIsland.notInstalled.map(\.id) == [.notInstalled(.notchLyrics)],
-                     "an island extension left installed without the island is not one of this Mac's features")
         let elsewhere = WhatsNewSupport.sections(
             digest: ReleaseDigest(previousVersion: "3.4.1", version: "3.4.2", versions: ["3.4.2"], summary: nil,
                                   changes: [devices]),
@@ -326,15 +324,12 @@ enum ReleaseDigestTests {
         suite.expect(!elsewhere.hasContentForYou && elsewhere.notInstalled.count == 1,
                      "an update only about missing features has nothing for this Mac")
 
-        suite.expect(WhatsNewSupport.rowID(for: .notchMascot, in: items) == .settings(.page(.notch)),
-                     "the companion belongs to the island's row")
         suite.expect(WhatsNewSupport.rowID(for: .soundOutputSwitcher, in: items) == .general,
                      "a tool Settings keeps on its General page joins the General row")
-        suite.expect(WhatsNewSupport.representedFeature(of: .page(.notch)) == .notch
-                        && WhatsNewSupport.representedFeature(of: .page(.monitor)) == nil
+        suite.expect(WhatsNewSupport.representedFeature(of: .page(.monitor)) == nil
                         && WhatsNewSupport.representedFeature(of: .feature(.mixer)) == .mixer,
                      "a row stands for one feature only when it has one")
-        suite.expect(WhatsNewSupport.grouped([gpu, switcher, island]).map(\.kind) == [.new, .changed, .fixed],
+        suite.expect(WhatsNewSupport.grouped([gpu, switcher, panel]).map(\.kind) == [.new, .changed, .fixed],
                      "a feature's page lists new, then changed, then fixed")
     }
 }

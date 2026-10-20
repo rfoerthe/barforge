@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AVFoundation
@@ -21,7 +22,6 @@ final class CameraPreviewService: ObservableObject {
     @Published private(set) var state: PreviewState = .idle
     @Published private(set) var devices: [AVCaptureDevice] = []
     @Published private(set) var selectedDeviceID: String?
-    @Published private(set) var isEmbeddedPresented = false
     private var captureGeneration = UUID()
     private var sessionRequest: CameraPreviewRequest?
     private var sessionObservers: [NSObjectProtocol] = []
@@ -59,8 +59,6 @@ final class CameraPreviewService: ObservableObject {
                                                   storageKey: DefaultsKey.cameraPreviewShortcut)
         if !available {
             hide()
-        } else if !NotchCameraSupport.isEnabled() {
-            hideEmbedded()
         }
     }
 
@@ -73,33 +71,8 @@ final class CameraPreviewService: ObservableObject {
         panel?.isVisible == true
     }
 
-    private var isPresented: Bool { isVisible || isEmbeddedPresented }
-
-    var keepsNotchPermissionPrompt: Bool {
-        isEmbeddedPresented && (state == .waitingPermission
-            || permissionResolvedAt.map { Date().timeIntervalSince($0) < 1 } == true)
-    }
-
-    /// The notch calls this only from its explicit camera button. Ownership
-    /// transfers from the floating mirror; the two never capture together.
-    func showEmbedded() {
-        let notch = NotchService.shared
-        guard SessionActivity.shared.isActive,
-            NotchCameraSupport.canPresent(expanded: notch.expanded, selected: notch.selected,
-            appPanel: notch.showingAppPanel, captureControls: notch.captureControls != nil),
-            !isEmbeddedPresented else { return }
-        hide()
-        isEmbeddedPresented = true
-        beginCapture()
-    }
-
-    func hideEmbedded() {
-        guard isEmbeddedPresented else { return }
-        hide()
-    }
-
     func toggle() {
-        if isPresented {
+        if isVisible {
             hide()
         } else {
             show()
@@ -108,9 +81,7 @@ final class CameraPreviewService: ObservableObject {
 
     func show() {
         guard AppFeature.cameraPreview.isAvailable, SessionActivity.shared.isActive else { return }
-        if showInNotchIfEnabled() { return }
         guard !isVisible else { return }
-        hideEmbedded()
         let panel = ensurePanel()
         installMonitors(for: panel)
         position(panel)
@@ -124,20 +95,8 @@ final class CameraPreviewService: ObservableObject {
         beginCapture()
     }
 
-    @discardableResult
-    func showInNotchIfEnabled() -> Bool {
-        guard SessionActivity.shared.isActive, NotchCameraSupport.isEnabled() else { return false }
-        let notch = NotchService.shared
-        notch.open(.camera)
-        guard NotchCameraSupport.canPresent(expanded: notch.expanded, selected: notch.selected,
-            appPanel: notch.showingAppPanel, captureControls: notch.captureControls != nil) else { return false }
-        showEmbedded()
-        return isEmbeddedPresented
-    }
-
     func hide() {
         captureGeneration = UUID()
-        isEmbeddedPresented = false
         permissionResolvedAt = nil
         removeMonitors()
         removeDeviceObservers()
@@ -161,7 +120,7 @@ final class CameraPreviewService: ObservableObject {
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 DispatchQueue.main.async {
                     Permissions.shared.refresh()
-                    guard let self, self.isPresented, self.captureGeneration == generation else { return }
+                    guard let self, self.isVisible, self.captureGeneration == generation else { return }
                     self.permissionResolvedAt = Date()
                     // The system dialog appears mid fade-in and was observed
                     // leaving the panel stuck transparent; the resolution is
@@ -182,7 +141,7 @@ final class CameraPreviewService: ObservableObject {
     }
 
     private func startSession() {
-        guard isPresented else { return }
+        guard isVisible else { return }
         // A session may still be alive when a queued permission callback or
         // a device replug lands here; two running sessions would fight over
         // the camera, so the old one always stops first.
@@ -202,7 +161,7 @@ final class CameraPreviewService: ObservableObject {
         for name in [AVCaptureSession.runtimeErrorNotification, AVCaptureSession.wasInterruptedNotification] {
             sessionObservers.append(NotificationCenter.default.addObserver(forName: name, object: session,
                 queue: .main) { [weak self] _ in
-                    guard let self, self.isPresented, self.session === session else { return }
+                    guard let self, self.isVisible, self.session === session else { return }
                     self.stopSession()
                     self.state = .unavailable
                 })
@@ -222,7 +181,7 @@ final class CameraPreviewService: ObservableObject {
             }
             let isRunning = hasInput && session.isRunning
             DispatchQueue.main.async {
-                guard let self, self.isPresented, self.session === session else { return }
+                guard let self, self.isVisible, self.session === session else { return }
                 self.state = isRunning ? .running : .unavailable
                 if !isRunning { self.stopSession() }
             }
@@ -246,7 +205,7 @@ final class CameraPreviewService: ObservableObject {
     }
 
     func retryCapture() {
-        guard isPresented, state == .unavailable else { return }
+        guard isVisible, state == .unavailable else { return }
         beginCapture()
     }
 
@@ -279,7 +238,7 @@ final class CameraPreviewService: ObservableObject {
             let hasInput = !session.inputs.isEmpty
             let isRunning = hasInput && session.isRunning
             DispatchQueue.main.async {
-                guard let self, self.isPresented, self.session === session else { return }
+                guard let self, self.isVisible, self.session === session else { return }
                 self.state = isRunning ? .running : .unavailable
                 if !isRunning { self.stopSession() }
             }
@@ -326,7 +285,7 @@ final class CameraPreviewService: ObservableObject {
     }
 
     private func handleDevicesChanged() {
-        guard isPresented else { return }
+        guard isVisible else { return }
         refreshDevices()
         let selectedStillHere = devices.contains { $0.uniqueID == selectedDeviceID }
         switch state {

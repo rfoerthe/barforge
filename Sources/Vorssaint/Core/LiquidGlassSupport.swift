@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -13,9 +14,7 @@ enum LiquidGlassSupport {
         return false
     }
 
-    /// Select the preference for the surface that owns the mixer.
-    static func isEnabled(inNotch: Bool, windows: Bool, island: Bool) -> Bool {
-        guard isSupported else { return false }
-        return inNotch ? island : windows
+    static func isEnabled(windows: Bool) -> Bool {
+        isSupported && windows
     }
 }

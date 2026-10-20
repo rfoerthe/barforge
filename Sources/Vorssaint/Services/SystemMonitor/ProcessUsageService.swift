@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Foundation
@@ -175,25 +176,15 @@ final class ProcessUsageService {
             && !KillProcessSupport.isProtected(pid: row.pid, name: row.name)
     }
 
-    func confirmForceQuit(_ row: ProcessUsage, inNotch: Bool) {
+    func confirmForceQuit(_ row: ProcessUsage) {
         guard canForceQuit(row), let startedAt = row.startedAt else { return }
         let strings = FeatureStrings.killProcess(L10n.shared.language)
-        let title = String(format: strings.confirmForceKillFormat, row.name)
-        let cancel = L10n.shared.s.uninstallerCancel
-        if inNotch {
-            DispatchQueue.main.async { [weak self] in
-                guard NSAlert.confirmAboveIsland(title, message: "", action: strings.forceKillButton,
-                                                 destructive: true, cancel: cancel) else { return }
-                self?.forceQuit(row, startedAt: startedAt)
-            }
-            return
-        }
         let alert = NSAlert()
         alert.alertStyle = .critical
-        alert.messageText = title
+        alert.messageText = String(format: strings.confirmForceKillFormat, row.name)
         alert.addButton(withTitle: strings.forceKillButton).hasDestructiveAction = true
-        // Escape cancels in every language, as in the island's confirmation.
-        alert.addButton(withTitle: cancel).keyEquivalent = "\u{1b}"
+        // Escape cancels in every language.
+        alert.addButton(withTitle: L10n.shared.s.uninstallerCancel).keyEquivalent = "\u{1b}"
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         forceQuit(row, startedAt: startedAt)

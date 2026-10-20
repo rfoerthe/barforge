@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AudioToolbox
 import Combine
@@ -71,20 +72,6 @@ enum MixerInputVolumeContract {
     enum QuickToolHUD {
         static var messages: [String] = []
         static func show(icon: String, message: String) { messages.append(message) }
-    }
-    final class NotchService {
-        static let shared = NotchService()
-        var showsMicrophone = false
-        var microphone: [Bool] = []
-        func showMicrophone(muted: Bool) -> Bool {
-            guard showsMicrophone else { return false }
-            microphone.append(muted)
-            return true
-        }
-        var retractions = 0
-        func retractMicrophoneNotice() { retractions += 1 }
-        var reactions: [NotchMascotReaction] = []
-        func reactMascot(_ reaction: NotchMascotReaction) { reactions.append(reaction) }
     }
     enum L10n {
         static let shared = Strings()
@@ -784,36 +771,24 @@ enum MixerInputVolumeContract {
             "an idle microphone with no mute or level of its own does not make the mute partial")
         HAL.reset()
         HAL.levels[HAL.key(10)] = 0.5
-        NotchService.shared.showsMicrophone = true
-        NotchService.shared.reactions = []
         QuickToolHUD.messages = []
         MicMuteService.shared.setMuted(true)
         DispatchQueue.drain()
         MicMuteService.shared.setMuted(false)
         DispatchQueue.drain()
-        check(
-            QuickToolHUD.messages.isEmpty && NotchService.shared.microphone == [true, false],
-            "with Dynamic Island showing it, the switch reports there instead of a floating confirmation")
-        check(NotchService.shared.reactions == [.hush, .perk],
-              "the companion hushes as the microphone mutes and perks up as it opens")
+        check(QuickToolHUD.messages == ["muted", "unmuted"],
+              "the switch reports each change in the floating confirmation")
         HAL.reset()
         HAL.devices = [10, 20]
         HAL.levels[HAL.key(10)] = 0.5
         HAL.levels[HAL.key(20)] = 0.5
         HAL.readOnly.insert(HAL.key(20))
         HAL.running = [20]
-        NotchService.shared.microphone = []
-        NotchService.shared.retractions = 0
         QuickToolHUD.messages = []
         MicMuteService.shared.setMuted(true)
         DispatchQueue.drain()
-        check(
-            QuickToolHUD.messages == ["mute partial"] && NotchService.shared.microphone.isEmpty,
-            "a microphone left open keeps its whole warning in the floating confirmation")
-        check(NotchService.shared.retractions == 1,
-              "a partial result takes back the island notice of the press before it")
-        NotchService.shared.showsMicrophone = false
-        NotchService.shared.microphone = []
+        check(QuickToolHUD.messages == ["mute partial"],
+              "a microphone left open keeps its whole warning in the floating confirmation")
         HAL.reset()
         HAL.levels[HAL.key(10)] = 0.5
         HAL.levels[HAL.key(10, 1)] = 1

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -29,9 +30,6 @@ enum FeatureHubLayoutTests {
         var summaryCard: some View { Text("Installed features").frame(height: 90) }
         @ViewBuilder var neverUsedCard: some View {
             if features.offersNeverUsed { Text("Never used").frame(height: 120) }
-        }
-        var dynamicIslandCard: some View {
-            Text("Dynamic Island").frame(height: 900).id(FeatureGroup.dynamicIsland)
         }
         var presetsCard: some View { Text("Presets").frame(height: 180) }
         func groupCard(_ group: FeatureGroup) -> some View {

@@ -105,24 +105,6 @@ struct SystemMonitorPanelNeeds: Equatable {
     var fanSpeed = false
     var connectedDevices = false
 
-    func merging(_ other: Self) -> Self {
-        Self(system: system || other.system,
-             network: network || other.network,
-             disk: disk || other.disk,
-             power: power || other.power,
-             powerCard: powerCard || other.powerCard,
-             cpu: cpu || other.cpu,
-             gpu: gpu || other.gpu,
-             memory: memory || other.memory,
-             battery: battery || other.battery,
-             peripheralBattery: peripheralBattery || other.peripheralBattery,
-             cpuTemperature: cpuTemperature || other.cpuTemperature,
-             gpuTemperature: gpuTemperature || other.gpuTemperature,
-             batteryTemperature: batteryTemperature || other.batteryTemperature,
-             fanSpeed: fanSpeed || other.fanSpeed,
-             connectedDevices: connectedDevices || other.connectedDevices)
-    }
-
     static let none = SystemMonitorPanelNeeds()
 
     var any: Bool {
@@ -144,11 +126,7 @@ final class SystemMonitor: ObservableObject {
     private let queue = DispatchQueue(label: "com.vorssaint.utils.system-monitor", qos: .utility)
     private var timer: Timer?
     private var intervalSeconds = 2
-    private var panelClients = 0
     private var menuPanelNeeds: SystemMonitorPanelNeeds = .none
-    private var notchVisible = false
-    private var notchDetailNeeds: SystemMonitorPanelNeeds = .none
-    private var notchAccessoryMonitoring = false
     private var menuBarActive = false
     private var alertsActive = false
     private var refreshInFlight = false
@@ -276,68 +254,6 @@ final class SystemMonitor: ObservableObject {
         }, context)?.takeRetainedValue()
         if let powerSourceRunLoopSource {
             CFRunLoopAddSource(CFRunLoopGetMain(), powerSourceRunLoopSource, .defaultMode)
-        }
-    }
-
-    /// Independent from the menu panel, so either surface can close without
-    /// taking the other surface’s readings away.
-    func setNotchDetailNeeds(_ needs: SystemMonitorPanelNeeds) {
-        runOnMain { [weak self] in
-            guard let self, self.notchDetailNeeds != needs else { return }
-            self.notchDetailNeeds = needs
-            self.stopTimerIfIdle()
-            self.ensureTimer()
-            if needs.any { self.refresh(suppressImmediateGPU: true); self.scheduleDeferredGPURefreshIfNeeded() }
-        }
-    }
-
-    /// This background consumer only requests accessory batteries. It does
-    /// not make CPU, graphics, temperature or disk sampling foreground work.
-    func setNotchAccessoryMonitoring(_ enabled: Bool) {
-        runOnMain { [weak self] in
-            guard let self, self.notchAccessoryMonitoring != enabled else { return }
-            self.notchAccessoryMonitoring = enabled
-            self.stopTimerIfIdle()
-            self.ensureTimer()
-            if enabled { self.refresh(suppressImmediateGPU: true) }
-        }
-    }
-
-    func setNotchVisible(_ visible: Bool) {
-        runOnMain { [weak self] in
-            guard let self, self.notchVisible != visible else { return }
-            self.notchVisible = visible
-            if visible {
-                self.ensureTimer()
-                self.refresh(suppressImmediateGPU: true)
-                self.scheduleDeferredGPURefreshIfNeeded()
-            } else {
-                self.stopTimerIfIdle()
-                // Foreground cadence can change even when another consumer
-                // still needs exactly the same metric families.
-                self.ensureTimer()
-            }
-        }
-    }
-
-    /// A full monitor surface became visible.
-    func panelDidAppear() {
-        runOnMain { [weak self] in
-            guard let self else { return }
-            panelClients += 1
-            ensureTimer()
-            refresh(suppressImmediateGPU: true)
-            scheduleDeferredGPURefreshIfNeeded()
-        }
-    }
-
-    /// A full monitor surface closed: keep going only if the menu panel or menu
-    /// bar metrics still need readings.
-    func panelDidDisappear() {
-        runOnMain { [weak self] in
-            guard let self else { return }
-            panelClients = max(0, panelClients - 1)
-            stopTimerIfIdle()
         }
     }
 
@@ -477,12 +393,7 @@ final class SystemMonitor: ObservableObject {
         }
     }
 
-    /// True while at least one full monitor surface (Settings or onboarding) is
-    /// on screen. A depth count, not a bool, so overlapping appear/disappear from
-    /// independent surfaces cannot desync.
-    private var fullMonitorVisible: Bool { panelClients > 0 }
-
-    private var shouldRun: Bool { fullMonitorVisible || menuPanelNeeds.any || notchDetailNeeds.any || notchVisible || notchAccessoryMonitoring || menuBarActive || alertsActive }
+    private var shouldRun: Bool { menuPanelNeeds.any || menuBarActive || alertsActive }
 
     private func shouldSample(defaults: UserDefaults = .standard) -> Bool {
         shouldRun && currentPlan(defaults: defaults).any
@@ -533,17 +444,16 @@ final class SystemMonitor: ObservableObject {
     }
 
     private func currentPlan(defaults: UserDefaults) -> SamplingPlan {
-        let menuPanelNeeds = self.menuPanelNeeds.merging(notchDetailNeeds)
         var plan = SamplingPlan()
         let hasInternalBattery = PowerSampler.hasInternalBattery
-        let panelNeedsSystem = fullMonitorVisible || menuPanelNeeds.system
-        let panelNeedsNetwork = fullMonitorVisible || menuPanelNeeds.network || notchVisible
-        let panelNeedsDisk = fullMonitorVisible || menuPanelNeeds.disk
-        let panelNeedsPower = fullMonitorVisible || menuPanelNeeds.power || notchVisible
+        let panelNeedsSystem = menuPanelNeeds.system
+        let panelNeedsNetwork = menuPanelNeeds.network
+        let panelNeedsDisk = menuPanelNeeds.disk
+        let panelNeedsPower = menuPanelNeeds.power
 
-        let panelCPU = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysCPU)) || menuPanelNeeds.cpu || notchVisible
-        let panelGPU = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysGPU)) || menuPanelNeeds.gpu || notchVisible
-        let panelMemory = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysMemory)) || menuPanelNeeds.memory || notchVisible
+        let panelCPU = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysCPU)) || menuPanelNeeds.cpu
+        let panelGPU = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysGPU)) || menuPanelNeeds.gpu
+        let panelMemory = (panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysMemory)) || menuPanelNeeds.memory
         let panelBattery = hasInternalBattery
             && ((panelNeedsPower && defaults.bool(forKey: DefaultsKey.monitorSysBattery)) || menuPanelNeeds.battery)
         let panelTemps = panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysTemps)
@@ -573,7 +483,7 @@ final class SystemMonitor: ObservableObject {
             || (hasInternalBattery && defaults.bool(forKey: DefaultsKey.menuBarBatteryTime))
             || alertBattery
         plan.needPowerDraw = defaults.bool(forKey: DefaultsKey.menuBarPower)
-        plan.needPeripheralBattery = menuPanelNeeds.peripheralBattery || notchAccessoryMonitoring
+        plan.needPeripheralBattery = menuPanelNeeds.peripheralBattery
             || (menuPanelNeeds.powerCard && defaults.bool(forKey: DefaultsKey.monitorPwrPeripherals))
             || defaults.bool(forKey: DefaultsKey.menuBarPeripheralBattery)
         plan.needGPUUsage = panelGPU || defaults.bool(forKey: DefaultsKey.menuBarGPU)
@@ -588,13 +498,11 @@ final class SystemMonitor: ObservableObject {
         let systemCardFans = menuPanelNeeds.system
             && defaults.bool(forKey: DefaultsKey.monitorSysFans)
         let otherFans = defaults.bool(forKey: AppFeature.monitorCPU.availabilityKey)
-            && (fullMonitorVisible || menuPanelNeeds.fanSpeed
+            && (menuPanelNeeds.fanSpeed
                 || defaults.bool(forKey: DefaultsKey.menuBarFanSpeed))
         plan.needFanSpeed = (systemCardFans || otherFans) && Self.fanTelemetryAvailable
-        // The island preview in Settings shows the device card too; the
-        // panel's System card reads USB only for its device row's count.
-        plan.needConnectedDevices = fullMonitorVisible
-            || (menuPanelNeeds.system && defaults.bool(forKey: DefaultsKey.monitorSysConnectedDevices))
+        // The panel's System card reads USB only for its device row's count.
+        plan.needConnectedDevices = (menuPanelNeeds.system && defaults.bool(forKey: DefaultsKey.monitorSysConnectedDevices))
             || menuPanelNeeds.connectedDevices
             || defaults.bool(forKey: DefaultsKey.menuBarConnectedDevices)
 
@@ -653,7 +561,7 @@ final class SystemMonitor: ObservableObject {
     /// onto the new grid or `tick % stride` could become unreachable.
     private func syncTimerCadence(plan: SamplingPlan) {
         lastSyncedPlan = plan
-        let foreground = fullMonitorVisible || menuPanelNeeds.any || notchDetailNeeds.any || notchVisible
+        let foreground = menuPanelNeeds.any
         let desired = MonitorSamplingPolicy.wakeTicks(for: Self.neededKinds(of: plan),
                                                       intervalSeconds: intervalSeconds,
                                                       foreground: foreground)
@@ -718,7 +626,7 @@ final class SystemMonitor: ObservableObject {
         syncTimerCadence(plan: plan)
         refreshInFlight = true
         let suppressGPUReadsUntil = self.suppressGPUReadsUntil
-        let foregroundSampling = fullMonitorVisible || menuPanelNeeds.any || notchDetailNeeds.any || notchVisible
+        let foregroundSampling = menuPanelNeeds.any
         let intervalSeconds = self.intervalSeconds
         // Ticks advance by the timer's cadence so `tick % stride` keeps
         // measuring base intervals; mutated on main only, read by the queue

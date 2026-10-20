@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import CoreGraphics
 
@@ -27,29 +28,10 @@ enum ScreenshotCapturePolicy {
             : workflowWindowIDs.union(contentWindowIDs)
     }
 
-    /// `islandWindowIDs` are the Dynamic Island windows that show in captures.
-    /// The island has its own preference for that, so "Hide Vorssaint windows"
-    /// leaves them in, but a caller that protects them keeps them out.
     static func excludedWindowIDs(hideVorssaintWindows: Bool,
                                   ownWindowIDs: Set<CGWindowID>,
-                                  protectedWindowIDs: Set<CGWindowID>,
-                                  islandWindowIDs: Set<CGWindowID> = []) -> Set<CGWindowID> {
-        let excluded = hideVorssaintWindows ? ownWindowIDs : ownWindowIDs.intersection(protectedWindowIDs)
-        return excluded.subtracting(islandWindowIDs.subtracting(protectedWindowIDs))
-    }
-
-    /// The island windows that show in captures, as the island normally looks.
-    /// While the main island offers the capture controls or shows a capture
-    /// just taken, it is the tool taking the picture and stays out of it, even
-    /// with the preference on (issue #2501). Copies on other displays only
-    /// ever show activities.
-    static func islandCaptureWindowIDs(islandWindowIDs: Set<CGWindowID>,
-                                       mainWindowID: CGWindowID?,
-                                       showsInCaptures: Bool,
-                                       showsCaptureTool: Bool) -> Set<CGWindowID> {
-        guard showsInCaptures else { return [] }
-        guard showsCaptureTool, let mainWindowID else { return islandWindowIDs }
-        return islandWindowIDs.subtracting([mainWindowID])
+                                  protectedWindowIDs: Set<CGWindowID>) -> Set<CGWindowID> {
+        hideVorssaintWindows ? ownWindowIDs : ownWindowIDs.intersection(protectedWindowIDs)
     }
 
     static func canPickWindow(_ windowID: CGWindowID,

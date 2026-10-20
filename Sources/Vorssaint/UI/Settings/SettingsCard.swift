@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
 /// One rounded group of related controls on a redesigned Settings page, with
-/// an optional heading. The same card the Dynamic Island page draws, so the
-/// pages read as one design.
+/// an optional heading, so the pages read as one design.
 struct SettingsCard<Content: View>: View {
     let title: String?
     let content: Content
@@ -98,52 +98,6 @@ struct SettingsRow<Accessory: View>: View {
     }
 }
 
-/// A switch for an option that needs another feature. While it cannot be
-/// used, its feature uninstalled or something else ruling it out, the option
-/// reads greyed and off, since a disabled switch looks like one that is just
-/// off, and a readable line under it says why.
-struct SettingsFeatureSwitchRow: View {
-    let symbol: String
-    let title: String
-    var caption: String? = nil
-    @Binding var isOn: Bool
-    let feature: AppFeature
-    /// False while something else rules the option out, as the caption says.
-    var enabled = true
-    @ObservedObject private var l10n = L10n.shared
-    @ObservedObject private var features = FeatureRuntime.shared
-
-    var body: some View {
-        let installed = features.isAvailable(feature)
-        let usable = installed && enabled
-        VStack(alignment: .leading, spacing: 6) {
-            SettingsRow(symbol: symbol, title: title, caption: usable ? caption : nil) {
-                Toggle(title, isOn: usable ? $isOn : .constant(false)).labelsHidden().toggleStyle(.switch)
-            }
-            .disabled(!usable)
-            .saturation(usable ? 1 : 0)
-            .opacity(usable ? 1 : 0.45)
-            if !installed {
-                HStack(spacing: 10) {
-                    Text(feature.enableReason(l10n))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Button(FeatureStrings.notchEditor(l10n.language).openFeatures) { feature.showInFeatures() }
-                        .controlSize(.small)
-                }
-                .padding(.leading, settingsRowTextInset)
-            } else if !usable, let caption {
-                Text(caption)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.leading, settingsRowTextInset)
-            }
-        }
-    }
-}
-
 /// A row that picks one of a few options: segments beside the title while the
 /// row fits on one line, under the title otherwise, and a menu there when the
 /// segments don't fit either. A row wider than its column would center the page
@@ -217,20 +171,5 @@ struct SettingsMenuRow<Value: Hashable, Options: View>: View {
 
     private var menu: some View {
         Picker(title, selection: $selection) { options }.pickerStyle(.menu).labelsHidden().fixedSize()
-    }
-}
-
-/// A switch pushed to the trailing edge with its label at the leading one,
-/// so a shared control that carries its own label lines up with the rows
-/// around it on a redesigned page.
-struct TrailingSwitchToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 12) {
-            configuration.label
-            Spacer(minLength: 12)
-            Toggle(isOn: configuration.$isOn) { EmptyView() }
-                .labelsHidden()
-                .toggleStyle(.switch)
-        }
     }
 }

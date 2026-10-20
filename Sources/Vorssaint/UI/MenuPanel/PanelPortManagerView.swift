@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
 struct PanelPortManagerView: View {
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var service = PortManagerService.shared
-    @Environment(\.notchPresentation) private var inNotch
     @State private var pending: PortManagerEntry?
     @State private var force = false
 
@@ -207,19 +207,8 @@ struct PanelPortManagerView: View {
         }
     }
 
-    /// The alert would hang from the island as a sheet; there it asks on its own.
     private func confirmTermination(_ entry: PortManagerEntry, force: Bool) {
-        guard inNotch else {
-            self.force = force
-            pending = entry
-            return
-        }
-        DispatchQueue.main.async {
-            guard NSAlert.confirmAboveIsland(String(format: strings.terminateFormat, entry.processName),
-                                             message: String(format: strings.terminateMessageFormat, entry.port, entry.pid),
-                                             action: force ? strings.forceKill : strings.kill, destructive: true,
-                                             cancel: l10n.s.uninstallerCancel) else { return }
-            service.terminate(entry, force: force)
-        }
+        self.force = force
+        pending = entry
     }
 }

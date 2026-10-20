@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -88,10 +89,6 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
     /// always lands the caret in the text.
     func toggle() {
         guard !modalInteractionActive else { return }
-        if NotchService.shared.showScratchpad(toggle: true) {
-            if isVisible { hide() }
-            return
-        }
         if isVisible, panel?.isKeyWindow == true {
             hide()
         } else {
@@ -99,14 +96,8 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
         }
     }
 
-    /// The island's own open action passes false: it moves the document out
-    /// to the floating pad instead of routing it back into the island.
-    func show(allowsIsland: Bool = true) {
+    func show() {
         guard AppFeature.scratchpad.isAvailable, !modalInteractionActive else { return }
-        if allowsIsland, NotchService.shared.showScratchpad() {
-            if isVisible { hide() }
-            return
-        }
         if isVisible {
             focusText(requiresKeyWindow: false)
             return
@@ -136,15 +127,7 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
         }
     }
 
-    /// The island edits the same document in place: load it (or the current
-    /// copy) without showing the floating pad, and commit when it leaves.
-    func loadForEmbedding() -> Bool {
-        guard AppFeature.scratchpad.isAvailable else { return false }
-        marksExpanded = false
-        return loadApplyingRetention()
-    }
-
-    /// The inline warning leaves with the pad or the island, so a final
+    /// The inline warning leaves with the pad, so a final
     /// write that fails on the way out falls back to the HUD.
     func commitEdits() {
         flushSave()
@@ -280,11 +263,10 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
     }
 
     /// Clearing goes through the text view when it is up, so one Cmd+Z brings
-    /// everything back while the pad stays open. The island passes its own
-    /// editor for the same undo there.
-    func clear(through editor: NSTextView? = nil) {
+    /// everything back while the pad stays open.
+    func clear() {
         guard !text.isEmpty else { return }
-        if let textView = editor ?? textView.flatMap({ $0.window === panel ? $0 : nil }) {
+        if let textView = textView.flatMap({ $0.window === panel ? $0 : nil }) {
             // A live input-method composition holds a marked range into the
             // storage; replacing the whole text underneath it leaves that
             // range pointing at nothing. Commit it first.
@@ -306,10 +288,9 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
 
     /// A checkbox clicked in the formatted reading flips its box through the
     /// text view when it is up, so the click is one edit that Cmd+Z takes
-    /// back and the history typed before it stays. The island passes its own
-    /// editor for the same undo there.
-    func toggleTask(box: Int, through editor: NSTextView? = nil) {
-        if let textView = editor ?? textView.flatMap({ $0.window === panel ? $0 : nil }) {
+    /// back and the history typed before it stays.
+    func toggleTask(box: Int) {
+        if let textView = textView.flatMap({ $0.window === panel ? $0 : nil }) {
             // A live input-method composition holds a marked range into the
             // storage; editing around it leaves that range pointing at nothing.
             if textView.hasMarkedText() { textView.unmarkText() }
@@ -327,11 +308,10 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
     }
 
     /// The toolbar types the Markdown the user would have typed, through the
-    /// text view so one Cmd+Z takes the whole mark back. The island passes its
-    /// own editor for the same undo there.
-    func apply(_ mark: ScratchpadMark, through editor: NSTextView? = nil) {
+    /// text view so one Cmd+Z takes the whole mark back.
+    func apply(_ mark: ScratchpadMark) {
         guard !isPreviewing else { return }
-        guard let textView = editor ?? textView.flatMap({ $0.window === panel ? $0 : nil }) else { return }
+        guard let textView = textView.flatMap({ $0.window === panel ? $0 : nil }) else { return }
         // A live input-method composition holds a marked range into the
         // storage; editing around it leaves that range pointing at nothing.
         if textView.hasMarkedText() { textView.unmarkText() }
@@ -376,12 +356,10 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
         isPinned = !closesOnClickOutside
     }
 
-    /// Activate for dialog input and return focus to the originating host.
-    /// The island's dialog floats just above it: a sheet would move and
-    /// reskin the borderless surface.
-    func exportText(suggestedName: String, from window: NSWindow? = nil) {
+    /// Activate for dialog input and return focus to the pad.
+    func exportText(suggestedName: String) {
         guard !text.isEmpty, !modalInteractionActive, let padID = selectedPadID,
-              let sourceWindow = window ?? panel, sourceWindow.isVisible else { return }
+              let sourceWindow = panel, sourceWindow.isVisible else { return }
         modalInteractionActive = true
         flushSave()
         let savePanel = NSSavePanel()
@@ -393,9 +371,9 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
             self?.modalInteractionActive = false
             if response == .OK, let url = savePanel.url {
                 do {
-                    // The island's dialog leaves the pad editable, so the file
-                    // gets the pad as it is when the save is confirmed. A pad
-                    // closed meanwhile is reported like any failed write.
+                    // The file gets the pad as it is when the save is
+                    // confirmed. A pad closed meanwhile is reported like any
+                    // failed write.
                     guard let content = self?.document?.pads.first(where: { $0.id == padID })?.text else {
                         throw CocoaError(.fileNoSuchFile)
                     }
@@ -413,20 +391,8 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
                 if sourceWindow.isVisible { sourceWindow.makeKey() }
             }
         }
-        if sourceWindow === NotchService.shared.presentationWindow {
-            // modalInteractionActive keeps the island's working surface
-            // while its independent dialog is up.
-            savePanel.level = NSWindow.Level(rawValue: sourceWindow.level.rawValue + 1)
-            // Like the sheet it replaces, it stays up while another app is active.
-            savePanel.hidesOnDeactivate = false
-            savePanel.begin(completionHandler: complete)
-            NSApp.activate(ignoringOtherApps: true)
-            // Activation alone can leave the nonactivating island holding focus.
-            savePanel.makeKeyAndOrderFront(nil)
-        } else {
-            NSApp.activate(ignoringOtherApps: true)
-            DispatchQueue.main.async { complete(savePanel.runModal()) }
-        }
+        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.async { complete(savePanel.runModal()) }
     }
 
     // MARK: - Focus
@@ -438,7 +404,7 @@ final class ScratchpadService: NSObject, ObservableObject, NSWindowDelegate {
     }
 
     /// Document actions keep focus in their host. Only an explicit show may
-    /// bring the floating pad forward while the island or another app is key.
+    /// bring the floating pad forward while another app is key.
     private func focusText(requiresKeyWindow: Bool = true) {
         guard let panel, panel.isVisible, !requiresKeyWindow || panel.isKeyWindow else { return }
         panel.makeKey()

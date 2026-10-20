@@ -6,18 +6,16 @@ You can review or change every grant in System Settings, under Privacy and Secur
 
 | Permission | Optional | Powers |
 |---|---|---|
-| Accessibility | Yes | Scroll direction, Logitech MX mice, Window Layout, the app and window switcher, Dock Preview, Dock click to minimize, middle click, paste as plain text, Finder cut and paste, quit on close, radial menu key actions, optional notch notification mirroring and keyboard feedback |
+| Accessibility | Yes | Scroll direction, Logitech MX mice, Window Layout, the app and window switcher, Dock Preview, Dock click to minimize, middle click, paste as plain text, Finder cut and paste, quit on close, and radial menu key actions |
 | Screen Recording | Yes | Window previews, screenshots, copy text from screen, magnified color picking and screen recordings |
-| System Audio Recording | Yes | Volume mixer, optional live equalizer and system audio capture for recordings |
+| System Audio Recording | Yes | Volume mixer and system audio capture for recordings |
 | Microphone | Yes | Your voice in a screen recording, only when you turn it on |
-| Camera | Yes | The camera preview mirror, floating or inside the notch |
-| Calendars | Yes | Upcoming appointments in the notch |
-| Bluetooth | Yes | Accessory battery levels in Monitor, optional accessory alerts in the notch and Bluetooth on sleep |
-| Files and Folders | Yes | Monitoring downloads in a folder you choose |
+| Camera | Yes | The camera preview mirror |
+| Bluetooth | Yes | Accessory battery levels in Monitor and Bluetooth on sleep |
 | Notifications | Yes | Keep awake, battery, Monitor and update alerts |
 | Full Disk Access | Yes | A deeper uninstaller scan |
 | Administrator (one time) | Yes | Password free closed lid toggling |
-| Automation | Yes | Finder actions, Homebrew Terminal handoff and supported music playback controls |
+| Automation | Yes | Finder actions and Homebrew Terminal handoff |
 | App Management | Yes | App installs, updates and removal |
 
 ## Accessibility
@@ -26,7 +24,6 @@ You can review or change every grant in System Settings, under Privacy and Secur
 
 **What uses it.**
 
-- **Notch**, for optional mirroring of new visible notifications, opening their original native action and optionally hiding the original banner, plus system key feedback. Scrolling gestures inside the notch window need no global input permission.
 - **Scroll direction inverter**, which flips the mouse wheel.
 - **Window Layout**, which moves or resizes windows when you use a layout action, shortcut or optional trackpad or mouse gesture.
 - **App and window switcher**, which captures the switcher hotkey and reads the window list.
@@ -64,11 +61,11 @@ The color picker also uses this permission for Barforge's magnifier and keyboard
 
 **Why it comes up.** macOS gates app audio taps behind the System Audio Recording permission.
 
-**What uses it.** The Volume Mixer, the optional live equalizer in Dynamic Island, and the screen recorder's system audio tap.
+**What uses it.** The Volume Mixer and the screen recorder's system audio tap.
 
-**If you say no.** Apps keep using normal system audio. The mixer cannot adjust or route individual apps, and the island uses animated music bars. The recorder can fall back to the screen capture stream's audio when available.
+**If you say no.** Apps keep using normal system audio. The mixer cannot adjust or route individual apps. The recorder can fall back to the screen capture stream's audio when available.
 
-**Optional.** Yes. The mixer and equalizer process audio in memory without saving or uploading it; apps you route to AirPlay are streamed from memory to the speaker you pick on your local network, through macOS's own AirPlay. The recorder saves audio only as part of a recording you start; sharing that recording is a separate action.
+**Optional.** Yes. The mixer processes audio in memory without saving or uploading it; apps you route to AirPlay are streamed from memory to the speaker you pick on your local network, through macOS's own AirPlay. The recorder saves audio only as part of a recording you start; sharing that recording is a separate action.
 
 ## Microphone
 
@@ -84,15 +81,11 @@ The color picker also uses this permission for Barforge's magnifier and keyboard
 
 **Why it comes up.** macOS asks before any app can show the camera image.
 
-**What uses it.** Camera preview, either in its floating mirror or inside the notch. The camera starts only from an explicit action and stops when the preview closes, its notch section is hidden, the feature is disabled or the Mac locks.
+**What uses it.** Camera preview, in its floating mirror. The camera starts only from an explicit action and stops when the preview closes, the feature is disabled or the Mac locks.
 
 **If you say no.** The preview window explains the state and offers the System Settings shortcut. Everything else in the app carries on as normal.
 
-**Optional.** Yes. The image goes straight to the local preview. This feature does not save or upload camera frames. Visible notch content can still appear in a screenshot or recording when you include the notch in captures.
-
-## Calendars
-
-The optional notch calendar asks for access when you press its permission button. macOS calls this full calendar access; Barforge uses it only to read appointments and never modifies them. If access is denied, the calendar shows a System Settings shortcut while the rest of the notch remains available. Event content stays on this Mac.
+**Optional.** Yes. The image goes straight to the local preview. This feature does not save or upload camera frames.
 
 ## Bluetooth
 
@@ -101,16 +94,11 @@ The optional notch calendar asks for access when you press its permission button
 **What uses it.**
 
 - **Monitor**, for the battery level of keyboards, mice, headphones and other accessories. It is read only while the battery details are open or while you show it in the menu bar or in the Power card. Both stay off until you turn them on.
-- **Notch**, for the optional accessory alerts when an accessory connects or runs low.
 - **Bluetooth on sleep**, which checks and switches Bluetooth around sleep while you have it turned on.
 
-**If you say no.** Accessories that report their battery to macOS directly, as many keyboards, mice and trackpads do, still show it. Others can be missing from the list and from accessory alerts. Bluetooth on sleep may be unable to switch Bluetooth off and back on.
+**If you say no.** Accessories that report their battery to macOS directly, as many keyboards, mice and trackpads do, still show it. Others can be missing from the list. Bluetooth on sleep may be unable to switch Bluetooth off and back on.
 
 **Optional.** Yes. Battery levels and the Bluetooth state are read on your Mac and never leave it.
-
-## Files and Folders
-
-Download monitoring watches only the folder you choose in the system picker. Folder access is stored as a local bookmark and does not travel in a settings backup. If the folder becomes unavailable or access is revoked, the notch asks you to choose it again. It does not scan other folders or need Full Disk Access for this feature.
 
 ## Notifications
 
@@ -124,7 +112,7 @@ Download monitoring watches only the folder you choose in the system picker. Fol
 - **Updates**, with a one time note when a new version shows up, and only while automatic update checks are on.
 - **App updates**, with a note when other apps on the Mac have a newer version, and only while the background check is on.
 
-**If you say no.** These system notifications are not posted. Status remains available inside the app, and alarms from timers you start still work. Mirroring existing system banners uses Accessibility instead of this permission.
+**If you say no.** These system notifications are not posted. Status remains available inside the app.
 
 **Optional.** Yes.
 
@@ -158,9 +146,8 @@ Download monitoring watches only the folder you choose in the system picker. Fol
 - **Uninstaller**, which moves leftover files to the Trash.
 - **Empty the Trash** in Quick toggles, which asks Finder to empty it. The other quick toggles, dark mode included, need no permission.
 - **Homebrew manager**, which can open Terminal with the exact Homebrew install or setup command when the app should not collect a password itself.
-- **Dynamic Island playback**, when a music app requires Automation to control its own playback while another app is active. Only playback commands declared by the selected app are used; an explicit button requests permission before a new action can be sent. The shuffle button on the music page reads and switches only the shuffle setting the app declares, and reads whether shuffle is available for what is playing when the app declares that too. Until the app is allowed, its first press only asks for this permission, even for an app whose playback controls work without it.
 
-**If you say no.** Those Finder or Terminal handoff steps will not go through. Music stays visible, and you can open its player to control it there. You can switch Automation back on in System Settings, under Privacy and Security, Automation.
+**If you say no.** Those Finder or Terminal handoff steps will not go through. You can switch Automation back on in System Settings, under Privacy and Security, Automation.
 
 **Optional.** Yes.
 

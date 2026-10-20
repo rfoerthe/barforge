@@ -120,16 +120,6 @@ extension AppFeature {
             return RadialMenuSupport.opensFromMouseOrTrackpad(
                 UserDefaults.standard.data(forKey: DefaultsKey.radialMenuProfiles))
                 ? .mouse : .idle
-        case .notchNotifications, .notchGestures, .notchTimer, .notchQueue, .notchDownloads: return .idle
-        // It reads only while something is being watched, and stops on its own.
-        case .notchWatch: return .idle
-        // A blink every few seconds and a visit every few minutes, both
-        // drawn by Core Animation, with one timer waiting for the next visit.
-        case .notchMascot: return .periodic
-        case .notchAccessories: return .periodic
-        // Log changes arrive as file events; a timer keeps countdowns and
-        // limits current while the section is on.
-        case .notch, .notchCalendar, .notchLyrics, .notchLiveEqualizer, .notchAgents: return .periodic
         case .clipboardHistory, .urlCleaner, .extraBrightness,
              .monitorCPU, .monitorGPU, .monitorMemory,
              .monitorNetwork, .monitorDisk, .monitorPower, .connectedDevices:
@@ -139,8 +129,7 @@ extension AppFeature {
                 ? .keyboard : .idle
         case .brightness:
             // Following the pointer, the overlay and a finer step answer the
-            // brightness keys from a tap. Like Accessibility, the island's own
-            // notices are counted under the island.
+            // brightness keys from a tap.
             let defaults = UserDefaults.standard
             return defaults.bool(forKey: DefaultsKey.brightnessKeysEnabled)
                 || defaults.bool(forKey: DefaultsKey.brightnessOSDEnabled)

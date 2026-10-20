@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -78,7 +79,6 @@ enum CommandBarFeatureTests {
         CommandBarTerminationContract.run(suite)
         CommandBarAppSortContract.run(suite)
         CommandBarKillProcessOrderContract.run(suite)
-        CommandBarDropletContract.run(suite)
         let isCodeLine: (String) -> Bool = {
             !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//")
         }
@@ -459,10 +459,8 @@ enum CommandBarFeatureTests {
                 .filter(isCodeLine)
                 .joined(separator: "\n")
         } ?? ""
-        suite.expect(volumeActionCode.contains("QuickToolHUD.show(")
-                && volumeActionCode.components(separatedBy: "QuickToolHUD.show(")[0]
-                    .contains("NotchSupport.routes(.volume), NotchService.shared.showVolume(level) { return }"),
-               "volume from the bar reports in Dynamic Island when it can, and floats its confirmation only otherwise")
+        suite.expect(volumeActionCode.contains("QuickToolHUD.show("),
+               "volume from the bar floats its confirmation")
 
         // MARK: Compact mode, what an empty field shows
         suite.expect(CommandBarHome.showsBrowseList(compact: false, hasCategory: false, isPeeking: false),
@@ -690,12 +688,6 @@ enum CommandBarFeatureTests {
         suite.expect(InputSourceSelection.asciiLayoutID(currentID: asciiCapableMethod.id,
                                                   snapshots: [asciiCapableMethod, latinSource]) == latinSourceID,
                "an ASCII-capable input method still moves to a plain layout")
-        suite.expect(InputSourceSelection.shortCode(languages: ["ru"]) == "RU",
-               "the island's layout notice reads the source's language as a short code")
-        suite.expect(InputSourceSelection.shortCode(languages: ["zh-Hans", "zh"]) == "ZH",
-               "a script-qualified language still reads as its two letters")
-        suite.expect(InputSourceSelection.shortCode(languages: []).isEmpty,
-               "a source with no language leaves the notice its mark alone")
 
         let commandBarServiceSource = (try? String(
             contentsOfFile: "Sources/Vorssaint/Services/CommandBar/CommandBarService.swift",
@@ -2346,9 +2338,6 @@ enum CommandBarInputSourceContract {
         static var acceptsSelection = true
         static var selected: [String] = []
         static func currentSourceID() -> String? { current }
-        static func currentReading() -> ProductionInputSourceSelection.Reading? {
-            .init(id: current, code: current.uppercased(), name: current)
-        }
         static func snapshots() -> [ProductionInputSourceSelection.Snapshot] {
             [.init(id: "original", isLayout: true, isASCIICapable: false),
              .init(id: "ascii", isLayout: true, isASCIICapable: true)]
@@ -2375,7 +2364,6 @@ enum CommandBarInputSourceContract {
         typealias UserDefaults = Preferences
         typealias InputSourceSelection = Sources
         typealias DispatchQueue = Queue
-        typealias NotchService = Island
         var suspendedInputSourceID: String?
         var presentationID = UUID()
     }
@@ -2387,57 +2375,15 @@ enum CommandBarInputSourceContract {
             Sources.selected = []
             Sources.acceptsSelection = true
             Preferences.enabled = true
-            Island.shared = Island()
-            Island.shared.inputSourceID = Sources.current
             return Service()
         }
         let normal = reset()
         normal.adoptASCIIInputSource()
-        Island.shared.inputSourceChanged()
         normal.restoreSuspendedInputSource()
         suite.expect(Sources.current == "ascii", "closing inside a key event defers keyboard restoration")
         Queue.drain()
         suite.expect(Sources.selected == ["ascii", "original"] && normal.suspendedInputSourceID == nil,
                      "ordinary close restores the original layout exactly once")
-        Island.shared.inputSourceChanged()
-        suite.expect(Island.shared.presented.isEmpty,
-                     "the borrowed layout and its return both leave the island's layout notice quiet")
-        for coalesced in [false, true] {
-            let manual = reset()
-            manual.adoptASCIIInputSource()
-            if !coalesced { Island.shared.inputSourceChanged() }
-            Sources.current = "de"
-            Island.shared.inputSourceChanged()
-            Island.shared.inputSourceChanged()
-            suite.expect(Island.shared.presented.map(\.title) == ["DE"],
-                         "a manual switch immediately after borrowing appears once, even with coalesced notifications")
-            Sources.current = "ascii"
-            Island.shared.inputSourceChanged()
-            suite.expect(Island.shared.presented.map(\.title) == ["DE", "ASCII"],
-                         "returning manually to the borrowed source is no longer an app-owned switch")
-            manual.restoreBorrowedInputSource()
-            Island.shared.inputSourceChanged()
-            Sources.current = "fr"
-            Island.shared.inputSourceChanged()
-            suite.expect(Island.shared.presented.map(\.title) == ["DE", "ASCII", "FR"],
-                         "restoration stays quiet without hiding the following manual switch")
-        }
-        let delayed = reset()
-        delayed.adoptASCIIInputSource()
-        Sources.current = "original"
-        Island.shared.inputSourceChanged()
-        Sources.current = "ascii"
-        Island.shared.inputSourceChanged()
-        suite.expect(Island.shared.presented.isEmpty,
-                     "an unchanged reading before a delayed selection lands does not lose its quiet marker")
-        let merged = reset()
-        merged.adoptASCIIInputSource()
-        merged.restoreBorrowedInputSource()
-        Island.shared.inputSourceChanged()
-        Sources.current = "ascii"
-        Island.shared.inputSourceChanged()
-        suite.expect(Island.shared.presented.map(\.title) == ["ASCII"],
-                     "coalesced borrowing and restoration cannot suppress a later manual change")
         let reopened = reset()
         reopened.adoptASCIIInputSource()
         reopened.restoreSuspendedInputSource()
@@ -2706,81 +2652,5 @@ enum CommandBarKillProcessOrderContract {
             suite.expect(service.killProcessEntries == expected,
                          "the Command Bar lists processes in the Kill Process page's \(sort) order, found \(service.killProcessEntries)")
         }
-    }
-}
-
-/// The drop that carries the bar out of the island answers the person while
-/// it falls: typing hurries it, and closing it sends it back up the way it
-/// came instead of making it vanish. Each body is cut at the next
-/// declaration, so a moved or renamed site fails here.
-enum CommandBarDropletContract {
-    static func run(_ suite: TestSuite) {
-        func code(_ path: String) -> String {
-            ((try? String(contentsOfFile: path, encoding: .utf8)) ?? "")
-                .components(separatedBy: "\n")
-                .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
-                .joined(separator: "\n")
-        }
-        func body(_ source: String, _ signature: String) -> String {
-            let parts = source.components(separatedBy: signature)
-            guard parts.count > 1 else { return "" }
-            return parts[1].components(separatedBy: "\n    func ").first?
-                .components(separatedBy: "\n    private func ").first ?? ""
-        }
-        let droplet = code("Sources/Vorssaint/UI/CommandBar/CommandBarDroplet.swift")
-        let view = code("Sources/Vorssaint/UI/CommandBar/CommandBarView.swift")
-
-        let typing = view.components(separatedBy: ".onChange(of: service.query) { _, query in").dropFirst().first ?? ""
-        suite.expect((typing.components(separatedBy: "}").first ?? "")
-                        .contains("if !query.isEmpty, service.presentation == .droplet { CommandBarDroplet.shared.hurry("),
-                     "typing while the drop falls hurries it")
-
-        let service = code("Sources/Vorssaint/Services/CommandBar/CommandBarService.swift")
-        let monitor = service.components(separatedBy: "keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown)")
-            .dropFirst().first ?? ""
-        let early = monitor.range(of: "if self.presentation == .droplet, event.keyCode != 53 { CommandBarDroplet.shared.hurry() }")
-        let composing = monitor.range(of: "if self.fieldIsComposing(in: panel) { return event }")
-        suite.expect(early != nil && composing != nil && early!.lowerBound < composing!.lowerBound,
-                     "a key while the drop falls shows the bar before the field or its search takes the key")
-        let shows = service.components(separatedBy: "CommandBarDroplet.shared.drop(from: island").dropFirst().first?
-            .components(separatedBy: "\n            return\n").first ?? ""
-        suite.expect(shows.contains("panel.alphaValue = 1") && shows.contains("layer.add(appear, forKey: \"appear\")")
-                     && !shows.contains("animator()"),
-                     "the bar shows at once and fades in through Core Animation, not through main thread alpha steps")
-        let revealed = shows.components(separatedBy: "panel.alphaValue = 1").dropFirst().first ?? ""
-        suite.expect(revealed.contains("panel.makeKey()") && revealed.contains("self.focusField(in: panel)"),
-                     "the bar takes the keyboard again once the drop shows it, as the window bar does")
-
-        let hurry = body(droplet, "func hurry() {")
-        suite.expect(hurry.contains("guard falling, let fall, let reveal else { return }")
-                     && hurry.contains("generation += 1") && hurry.contains("stage.removeAnimation(forKey: \"reveal\")")
-                     && hurry.contains("fall.motion.remainder(from:") && hurry.contains("reveal(length)")
-                     && hurry.contains("fadeOut(current, duration: length)") && hurry.contains("CATransaction.flush()")
-                     && hurry.contains("mascot.root.opacity = 0"),
-                     "typing as the drop falls shows the bar at once and plays the rest of the fall under it")
-
-        let retract = body(droplet, "func retract(from bar: CGRect, look: NotchMascotLook, mood: NotchMascotMood) {")
-        let rewindCall = retract.range(of: "if falling, !Self.reducesMotion, rewind(homecoming: mood) { return }")
-        let cancelCall = retract.range(of: "cancel()")
-        suite.expect(rewindCall != nil && cancelCall != nil && rewindCall!.lowerBound < cancelCall!.lowerBound,
-                     "closing a drop that still falls rewinds it before anything cancels it")
-
-        let rewind = body(droplet, "private func rewind(homecoming mood: NotchMascotMood) -> Bool {")
-        suite.expect(rewind.contains("generation += 1") && rewind.contains("stage.removeAnimation(forKey: \"reveal\")")
-                     && rewind.contains("fall.motion.rewound(from:")
-                     && rewind.contains("self.panel?.orderOut(nil)")
-                     && rewind.contains("NotchService.shared.setMascotInBar(false, homecoming: mood)"),
-                     "a rewound drop never shows the bar, rises as motion of its own and brings the companion home")
-        // Played backward through the layer's clock, Core Animation drops the
-        // fill before the first frame and the bar's shape flashes. The way
-        // back is a motion of its own instead.
-        suite.expect(!droplet.contains(".speed") && !droplet.contains("timeOffset"),
-                     "no drop plays by changing the layer's clock")
-
-        let reveal = droplet.components(separatedBy: "self.falling = false").dropFirst().first ?? ""
-        let shown = reveal.range(of: "revealed(0)")
-        let fade = reveal.range(of: "self.fadeOut(current)")
-        suite.expect(shown != nil && fade != nil && shown!.lowerBound < fade!.lowerBound,
-                     "a landed drop hands over to the bar as is, then fades off it")
     }
 }

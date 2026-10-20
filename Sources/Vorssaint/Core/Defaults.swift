@@ -11,16 +11,13 @@ enum DefaultsKey {
     static let language = "appLanguage"                   // AppLanguage.rawValue
     static let appearance = "appAppearance"               // AppAppearance.rawValue
     static let liquidGlassEnabled = "liquidGlassEnabled"  // Liquid Glass in windows and panels on macOS 26+
-    static let notchLiquidGlassEnabled = "notchLiquidGlassEnabled" // Dynamic Island glass, independently controlled
     static let clamshellPreferred = "clamshellPreferred"  // apply closed-lid mode to every session
     static let dimScreenOnLidClose = "dimScreenOnLidClose" // dim the built-in display to zero while the lid is closed
     static let onboardingStep = "onboardingStep"          // resume point if onboarding is interrupted
     static let featuresOnboardingVersion = "featuresOnboardingVersion" // last feature-tour marker handled
     static let lastUpdateIntroVersion = "lastUpdateIntroVersion"
     static let supportUpdateIntroVersion = "supportUpdateIntroVersion"
-    static let updateHighlightsSeenVersion = "updateHighlightsSeenVersion"
     static let featureHubKeptFeatures = "featureHubKeptFeatures" // comma-joined AppFeature raw values
-    static let brightnessUpdatePromptState = "brightnessUpdatePromptState"
     static let updateShowcaseIntroVersion = "updateShowcaseIntroVersion"
     static let updateShowcaseMediaOverride = "updateShowcaseMediaOverride"
     static let defaultDuration = "defaultDurationMinutes" // 0 = indefinite
@@ -230,8 +227,6 @@ enum DefaultsKey {
     // Set once the paths cached before paired discovery requests have been
     // dropped, so a monitor written off then is classified again exactly once.
     static let brightnessDDCWriteOnlyPathsRechecked = "brightnessDDCWriteOnlyPathsRechecked"
-    /// A beta already installed the companion for this Command Bar user, once.
-    static let notchMascotBetaInstalled = "notchMascotBetaInstalled"
     // Per-monitor connection paths a person has told this app to dim in
     // software: the only way to know a write-only channel swallows its writes
     // is to watch the panel, which no probe can do. Issue #1589.
@@ -788,153 +783,6 @@ enum DefaultsKey {
     static let snippetSoundEnabled = "snippetSoundEnabled"
     static let snippetSoundName = "snippetSoundName"
 
-    // Optional top-of-screen workspace and activity presentations.
-    static let notchShowPlayingMusic = "notchShowPlayingMusic"
-    static let notchIncludeOtherPlayers = "notchIncludeOtherPlayers"
-    static let notchPreferredPlayer = "notchPreferredPlayer"
-    static let notchDefaultProfileInitialized = "notchDefaultProfileInitialized" // local migration marker; never backed up
-    static let notchInitialExtensionsInstalled = "notchInitialExtensionsInstalled" // local first-install marker; never backed up
-    static let notchAgentsOptInMigrated = "notchAgentsOptInMigrated" // local migration marker; never backed up
-    static let notchIdleContent = "notchIdleContent"
-    static let notchHiddenControls = "notchHiddenControls"
-    // Travels with the controls so old backups migrate and later choices survive.
-    static let notchScratchpadControlHidden = "notchScratchpadControlHidden"
-    static let notchKeyboardLightControlHidden = "notchKeyboardLightControlHidden"
-    static let notchControlOrder = "notchControlOrder"
-    static let notchSize = "notchSize"
-    static let notchOutlineEnabled = "notchOutlineEnabled"
-    static let notchHideMenuBarGap = "notchHideMenuBarGap"
-    static let notchCustomWidth = "notchCustomWidth"
-    static let notchCustomHeight = "notchCustomHeight"
-    // Fits the island to one Mac's camera housing; never backed up.
-    static let notchCameraFitWidth = "notchCameraFitWidth"
-    static let notchCameraFitHeight = "notchCameraFitHeight"
-    static let notchHapticFeedback = "notchHapticFeedback"
-    static let notchTranslucentBackground = "notchTranslucentBackground"
-    static let notchShelf = "notchShelf"
-    static let notchDragReveal = "notchDragReveal"
-    static let notchCaptureControls = "notchCaptureControls"
-    static let notchQuickPanel = "notchQuickPanel"
-    static let notchAppPanel = "notchAppPanel"
-    static let notchHidesMenuBarIcon = "notchHidesMenuBarIcon" // the island takes the glyph's place while it is on
-    static let notchKeepAwakeActivity = "notchKeepAwakeActivity" // a running Keep Awake session in the closed island
-    static let notchScratchpad = "notchScratchpad"
-    static let notchHoverExpands = "notchHoverExpands"
-    static let notchGesturesEnabled = "notchGesturesEnabled"
-    static let notchKeyboardLight = "notchKeyboardLight"
-    static let notchNotificationsEnabled = "notchNotificationsEnabled"
-    static let notchDismissNativeNotifications = "notchDismissNativeNotifications"
-    static let notchTimerEnabled = "notchTimerEnabled"
-    static let notchTimerMode = "notchTimerMode"
-    static let notchTimerMinutes = "notchTimerMinutes"
-    static let notchTimerSoundEnabled = "notchTimerSoundEnabled"
-    static let notchHideTimerCountdown = "notchHideTimerCountdown"
-    static let notchPomodoroFocusMinutes = "notchPomodoroFocusMinutes"
-    static let notchPomodoroShortBreakMinutes = "notchPomodoroShortBreakMinutes"
-    static let notchPomodoroLongBreakMinutes = "notchPomodoroLongBreakMinutes"
-    static let notchPomodoroLongBreakInterval = "notchPomodoroLongBreakInterval"
-    static let notchPomodoroTotalSessions = "notchPomodoroTotalSessions"
-    static let notchCameraEnabled = "notchCameraEnabled"
-    static let notchAccessoriesEnabled = "notchAccessoriesEnabled"
-    static let notchLyricsEnabled = "notchLyricsEnabled"
-    static let notchLyricsOnline = "notchLyricsOnline"
-    static let notchBrowserCovers = "notchBrowserCovers"
-    static let notchLiveEqualizer = "notchLiveEqualizer"
-    static let notchQueueEnabled = "notchQueueEnabled"
-    static let notchDownloadsEnabled = "notchDownloadsEnabled"
-    static let notchDownloadsFolderBookmark = "notchDownloadsFolderBookmark"
-    // Watch: any part of any window read live in the island.
-    static let notchWatchEnabled = "notchWatchEnabled"
-    static let notchWatchSound = "notchWatchSound"
-    static let notchWatchCondition = "notchWatchCondition"
-    static let notchCalendarEnabled = "notchCalendarEnabled"
-    static let notchCalendarCountdown = "notchCalendarCountdown"
-    static let notchCalendarTimeLeft = "notchCalendarTimeLeft" // the event under way counts down to its end
-    static let notchCalendarWeekNumbers = "notchCalendarWeekNumbers" // the month grid numbers its weeks
-    static let notchCalendarExcluded = "notchCalendarExcluded" // [EKCalendar.calendarIdentifier] left out of the island
-    // [countdown key: event end] chosen from an event's menu; unregistered, so it stays out of backups
-    static let notchCalendarChosenCountdowns = "notchCalendarChosenCountdowns"
-    // AI agents: what the island reads from Claude Code, Codex, OpenCode and GitHub Copilot, and shows.
-    static let notchAgentsEnabled = "notchAgentsEnabled"
-    static let notchAgentsClaude = "notchAgentsClaude"
-    static let notchAgentsCodex = "notchAgentsCodex"
-    /// The Codex homes, `CODEX_HOME` folders, that get limits cards of their own.
-    static let notchAgentsCodexProfiles = "notchAgentsCodexProfiles"
-    static let notchAgentsOpenCode = "notchAgentsOpenCode"
-    static let notchAgentsCopilot = "notchAgentsCopilot"
-    static let notchAgentsCardOrder = "notchAgentsCardOrder"
-    static let notchAgentsHiddenCards = "notchAgentsHiddenCards"
-    static let notchAgentsPeriod = "notchAgentsPeriod"
-    static let notchAgentsLimitDisplay = "notchAgentsLimitDisplay"
-    static let notchAgentsLimitFocus = "notchAgentsLimitFocus"
-    static let notchAgentsLiveActivity = "notchAgentsLiveActivity"
-    static let notchAgentsReadout = "notchAgentsReadout"
-    static let notchAgentsFinishAlert = "notchAgentsFinishAlert"
-    static let notchAgentsFinishMinimum = "notchAgentsFinishMinimum"
-    static let notchAgentsLimitAlert = "notchAgentsLimitAlert"
-    static let notchAgentsLimitThreshold = "notchAgentsLimitThreshold"
-    static let notchAgentsDailyBudget = "notchAgentsDailyBudget"
-    static let notchAgentsPriceUpdates = "notchAgentsPriceUpdates"
-    static let notchEnabled = "notchEnabled"
-    static let notchDisplay = "notchDisplay"
-    // How the island looks on a display without a camera housing.
-    static let notchSilhouette = "notchSilhouette"
-    // The capsule's size and place, fitted by hand on such a display.
-    static let notchCapsuleFitWidth = "notchCapsuleFitWidth"
-    static let notchCapsuleFitHeight = "notchCapsuleFitHeight"
-    static let notchCapsuleFitDrop = "notchCapsuleFitDrop"
-    static let notchOpenOnHover = "notchOpenOnHover"
-    static let notchShortcutEnabled = "notchShortcutEnabled"
-    static let notchShortcut = "notchShortcut"
-    static let notchHideInFullscreen = "notchHideInFullscreen"
-    static let notchHideUntilHover = "notchHideUntilHover"
-    static let notchCoversMenus = "notchCoversMenus"
-    static let notchLowBatteryTint = "notchLowBatteryTint"
-    static let notchLowBatteryThreshold = "notchLowBatteryThreshold"
-    static let notchLowBatteryEarly = "notchLowBatteryEarly"
-    static let notchLowBatteryEarlyThreshold = "notchLowBatteryEarlyThreshold"
-    static let notchLowBatteryMenuBar = "notchLowBatteryMenuBar"
-    static let notchHoverDelay = "notchHoverDelay"
-    static let notchCloseDelay = "notchCloseDelay"
-    static let notchReturnHome = "notchReturnHome"
-    static let notchHomeModule = "notchHomeModule"
-    static let notchOpensActivity = "notchOpensActivity"
-    static let notchHiddenModules = "notchHiddenModules"
-    static let notchModuleOrder = "notchModuleOrder"
-    static let notchQuickAccessLayout = "notchQuickAccessLayout"
-    static let notchQuickAccessSide = "notchQuickAccessSide"
-    static let notchQuickAccessSecond = "notchQuickAccessSecond"
-    static let notchQuickAccessThird = "notchQuickAccessThird"
-    static let notchVolume = "notchVolume"
-    static let notchInputSource = "notchInputSource"
-    static let notchMicrophone = "notchMicrophone"
-    static let notchBrightness = "notchBrightness"
-    static let notchBattery = "notchBattery"
-    static let notchClipboard = "notchClipboard"
-    static let notchClipboardWindow = "notchClipboardWindow"
-    static let notchClipboardCardSize = "notchClipboardCardSize"
-    static let notchCapture = "notchCapture"
-    static let notchTrackChange = "notchTrackChange"
-    // Legacy backup key. Resting content is now selected explicitly by notchIdleContent.
-    static let notchMusicActivity = "notchMusicActivity"
-    static let notchShowInCaptures = "notchShowInCaptures"
-    static let notchLockScreen = "notchLockScreen" // music and live activities over the lock screen
-    static let notchLockSounds = "notchLockSounds" // padlock sounds as the Mac locks and unlocks
-    // Companion: a small friend who rests in the closed island and is the Command Bar's face.
-    static let notchMascotEnabled = "notchMascotEnabled"
-    static let notchMascotVisits = "notchMascotVisits" // passes through the island now and then
-    static let notchMascotReactions = "notchMascotReactions" // comes out to react to what the island sees
-    static let notchMascotStyle = "notchMascotStyle" // NotchMascotStyle.rawValue
-    static let notchMascotShape = "notchMascotShape" // NotchMascotShape.rawValue
-    static let notchMascotPalette = "notchMascotPalette" // NotchMascotPalette.rawValue
-    static let notchMascotSide = "notchMascotSide" // NotchMascotSide.rawValue, beside the camera
-    static let notchMascotVisitFrequency = "notchMascotVisitFrequency" // NotchMascotVisitFrequency.rawValue
-    static let notchMascotHidesWhenIdle = "notchMascotHidesWhenIdle" // hops into the island after a quiet while
-    static let notchCommandBar = "notchCommandBar" // the Command Bar comes out of the island
-    static let notchCommandBarStyle = "notchCommandBarStyle" // NotchCommandBarStyle.rawValue
-    // Legacy inverse preference; the explicit visibility switch supersedes it.
-    static let notchHideInCaptures = "notchHideInCaptures"
-    static let panelControlNotch = "panelControlNotch"
 
     // Radial menu: a wheel of actions on a shortcut.
     static let radialMenuEnabled = "radialMenuEnabled"
@@ -961,58 +809,6 @@ enum OnboardingInfo {
     // 3: app languages and support settings.
     // 4: navigable menu panel sections.
     static let currentFeatureSet = 4
-}
-
-/// The one-time tour of this release's headline feature, shown after updating.
-enum UpdateHighlightsInfo {
-    // Keep this marker unchanged for every stable patch in the 3.4 series.
-    static let releaseVersion = "3.4.0"
-    static let betaSeenVersion = "3.4.0-beta.1"
-
-    static func matchesRelease(_ appVersion: String) -> Bool {
-        guard let version = UpdateServiceSupport.SemanticVersion(raw: appVersion),
-              let release = UpdateServiceSupport.SemanticVersion(raw: releaseVersion),
-              (version.major, version.minor) == (release.major, release.minor),
-              version.patch >= release.patch else { return false }
-        if version.prerelease.isEmpty { return true }
-        guard version.patch == release.patch, (2...3).contains(version.prerelease.count), version.prerelease[0].description == "beta",
-              let number = Int(version.prerelease[1].description) else { return false }
-        if version.prerelease.count == 3 {
-            guard case let .numeric(hotfix) = version.prerelease[2], hotfix >= 0 else { return false }
-        }
-        return number >= 1
-    }
-
-    static func shouldShow(appVersion: String, lastSeenVersion: String?) -> Bool {
-        guard let marker = seenVersion(for: appVersion) else { return false }
-        return lastSeenVersion != marker
-    }
-
-    static func seenVersion(for appVersion: String) -> String? {
-        guard matchesRelease(appVersion),
-              let version = UpdateServiceSupport.SemanticVersion(raw: appVersion) else { return nil }
-        return version.prerelease.isEmpty ? releaseVersion : betaSeenVersion
-    }
-}
-
-/// A single invitation for existing Dynamic Island users to turn on display
-/// controls after updating. "pending" survives a launch interrupted before
-/// the invitation can be shown; "handled" prevents future updates replaying it.
-enum BrightnessUpdatePromptInfo {
-    static let pending = "pending"
-    static let handled = "handled"
-
-    static func isUpgrade(appVersion: String, previousVersion: String?) -> Bool {
-        guard let previousVersion,
-              let previous = UpdateServiceSupport.SemanticVersion(raw: previousVersion),
-              let current = UpdateServiceSupport.SemanticVersion(raw: appVersion) else { return false }
-        return current > previous
-    }
-
-    static func needsSetup(notchAvailable: Bool, brightnessAvailable: Bool,
-                           notchEnabled: Bool, notchBrightness: Bool, brightnessEnabled: Bool) -> Bool {
-        notchAvailable && brightnessAvailable && notchEnabled && notchBrightness && !brightnessEnabled
-    }
 }
 
 enum SupportUpdateIntroInfo {
@@ -1177,7 +973,6 @@ enum Defaults {
     static let registeredDefaults: [String: Any] = [
         DefaultsKey.appearance: AppAppearance.fallback.rawValue,
         DefaultsKey.liquidGlassEnabled: false,
-        DefaultsKey.notchLiquidGlassEnabled: false,
         DefaultsKey.clamshellPreferred: false,
         DefaultsKey.dimScreenOnLidClose: false,
         DefaultsKey.defaultDuration: 0,
@@ -1397,133 +1192,6 @@ enum Defaults {
         DefaultsKey.snippetLibraryShortcut: GlobalShortcut.snippetLibraryDefault.storageValue,
         DefaultsKey.snippetSoundEnabled: false,
         DefaultsKey.snippetSoundName: defaultSnippetSoundName,
-        DefaultsKey.notchShowPlayingMusic: true,
-        DefaultsKey.notchIncludeOtherPlayers: true,
-        DefaultsKey.notchPreferredPlayer: "",
-        DefaultsKey.notchIdleContent: NotchIdleContent.music.rawValue,
-        DefaultsKey.notchHiddenControls: NotchControlItem.defaultHidden,
-        DefaultsKey.notchScratchpadControlHidden: false,
-        DefaultsKey.notchKeyboardLightControlHidden: false,
-        DefaultsKey.notchControlOrder: "",
-        DefaultsKey.notchSize: NotchSize.spacious.rawValue,
-        DefaultsKey.notchOutlineEnabled: false,
-        DefaultsKey.notchHideMenuBarGap: false,
-        DefaultsKey.notchCustomWidth: NotchSize.defaultWidth,
-        DefaultsKey.notchCustomHeight: NotchSize.defaultHeight,
-        DefaultsKey.notchCameraFitWidth: 0.0,
-        DefaultsKey.notchCameraFitHeight: 0.0,
-        DefaultsKey.notchHapticFeedback: true,
-        DefaultsKey.notchTranslucentBackground: false,
-        DefaultsKey.notchShelf: true,
-        DefaultsKey.notchDragReveal: true,
-        DefaultsKey.notchCaptureControls: true,
-        DefaultsKey.notchQuickPanel: true,
-        DefaultsKey.notchAppPanel: false,
-        DefaultsKey.notchHidesMenuBarIcon: false,
-        DefaultsKey.notchKeepAwakeActivity: false,
-        DefaultsKey.notchScratchpad: true,
-        DefaultsKey.notchHoverExpands: true,
-        DefaultsKey.notchGesturesEnabled: true,
-        DefaultsKey.notchKeyboardLight: true,
-        DefaultsKey.notchNotificationsEnabled: true,
-        DefaultsKey.notchDismissNativeNotifications: false,
-        DefaultsKey.notchTimerEnabled: true,
-        DefaultsKey.notchTimerMode: NotchTimerMode.timer.rawValue,
-        DefaultsKey.notchTimerMinutes: 15,
-        DefaultsKey.notchTimerSoundEnabled: true,
-        DefaultsKey.notchHideTimerCountdown: false,
-        DefaultsKey.notchPomodoroFocusMinutes: 25,
-        DefaultsKey.notchPomodoroShortBreakMinutes: 5,
-        DefaultsKey.notchPomodoroLongBreakMinutes: 15,
-        DefaultsKey.notchPomodoroLongBreakInterval: 4,
-        DefaultsKey.notchPomodoroTotalSessions: 4,
-        DefaultsKey.notchCameraEnabled: true,
-        DefaultsKey.notchAccessoriesEnabled: true,
-        DefaultsKey.notchCalendarEnabled: true,
-        DefaultsKey.notchCalendarCountdown: false,
-        DefaultsKey.notchCalendarTimeLeft: false,
-        DefaultsKey.notchCalendarWeekNumbers: false,
-        DefaultsKey.notchCalendarExcluded: [String](),
-        DefaultsKey.notchAgentsEnabled: false,
-        DefaultsKey.notchAgentsClaude: true,
-        DefaultsKey.notchAgentsCodex: true,
-        DefaultsKey.notchAgentsCodexProfiles: "",
-        DefaultsKey.notchAgentsOpenCode: true,
-        DefaultsKey.notchAgentsCopilot: true,
-        DefaultsKey.notchAgentsCardOrder: "",
-        DefaultsKey.notchAgentsHiddenCards: "",
-        DefaultsKey.notchAgentsPeriod: AgentPeriod.today.rawValue,
-        DefaultsKey.notchAgentsLimitDisplay: NotchAgentLimitDisplay.remaining.rawValue,
-        DefaultsKey.notchAgentsLimitFocus: NotchAgentLimitFocus.mostUsed.rawValue,
-        DefaultsKey.notchAgentsLiveActivity: true,
-        DefaultsKey.notchAgentsReadout: NotchAgentReadout.elapsed.rawValue,
-        DefaultsKey.notchAgentsFinishAlert: true,
-        DefaultsKey.notchAgentsFinishMinimum: NotchAgentSupport.defaultFinishMinimum,
-        DefaultsKey.notchAgentsLimitAlert: true,
-        DefaultsKey.notchAgentsLimitThreshold: NotchAgentSupport.defaultLimitThreshold,
-        DefaultsKey.notchAgentsDailyBudget: 0.0,
-        DefaultsKey.notchAgentsPriceUpdates: true,
-        DefaultsKey.notchLyricsEnabled: true,
-        DefaultsKey.notchLyricsOnline: false,
-        DefaultsKey.notchBrowserCovers: false,
-        DefaultsKey.notchLiveEqualizer: false,
-        DefaultsKey.notchQueueEnabled: true,
-        DefaultsKey.notchDownloadsEnabled: true,
-        DefaultsKey.notchWatchEnabled: true,
-        DefaultsKey.notchWatchSound: true,
-        DefaultsKey.notchWatchCondition: NotchWatchCondition.changes.rawValue,
-        DefaultsKey.notchEnabled: false,
-        DefaultsKey.notchDisplay: NotchDisplay.automatic.rawValue,
-        DefaultsKey.notchSilhouette: NotchSilhouette.capsule.rawValue,
-        DefaultsKey.notchCapsuleFitWidth: 0.0,
-        DefaultsKey.notchCapsuleFitHeight: 0.0,
-        DefaultsKey.notchCapsuleFitDrop: 0.0,
-        DefaultsKey.notchOpenOnHover: false,
-        DefaultsKey.notchShortcutEnabled: false,
-        DefaultsKey.notchShortcut: GlobalShortcut.notchDefault.storageValue,
-        DefaultsKey.notchHideInFullscreen: false,
-        DefaultsKey.notchHideUntilHover: false,
-        DefaultsKey.notchCoversMenus: true,
-        DefaultsKey.notchLowBatteryTint: false,
-        DefaultsKey.notchLowBatteryThreshold: NotchSupport.defaultLowBatteryThreshold,
-        DefaultsKey.notchLowBatteryEarly: false,
-        DefaultsKey.notchLowBatteryEarlyThreshold: NotchSupport.defaultEarlyBatteryThreshold,
-        DefaultsKey.notchLowBatteryMenuBar: true,
-        DefaultsKey.notchHoverDelay: NotchSupport.defaultHoverDelay,
-        DefaultsKey.notchCloseDelay: NotchSupport.defaultCloseDelay,
-        DefaultsKey.notchReturnHome: false,
-        DefaultsKey.notchHomeModule: NotchModule.controls.rawValue,
-        DefaultsKey.notchOpensActivity: true,
-        DefaultsKey.notchHiddenModules: "",
-        DefaultsKey.notchModuleOrder: "",
-        DefaultsKey.notchQuickAccessLayout: Data(),
-        DefaultsKey.notchVolume: true,
-        DefaultsKey.notchInputSource: true,
-        DefaultsKey.notchMicrophone: true,
-        DefaultsKey.notchBrightness: true,
-        DefaultsKey.notchBattery: true,
-        DefaultsKey.notchClipboard: true,
-        DefaultsKey.notchClipboardWindow: true,
-        DefaultsKey.notchClipboardCardSize: NotchClipboardCardSize.comfortable.rawValue,
-        DefaultsKey.notchCapture: true,
-        DefaultsKey.notchTrackChange: true,
-        DefaultsKey.notchMusicActivity: false,
-        DefaultsKey.notchShowInCaptures: true,
-        DefaultsKey.notchLockScreen: false,
-        DefaultsKey.notchLockSounds: false,
-        DefaultsKey.notchMascotEnabled: false,
-        DefaultsKey.notchMascotVisits: true,
-        DefaultsKey.notchMascotReactions: true,
-        DefaultsKey.notchMascotStyle: NotchMascotStyle.minimal.rawValue,
-        DefaultsKey.notchMascotShape: NotchMascotShape.ball.rawValue,
-        DefaultsKey.notchMascotPalette: NotchMascotPalette.pearl.rawValue,
-        DefaultsKey.notchMascotSide: NotchMascotSide.left.rawValue,
-        DefaultsKey.notchMascotVisitFrequency: NotchMascotVisitFrequency.normal.rawValue,
-        DefaultsKey.notchMascotHidesWhenIdle: true,
-        DefaultsKey.notchCommandBar: true,
-        DefaultsKey.notchCommandBarStyle: NotchCommandBarStyle.droplet.rawValue,
-        DefaultsKey.notchHideInCaptures: false,
-        DefaultsKey.panelControlNotch: true,
         DefaultsKey.radialMenuEnabled: false,
         DefaultsKey.radialMenuShortcut: GlobalShortcut.radialMenuDefault.storageValue,
         DefaultsKey.radialMenuAtPointer: true,
@@ -1947,10 +1615,8 @@ enum Defaults {
     static func register() {
         let defaults = UserDefaults.standard
         migrateClipboardSensitiveTextOptIn(in: defaults)
-        migrateNotchAgentsOptIn(in: defaults)
-        migrateExistingNotchDefaults(in: defaults)
-        migrateLiquidGlassIsland(in: defaults)
         removeFanControlSettings(in: defaults)
+        removeDynamicIslandSettings(in: defaults)
         migrateScrollInverterAxes(in: defaults)
         migrateLinearScrollAvailability(in: defaults)
         migrateWhatsAppDownloadsEnabled(in: defaults)
@@ -1958,11 +1624,9 @@ enum Defaults {
         migratePowerPeripheralsVisibility(in: defaults)
         migrateSwitcherPreviewSize(in: defaults)
         migrateSwitcherPreviewExcludedApps(in: defaults)
-        migrateNotchWatchAvailability(in: defaults)
         defaults.register(defaults: registeredDefaults)
         defaults.register(defaults: AppFeature.availabilityDefaults)
         activateBetaChannelIfRunningBeta(in: defaults)
-        installCompanionForBetaCommandBar(in: defaults)
         migrateLegacyMenuBarTemperatureMetric(in: defaults)
         migrateLegacySwitcherWindowShortcut(in: defaults)
         migrateLegacyKeyboardDebounceWindow(in: defaults)
@@ -1976,8 +1640,6 @@ enum Defaults {
         migrateAppVolumesToPositions(in: defaults)
         migrateSwitcherWindowlessFinder(in: defaults)
         recheckBrightnessDDCWriteOnlyPaths(in: defaults)
-        hideScratchpadControlOnce(in: defaults)
-        hideKeyboardLightControlOnce(in: defaults)
         // The "all apps" output choice now lasts one session; a saved one
         // would move apps that chose their own output after every launch.
         defaults.removeObject(forKey: DefaultsKey.mixerUniversalOutputDevice)
@@ -1988,113 +1650,6 @@ enum Defaults {
     /// heuristic, while preserving choices made after this update.
     static func migrateClipboardSensitiveTextOptIn(in defaults: UserDefaults) {
         defaults.removeObject(forKey: "clipboardHistorySkipSensitive")
-    }
-
-    /// Keep the implicit on choice of an existing island profile. A new
-    /// profile leaves the key unsaved so explicitly installing Agents can
-    /// enable it; the marker prevents a later launch from changing that choice.
-    static func migrateNotchAgentsOptIn(in defaults: UserDefaults,
-                                       domainName: String? = Bundle.main.bundleIdentifier) {
-        guard let domainName else { return }
-        let saved = defaults.persistentDomain(forName: domainName) ?? [:]
-        guard saved[DefaultsKey.notchAgentsOptInMigrated] == nil else { return }
-        if saved[DefaultsKey.notchDefaultProfileInitialized] as? Bool == true,
-           saved[DefaultsKey.notchAgentsEnabled] == nil {
-            defaults.set(true, forKey: DefaultsKey.notchAgentsEnabled)
-        }
-        defaults.set(true, forKey: DefaultsKey.notchAgentsOptInMigrated)
-    }
-
-    /// Existing users keep the island's previous glass choice. The island
-    /// value is saved once, even when off, so turning on glass for other
-    /// windows later never reaches the island on the next launch.
-    static func migrateLiquidGlassIsland(in defaults: UserDefaults,
-                                         domainName: String? = Bundle.main.bundleIdentifier) {
-        guard let domainName else { return }
-        let saved = defaults.persistentDomain(forName: domainName) ?? [:]
-        guard saved[DefaultsKey.notchLiquidGlassEnabled] == nil else { return }
-        defaults.set(saved[DefaultsKey.liquidGlassEnabled] as? Bool ?? false,
-                     forKey: DefaultsKey.notchLiquidGlassEnabled)
-    }
-
-    /// Keep the previous implicit choices for people who already configured
-    /// the island. A fresh setup gets the new profile instead.
-    static func migrateExistingNotchDefaults(in defaults: UserDefaults,
-                                             domainName: String? = Bundle.main.bundleIdentifier) {
-        guard let domainName else { return }
-        let saved = defaults.persistentDomain(forName: domainName) ?? [:]
-        guard saved[DefaultsKey.notchDefaultProfileInitialized] == nil else {
-            // The previous profile registered Compact without persisting it.
-            // Preserve that implicit choice before registering Spacious.
-            if saved[DefaultsKey.notchSize] == nil {
-                defaults.set(NotchSize.compact.rawValue, forKey: DefaultsKey.notchSize)
-            }
-            return
-        }
-        let automaticKeys: Set<String> = [DefaultsKey.notchScratchpadControlHidden,
-                                          DefaultsKey.notchKeyboardLightControlHidden,
-                                          DefaultsKey.notchHidesMenuBarIcon,
-                                          DefaultsKey.notchAgentsOptInMigrated]
-        let wasConfigured = saved.keys.contains {
-            $0.hasPrefix("notch") && !automaticKeys.contains($0)
-                && ($0 != DefaultsKey.notchHiddenControls
-                    || saved[$0] as? String != NotchControlItem.defaultHidden)
-        } || saved[DefaultsKey.notchHidesMenuBarIcon] as? Bool == true
-        if wasConfigured {
-            defaults.set(true, forKey: DefaultsKey.notchInitialExtensionsInstalled)
-            let previous: [String: Any] = [
-                DefaultsKey.notchSize: NotchSize.spacious.rawValue,
-                DefaultsKey.notchAppPanel: true,
-                DefaultsKey.notchKeyboardLight: false,
-                DefaultsKey.notchNotificationsEnabled: false,
-                DefaultsKey.notchCameraEnabled: false,
-                DefaultsKey.notchAccessoriesEnabled: false,
-                DefaultsKey.notchAgentsEnabled: false,
-                DefaultsKey.notchLyricsEnabled: false,
-                DefaultsKey.notchLiveEqualizer: false,
-                DefaultsKey.notchQueueEnabled: false,
-                DefaultsKey.notchDownloadsEnabled: false,
-                DefaultsKey.notchOpenOnHover: true,
-                DefaultsKey.notchClipboard: false,
-                DefaultsKey.notchCapture: false,
-                DefaultsKey.notchTrackChange: false,
-            ]
-            for (key, value) in previous where saved[key] == nil {
-                defaults.set(value, forKey: key)
-            }
-        }
-        if !wasConfigured {
-            // Pin the new choice so subsequent launches cannot mistake this
-            // setup for an older profile with an implicit Compact size.
-            defaults.set(NotchSize.spacious.rawValue, forKey: DefaultsKey.notchSize)
-        }
-        defaults.set(true, forKey: DefaultsKey.notchDefaultProfileInitialized)
-    }
-
-    /// The Scratchpad tile joined the controls hidden by default after lists
-    /// had been saved without it, and a saved list is read whole: a setup
-    /// customized before then would show a tile nobody asked for. Once, so
-    /// showing it afterwards stays the user's choice.
-    static func hideScratchpadControlOnce(in defaults: UserDefaults) {
-        guard !defaults.bool(forKey: DefaultsKey.notchScratchpadControlHidden) else { return }
-        defaults.set(true, forKey: DefaultsKey.notchScratchpadControlHidden)
-        guard let saved = defaults.string(forKey: DefaultsKey.notchHiddenControls) else { return }
-        var hidden = saved.split(separator: ",").map(String.init)
-        guard !hidden.contains(NotchControlItem.scratchpad.rawValue) else { return }
-        hidden.append(NotchControlItem.scratchpad.rawValue)
-        defaults.set(hidden.joined(separator: ","), forKey: DefaultsKey.notchHiddenControls)
-    }
-
-    /// The keyboard light level joined the hidden controls the same way, and
-    /// a list saved before it would otherwise grow a third slider on update.
-    static func hideKeyboardLightControlOnce(in defaults: UserDefaults) {
-        guard !defaults.bool(forKey: DefaultsKey.notchKeyboardLightControlHidden) else { return }
-        defaults.set(true, forKey: DefaultsKey.notchKeyboardLightControlHidden)
-        guard let saved = defaults.string(forKey: DefaultsKey.notchHiddenControls) else { return }
-        var hidden = saved.split(separator: ",").map(String.init)
-        guard !hidden.contains(NotchControlItem.keyboardLight.rawValue) else { return }
-        hidden.append(NotchControlItem.keyboardLight.rawValue)
-        defaults.set(hidden.joined(separator: ","), forKey: DefaultsKey.notchHiddenControls)
     }
 
     /// Discovery used to send one request per read, which reads a monitor that
@@ -2162,25 +1717,6 @@ enum Defaults {
         defaults.set(true, forKey: DefaultsKey.includeBetaUpdates)
     }
 
-    /// On a beta, people with the Command Bar get the island's companion,
-    /// which can be its face, installed and on, once: uninstalled afterwards,
-    /// it stays out. A clean install waits for its setup to finish, since
-    /// setup picks the installed features afresh. It lives in the island, so
-    /// someone without the island gets nothing.
-    static func installsCompanionForBeta(in defaults: UserDefaults, isBeta: Bool = AppInfo.isBeta) -> Bool {
-        isBeta && defaults.bool(forKey: DefaultsKey.hasOnboarded)
-            && !defaults.bool(forKey: DefaultsKey.notchMascotBetaInstalled)
-            && AppFeature.commandBar.isAvailable(in: defaults)
-            && AppFeature.notch.isAvailable(in: defaults)
-    }
-
-    static func installCompanionForBetaCommandBar(in defaults: UserDefaults, isBeta: Bool = AppInfo.isBeta) {
-        guard installsCompanionForBeta(in: defaults, isBeta: isBeta) else { return }
-        defaults.set(true, forKey: DefaultsKey.notchMascotBetaInstalled)
-        defaults.set(true, forKey: AppFeature.notchMascot.availabilityKey)
-        defaults.set(true, forKey: DefaultsKey.notchMascotEnabled)
-    }
-
     /// The downloads cleanup for a messaging app used to sit in Cleaner for
     /// everyone. Keep it visible only when someone already turned automatic
     /// cleanup or the organizer on; everyone else gets the new off-by-default
@@ -2207,16 +1743,6 @@ enum Defaults {
                      forKey: DefaultsKey.scrollInverterHorizontalEnabled)
     }
 
-    /// Watch arrived installed, as one of the island's extensions. Whoever
-    /// left the island out keeps it out: an extension installed on its own
-    /// would bring the Dynamic Island page back to Settings after an update.
-    static func migrateNotchWatchAvailability(in defaults: UserDefaults) {
-        guard defaults.object(forKey: AppFeature.notchWatch.availabilityKey) == nil,
-              defaults.object(forKey: AppFeature.notch.availabilityKey) as? Bool == false
-        else { return }
-        defaults.set(false, forKey: AppFeature.notchWatch.availabilityKey)
-    }
-
     /// Linear scrolling reached development builds installed, before new
     /// features became opt-in. Whoever switched it on keeps it installed.
     static func migrateLinearScrollAvailability(in defaults: UserDefaults) {
@@ -2233,6 +1759,22 @@ enum Defaults {
                     "fanControlResume", "fanControlResumeConfiguration", "monitorShowFanControlBeta",
                     "fanControlRecoveryNeeded", "fanControlHelperVersion",
                     DefaultsKey.featureAvailable("fanControl")] {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
+    /// The Dynamic Island is gone, with its extensions, the agents readout and
+    /// the radial menu's Now Playing card. Every island setting, the hub
+    /// switches of the island and its extensions, the one-time prompt that
+    /// offered display controls to island users and the marker of the
+    /// island's update tour go with it.
+    static func removeDynamicIslandSettings(in defaults: UserDefaults,
+                                            domainName: String? = Bundle.main.bundleIdentifier) {
+        guard let domainName else { return }
+        let saved = defaults.persistentDomain(forName: domainName) ?? [:]
+        let availability = DefaultsKey.featureAvailable("notch")
+        for key in saved.keys where key.hasPrefix("notch") || key.hasPrefix(availability)
+            || ["panelControlNotch", "brightnessUpdatePromptState", "updateHighlightsSeenVersion"].contains(key) {
             defaults.removeObject(forKey: key)
         }
     }

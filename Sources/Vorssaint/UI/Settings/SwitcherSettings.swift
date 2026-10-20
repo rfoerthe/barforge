@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -116,7 +117,7 @@ struct SwitcherSettings: View {
             }
             Group {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(FeatureStrings.notchEditor(l10n.language).layout)
+                    Text(pages.switcherLayout)
                         .font(.subheadline.weight(.medium))
                     HStack(spacing: 10) {
                         SwitcherLayoutChoice(layout: .windows, title: pages.switcherLayoutWindows,

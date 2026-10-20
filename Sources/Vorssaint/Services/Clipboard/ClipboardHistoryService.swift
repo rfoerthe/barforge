@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -615,7 +616,7 @@ final class ClipboardHistoryService: ObservableObject {
                 }
                 self.hideHistoryWindow()
                 (NSApp.delegate as? AppDelegate)?.closePopover()
-                NotchService.shared.perform {
+                DispatchQueue.main.async {
                     ScreenshotService.shared.openEditor(with: capture)
                 }
             }
@@ -1199,7 +1200,6 @@ final class ClipboardHistoryService: ObservableObject {
     }
 
     func toggleHistoryWindow() {
-        if NotchSupport.routesClipboardWindow(), NotchService.shared.showClipboard(toggle: true) { return }
         if panel?.isVisible == true {
             hideHistoryWindow()
         } else {
@@ -1207,8 +1207,7 @@ final class ClipboardHistoryService: ObservableObject {
         }
     }
 
-    func showHistoryWindow(preferNotch: Bool = true) {
-        if preferNotch, NotchSupport.routesClipboardWindow(), NotchService.shared.showClipboard() { return }
+    func showHistoryWindow() {
         let panel = ensurePanel()
         rememberPasteTarget()
         refreshQuickLayout()

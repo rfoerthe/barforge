@@ -576,8 +576,6 @@ struct SettingsView: View {
             }
         case .features: FeatureHubSettings()
         case .textSnippets: TextSnippetsSettings()
-        case .notch: NotchSettings()
-        case .notchMascot: NotchMascotSettings()
         case .radialMenu: RadialMenuSettings()
         case .commandBar: CommandBarSettings()
         case .energy: EnergySettings(focus: router.destination.sectionAnchor)
@@ -792,9 +790,6 @@ struct AboutSettings: View {
             HStack(spacing: 12) {
                 Button(l10n.s.reviewIntro) {
                     appDelegate()?.showOnboarding()
-                }
-                Button(l10n.s.reviewHighlights) {
-                    appDelegate()?.showUpdateHighlights(isReview: true)
                 }
                 Link(l10n.s.viewOnGitHub, destination: AppInfo.repositoryURL)
             }

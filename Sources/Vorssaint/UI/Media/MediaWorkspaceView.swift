@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AVFoundation
@@ -54,7 +55,6 @@ struct MediaWorkspaceView: View {
     @ObservedObject private var media: MediaService
     @ObservedObject private var featureRuntime = FeatureRuntime.shared
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.notchPresentation) private var inNotch
 
     @AppStorage(DefaultsKey.mediaLastTool) private var toolRaw = MediaTool.videoCompressor.rawValue
     @AppStorage(DefaultsKey.mediaVideoStart) private var videoStart = 0.0
@@ -128,27 +128,12 @@ struct MediaWorkspaceView: View {
 
     var compact: Bool
     var onClose: (() -> Void)?
-    private let initialInputs: [URL]
-    private let initialTool: MediaTool?
-    private let preservesServiceState: Bool
-    private let onContentHeightChange: ((CGFloat) -> Void)?
-    private let onToolChange: (() -> Void)?
 
-    init(compact: Bool, onClose: (() -> Void)? = nil,
-         media: MediaService = .shared, initialInputs: [URL] = [],
-         initialTool: MediaTool? = nil, preservesServiceState: Bool = false,
-         workspace: MediaWorkspaceSelection? = nil,
-         onContentHeightChange: ((CGFloat) -> Void)? = nil,
-         onToolChange: (() -> Void)? = nil) {
+    init(compact: Bool, onClose: (() -> Void)? = nil) {
         self.compact = compact
         self.onClose = onClose
-        self.media = media
-        self.initialInputs = initialInputs
-        self.initialTool = initialTool
-        self.preservesServiceState = preservesServiceState
-        self.onContentHeightChange = onContentHeightChange
-        self.onToolChange = onToolChange
-        _workspace = StateObject(wrappedValue: workspace ?? MediaWorkspaceSelection())
+        self.media = .shared
+        _workspace = StateObject(wrappedValue: MediaWorkspaceSelection())
     }
 
     private var inputURL: URL? { inputURLs.first }
@@ -166,11 +151,10 @@ struct MediaWorkspaceView: View {
     }
 
     private var selectedTool: MediaTool {
-        get { workspace.tool ?? MediaSupport.sanitizedTool(toolRaw) }
+        get { MediaSupport.sanitizedTool(toolRaw) }
         nonmutating set {
             cancelVideoImport()
-            if preservesServiceState { workspace.tool = newValue }
-            else { toolRaw = newValue.rawValue }
+            toolRaw = newValue.rawValue
             inputImageSize = newValue == .imageCompressor
                 ? inputURL.flatMap { MediaSupport.imageDisplaySize(at: $0) }
                 : nil
@@ -187,7 +171,6 @@ struct MediaWorkspaceView: View {
             selectedTool
         } set: { newValue in
             guard newValue != selectedTool else { return }
-            onToolChange?()
             selectedTool = newValue
         }
     }
@@ -200,13 +183,8 @@ struct MediaWorkspaceView: View {
     var body: some View {
         layout
         .onAppear {
-            if !workspace.loadedInitialInputs {
-                workspace.loadedInitialInputs = true
-                if let initialTool {
-                    if preservesServiceState { workspace.tool = initialTool }
-                    else { selectedTool = initialTool }
-                }
-                if !initialInputs.isEmpty { setInputs(initialInputs, resetsMedia: !preservesServiceState) }
+            if !workspace.hasAppeared {
+                workspace.hasAppeared = true
             } else {
                 applyMediaDefaults(for: inputURL, tool: selectedTool, replacingInput: false)
             }
@@ -240,29 +218,13 @@ struct MediaWorkspaceView: View {
     }
 
     private var layout: some View {
-        Group {
-            if let onContentHeightChange {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-                        header
-                        toolPicker
-                        content.padding(.trailing, 1)
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
-                        onContentHeightChange($0)
-                    }
-                }
-            } else {
-                VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-                    header
-                    toolPicker
-                    ScrollView {
-                        content.padding(.trailing, 1)
-                    }
-                    .frame(maxHeight: compact ? 430 : .infinity)
-                }
+        VStack(alignment: .leading, spacing: compact ? 10 : 14) {
+            header
+            toolPicker
+            ScrollView {
+                content.padding(.trailing, 1)
             }
+            .frame(maxHeight: compact ? 430 : .infinity)
         }
     }
 
@@ -306,13 +268,9 @@ struct MediaWorkspaceView: View {
         }
     }
 
-    @ViewBuilder private var inputDropTarget: some View {
-        if inNotch {
-            inputSelector
-        } else {
-            inputSelector.onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
-                acceptDrop(providers)
-            }
+    private var inputDropTarget: some View {
+        inputSelector.onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            acceptDrop(providers)
         }
     }
 
@@ -1332,33 +1290,12 @@ struct MediaWorkspaceView: View {
     /// One dialog at a time: the modal now starts a run-loop turn after the
     /// click, so a double-click (or clicking both pickers quickly) would queue
     /// a second identical dialog behind the first without this guard.
-    /// While it is set, the island keeps its working surface open.
-    private(set) static var panelModalActive = false
+    private static var panelModalActive = false
 
     private static func runPanelModal(_ panel: NSSavePanel,
                                       completion: @escaping (NSApplication.ModalResponse) -> Void) {
         guard !panelModalActive else { return }
         panelModalActive = true
-        if let island = NotchService.shared.presentationWindow, island.isVisible,
-           NSApp.currentEvent?.window === island || NSApp.keyWindow === island {
-            // The island floats above the modal panel level, so an
-            // application-modal dialog would open behind it, and a sheet
-            // moves/reskins the borderless island. Open it on its own,
-            // just above the island.
-            panel.level = NSWindow.Level(rawValue: island.level.rawValue + 1)
-            // Like the sheet it replaces, it stays up while another app is active.
-            panel.hidesOnDeactivate = false
-            panel.begin { response in
-                panelModalActive = false
-                // Dismissal restores the previous key window after this callback.
-                DispatchQueue.main.async { if NotchService.shared.expanded { island.makeKey() } }
-                completion(response)
-            }
-            NSApp.activate(ignoringOtherApps: true)
-            // Activation alone can leave the nonactivating island holding focus.
-            panel.makeKeyAndOrderFront(nil)
-            return
-        }
         NSApp.activate(ignoringOtherApps: true)
         DispatchQueue.main.async {
             let response = panel.runModal()
@@ -1410,7 +1347,7 @@ struct MediaWorkspaceView: View {
         return true
     }
 
-    private func setInputs(_ urls: [URL], resetsMedia: Bool = true) {
+    private func setInputs(_ urls: [URL]) {
         cancelVideoImport()
         inputURLs = selectedTool == .imageCompressor ? urls : Array(urls.prefix(1))
         inputImageSize = selectedTool == .imageCompressor
@@ -1420,7 +1357,7 @@ struct MediaWorkspaceView: View {
         outputWasChosenManually = false
         applyMediaDefaults(for: inputURL, tool: selectedTool)
         localMessage = nil
-        if resetsMedia { media.reset() }
+        media.reset()
     }
 
     private func clearInput() {

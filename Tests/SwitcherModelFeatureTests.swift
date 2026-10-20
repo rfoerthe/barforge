@@ -282,61 +282,6 @@ enum SwitcherModelFeatureTests {
                    == ["display|port"],
                    "the recheck runs once and keeps later verdicts")
 
-            migrationDefaults.set("microphone,panel", forKey: DefaultsKey.notchHiddenControls)
-            Defaults.hideScratchpadControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.string(forKey: DefaultsKey.notchHiddenControls)
-                   == "microphone,panel,scratchpad"
-                   && migrationDefaults.bool(forKey: DefaultsKey.notchScratchpadControlHidden),
-                   "a hidden-controls list saved before the Scratchpad tile existed hides it once")
-            migrationDefaults.set("microphone,panel", forKey: DefaultsKey.notchHiddenControls)
-            Defaults.hideScratchpadControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.string(forKey: DefaultsKey.notchHiddenControls) == "microphone,panel",
-                   "showing the Scratchpad tile afterwards is kept")
-            migrationDefaults.removeObject(forKey: DefaultsKey.notchScratchpadControlHidden)
-            migrationDefaults.removeObject(forKey: DefaultsKey.notchHiddenControls)
-            Defaults.hideScratchpadControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.object(forKey: DefaultsKey.notchHiddenControls) == nil
-                   && migrationDefaults.bool(forKey: DefaultsKey.notchScratchpadControlHidden),
-                   "a setup that never customized the controls keeps the registered default")
-            migrationDefaults.set("microphone,panel", forKey: DefaultsKey.notchHiddenControls)
-            Defaults.hideKeyboardLightControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.string(forKey: DefaultsKey.notchHiddenControls)
-                   == "microphone,panel,keyboardLight"
-                   && migrationDefaults.bool(forKey: DefaultsKey.notchKeyboardLightControlHidden),
-                   "a hidden-controls list saved before the keyboard light level existed hides it once")
-            migrationDefaults.set("microphone,panel", forKey: DefaultsKey.notchHiddenControls)
-            Defaults.hideKeyboardLightControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.string(forKey: DefaultsKey.notchHiddenControls) == "microphone,panel",
-                   "showing the keyboard light level afterwards is kept")
-            migrationDefaults.removeObject(forKey: DefaultsKey.notchKeyboardLightControlHidden)
-            migrationDefaults.removeObject(forKey: DefaultsKey.notchHiddenControls)
-            let hiddenControlsKey = DefaultsKey.notchHiddenControls
-            let scratchpadMigrationKey = DefaultsKey.notchScratchpadControlHidden
-            suite.expect(SettingsBackupSupport.exportKeys().contains(scratchpadMigrationKey),
-                   "the migration marker travels with a later choice to show the Scratchpad tile")
-            suite.expect(!SettingsBackupSupport.valueLooksRight(scratchpadMigrationKey, "true"),
-                   "an imported migration marker must be a boolean")
-            for shown in [false, true] {
-                migrationDefaults.set(shown ? "microphone,panel" : "microphone,panel,scratchpad",
-                                      forKey: hiddenControlsKey)
-                let backup = SettingsBackupSupport.payload(appVersion: "3.4.0") {
-                    migrationDefaults.object(forKey: $0)
-                }
-                let restored = SettingsBackupSupport.sanitizedSettings(from: backup) ?? [:]
-                for key in SettingsBackupSupport.exportKeys() { migrationDefaults.removeObject(forKey: key) }
-                for (key, value) in restored { migrationDefaults.set(value, forKey: key) }
-                Defaults.hideScratchpadControlOnce(in: migrationDefaults)
-                suite.expect(migrationDefaults.string(forKey: hiddenControlsKey)?.contains("scratchpad") == !shown,
-                       "restoring a current backup preserves the explicit Scratchpad visibility choice")
-            }
-            // A restore clears every exportable key before applying the backup.
-            // Old backups have a controls list but no migration marker.
-            for key in SettingsBackupSupport.exportKeys() { migrationDefaults.removeObject(forKey: key) }
-            migrationDefaults.set("microphone,panel", forKey: hiddenControlsKey)
-            Defaults.hideScratchpadControlOnce(in: migrationDefaults)
-            suite.expect(migrationDefaults.string(forKey: hiddenControlsKey) == "microphone,panel,scratchpad",
-                   "an old backup restored after the first launch still hides the new Scratchpad tile")
-
             migrationDefaults.removeObject(
                 forKey: DefaultsKey.unifiedScreenCaptureShortcutMigrated)
             migrationDefaults.set(false, forKey: DefaultsKey.screenshotShortcutEnabled)
@@ -2077,44 +2022,15 @@ enum SwitcherModelFeatureTests {
                "every app version needs its own incremented bundle build")
         suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.1",
                "the support prompt is prepared for the 3.4.1 stable release")
-        suite.expect(UpdateHighlightsInfo.releaseVersion == "3.4.0",
-               "the stable release has its own tour marker without changing the installed version")
-        for version in ["3.4.0-beta.1", "3.4.0-beta.2", "3.4.0-beta.2.1", "3.4.0-beta.3", "3.4.0-beta.4", "3.4.0-beta.5", "3.4.0-beta.6", "3.4.0-beta.7", "3.4.0-beta.10"] {
-            suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: nil)
-                   && UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: "3.3.3"),
-                   "the notch tour introduces this beta cycle to new and returning users")
-            suite.expect(!UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: UpdateHighlightsInfo.betaSeenVersion),
-                   "the beta tour does not repeat after it has been seen")
+        for version in ["3.4.0-beta.1", "3.4.0-beta.7", "3.4.0-beta.10"] {
             suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: nil),
                    "beta updates do not request the support introduction")
         }
-        suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: "3.4.0", lastSeenVersion: nil)
-               && UpdateHighlightsInfo.shouldShow(appVersion: "3.4.0", lastSeenVersion: "3.3.2")
-               && !UpdateHighlightsInfo.shouldShow(appVersion: "3.4.0",
-                                                      lastSeenVersion: UpdateHighlightsInfo.releaseVersion),
-               "the final release shows its tour once to upgraders")
-        suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: "3.4.0",
-                                                      lastSeenVersion: UpdateHighlightsInfo.betaSeenVersion),
-               "beta tour viewers also see the final release tour")
-        for version in ["3.3.5", "3.5.0", "3.4.1-beta.1", "3.4.0-rc.1", "3.4.0-beta.0", "3.4.0-beta.no", "3.4.0-beta.2.no", "3.4.0-beta.2.1.1", "3.5.0-beta.1", "4.0.0"] {
-            suite.expect(!UpdateHighlightsInfo.matchesRelease(version)
-                   && !UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: nil),
-                   "previewing from the current build and other release cycles cannot consume the future beta tour")
-        }
-        for version in ["3.4.0", "3.4.1", "3.4.2", "3.4.10", "3.4.99"] {
-            suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: nil)
-                   && UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: UpdateHighlightsInfo.betaSeenVersion)
-                   && (version == "3.4.0" || SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: "3.4.0")),
-                   "direct hotfix upgraders still receive the stable tour and, from 3.4.1, the support invitation")
-            suite.expect(UpdateHighlightsInfo.seenVersion(for: version) == UpdateHighlightsInfo.releaseVersion
-                   && !UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: UpdateHighlightsInfo.releaseVersion)
+        for version in ["3.4.1", "3.4.2", "3.4.10", "3.4.99"] {
+            suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: "3.4.0")
                    && !SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: SupportUpdateIntroInfo.seenVersion),
-                   "all stable patches share completion markers and never repeat completed introductions")
+                   "stable patches from 3.4.1 share one support invitation and never repeat it")
         }
-        let tourGIF = URL(fileURLWithPath: "Resources/Gifs/highlights-notch.gif")
-        let tourFrames = CGImageSourceCreateWithURL(tourGIF as CFURL, nil).map(CGImageSourceGetCount)
-        suite.expect(tourFrames.map { $0 > 1 } == true,
-               "the Dynamic Island tour includes an animated GIF in the app resources")
         suite.expect(registeredDefaults[DefaultsKey.mixerLowerVolumeOnHeadphonesDisconnect] as? Bool == false,
                "headphone disconnect volume lowering is opt-in")
         suite.expect(registeredDefaults[DefaultsKey.mixerHeadphonesDisconnectVolumePercent] as? Int
@@ -2525,7 +2441,7 @@ enum SwitcherModelFeatureTests {
         let panelGlassCode = stripCommentLines((panelThemeSource
             .components(separatedBy: "private struct PanelGlassSurface: View {").last ?? "")
             .components(separatedBy: "\n}").first ?? "")
-        suite.expect(panelGlassCode.contains("} else if PanelSurface.popoverHostsFullSizeContent {\n            surface.ignoresSafeArea()\n        } else {\n            insetSurface"),
+        suite.expect(panelGlassCode.contains("if PanelSurface.popoverHostsFullSizeContent {\n            surface.ignoresSafeArea()\n        } else {\n            insetSurface"),
                "the panel surface paints past the safe area, up into the arrow, only in a full-size popover")
         let fullSizeSurfaceCode = panelGlassCode
             .components(separatedBy: "private var insetSurface: some View {").first ?? ""
@@ -2680,38 +2596,6 @@ enum SwitcherModelFeatureTests {
                                                                metricItemsShown: 2, renderedTitleLength: 0,
                                                                mustShowForSignal: false),
                "the whole-item hiding only applies to the separate-items mode")
-
-        // Dynamic Island may take the icon's place, but only while it runs:
-        // with the island off or removed, nothing else on screen would lead
-        // back to the app.
-        suite.expect(registeredDefaults[DefaultsKey.notchHidesMenuBarIcon] as? Bool == false,
-               "Dynamic Island only takes the icon's place when asked")
-        let islandIconSuite = "com.vorssaint.tests.islandMenuBarIcon"
-        if let islandDefaults = UserDefaults(suiteName: islandIconSuite) {
-            islandDefaults.removePersistentDomain(forName: islandIconSuite)
-            defer { islandDefaults.removePersistentDomain(forName: islandIconSuite) }
-            islandDefaults.set(true, forKey: AppFeature.notch.availabilityKey)
-            islandDefaults.set(true, forKey: DefaultsKey.notchEnabled)
-            suite.expect(!MenuBarSpacingSupport.islandHidesStatusIcon(in: islandDefaults),
-                   "a running island leaves the icon alone until asked")
-            islandDefaults.set(true, forKey: DefaultsKey.notchHidesMenuBarIcon)
-            suite.expect(MenuBarSpacingSupport.islandHidesStatusIcon(in: islandDefaults),
-                   "a running island takes the icon's place when asked")
-            islandDefaults.set(true, forKey: DefaultsKey.notchHideInFullscreen)
-            suite.expect(!MenuBarSpacingSupport.islandHidesStatusIcon(
-                in: islandDefaults, hiddenInFullscreen: true),
-                   "the menu bar icon returns while the island is hidden in fullscreen")
-            suite.expect(MenuBarSpacingSupport.islandHidesStatusIcon(
-                in: islandDefaults, hiddenInFullscreen: false),
-                   "the saved icon preference resumes when the island leaves fullscreen")
-            islandDefaults.set(false, forKey: DefaultsKey.notchEnabled)
-            suite.expect(!MenuBarSpacingSupport.islandHidesStatusIcon(in: islandDefaults),
-                   "switching the island off brings the icon back")
-            islandDefaults.set(true, forKey: DefaultsKey.notchEnabled)
-            islandDefaults.set(false, forKey: AppFeature.notch.availabilityKey)
-            suite.expect(!MenuBarSpacingSupport.islandHidesStatusIcon(in: islandDefaults),
-                   "removing the island in the hub brings the icon back")
-        }
 
         // A pinned metric that momentarily has nothing to show keeps its item
         // instead of being taken away and put back every tick.
@@ -2966,9 +2850,8 @@ enum SwitcherModelFeatureTests {
         let reshowCode = stripCommentLines((statusAnchorAppDelegateSource
             .components(separatedBy: "func reshowStatusItem() {").last ?? "")
             .components(separatedBy: "\n    }").first ?? "")
-        suite.expect(reshowCode.contains("DefaultsKey.menuBarHideIconWithMetrics")
-                     && reshowCode.contains("DefaultsKey.notchHidesMenuBarIcon"),
-               "Show menu bar icon turns off both ways of hiding it")
+        suite.expect(reshowCode.contains("DefaultsKey.menuBarHideIconWithMetrics"),
+               "Show menu bar icon turns off hiding it behind the metrics")
 
         // macOS 26 lets the person switch an app's menu bar items off per app,
         // and remembers the choice in Control Center's group container. The

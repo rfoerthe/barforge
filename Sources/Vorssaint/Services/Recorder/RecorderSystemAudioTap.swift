@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Accelerate
 import AVFoundation
@@ -622,7 +623,7 @@ final class RecorderSystemAudioTap: @unchecked Sendable {
 
     /// Every audio process the app answers for. A browser makes its sound in
     /// a helper process, so a tap on the app's own pid alone would never hear
-    /// it; the mixer and the island's level reader gather theirs the same way.
+    /// it; the mixer gathers its own the same way.
     /// The audio system lists only processes connected to it, so an app that
     /// has not played since it launched has none. Sound the system plays for
     /// an app from a process of its own, such as a call, is not the app's

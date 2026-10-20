@@ -218,7 +218,7 @@ struct NetworkSection: View {
 
     private var speedInBits: Bool { speedUnit == .bits }
 
-    /// Flips every live network speed (panel, menu bar, island) between
+    /// Flips every live network speed (panel, menu bar) between
     /// bits and bytes per second. The label shows the unit in use. Its
     /// symbol alone would not tell VoiceOver or a hover what it changes.
     private var speedUnitToggle: some View {

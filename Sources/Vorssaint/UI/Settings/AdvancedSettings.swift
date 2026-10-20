@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -147,8 +148,7 @@ struct AdvancedSettings: View {
                 }
             }
         } message: {
-            Text(SettingsBackupSupport.omitsDynamicIslandSettings(pendingImport ?? [:])
-                 ? backup.importMissingIslandBody : backup.importConfirmBody)
+            Text(backup.importConfirmBody)
         }
     }
 }

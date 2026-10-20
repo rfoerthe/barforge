@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -67,61 +68,43 @@ enum ScreenshotOCRControlTests {
                                 bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
                                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
         let image = context.makeImage()!
-        for embedded in [false, true] {
-            for language in [AppLanguage.enUS, .de] {
+        for language in [AppLanguage.enUS, .de] {
+            FeatureRuntime.shared.available = false
+            let strings = FeatureStrings.screenshot(language)
+            let model = ScreenshotQuickPreviewModel()
+            model.qr = "test QR"
+            var presses = 0
+            let view = ScreenshotQuickPreviewView(
+                image: image, strings: strings, model: model, perform: { _ in },
+                dragItem: { NSItemProvider() }, share: { _ in }, systemShare: {},
+                shareAnchor: ShelfSharePickerAnchor.Anchor(), copySharedLink: {},
+                deleteSharedLink: {}, showQR: {}, copyText: { presses += 1 },
+                dismiss: {}, hoverChanged: { _ in }, showsDismissButton: true)
+            let host = NSHostingView(rootView: view.defaultAppStorage(defaults))
+            let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 350, height: 210),
+                                  styleMask: [.borderless], backing: .buffered, defer: false)
+            window.isReleasedWhenClosed = false
+            window.contentView = host
+            host.frame = NSRect(x: 0, y: 0, width: 350, height: 210)
+            defer { window.contentView = nil; window.close() }
+            settle(host)
+            suite.expect(buttons(host, label: strings.copyTextButton).isEmpty,
+                         "\(language.rawValue): OCR button is absent when disabled")
+            for _ in 0..<2 {
+                FeatureRuntime.shared.available = true
+                settle(host)
+                let controls = buttons(host, label: strings.copyTextButton)
+                suite.expect(controls.count == 1,
+                             "\(language.rawValue): enabling OCR reveals exactly one localized button")
+                let before = presses
+                let performed = controls.first?.accessibilityPerformPress?() ?? false
+                settle(host)
+                suite.expect(performed && presses == before + 1,
+                             "\(language.rawValue): pressing the rendered OCR button calls its action once")
                 FeatureRuntime.shared.available = false
-                let strings = FeatureStrings.screenshot(language)
-                let model = ScreenshotQuickPreviewModel()
-                model.qr = "test QR"
-                var presses = 0
-                let view = ScreenshotQuickPreviewView(
-                    image: image, strings: strings, model: model, perform: { _ in },
-                    dragItem: { NSItemProvider() }, share: { _ in }, systemShare: {},
-                    shareAnchor: ShelfSharePickerAnchor.Anchor(), copySharedLink: {},
-                    deleteSharedLink: {}, showQR: {}, copyText: { presses += 1 },
-                    dismiss: {}, hoverChanged: { _ in }, showsDismissButton: true,
-                    embedded: embedded)
-                let host = NSHostingView(rootView: (embedded ? view.toolbar : view)
-                    .defaultAppStorage(defaults))
-                let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 350, height: 210),
-                                      styleMask: [.borderless], backing: .buffered, defer: false)
-                window.isReleasedWhenClosed = false
-                window.contentView = host
-                host.frame = NSRect(x: 0, y: 0, width: 350, height: 210)
-                defer { window.contentView = nil; window.close() }
                 settle(host)
                 suite.expect(buttons(host, label: strings.copyTextButton).isEmpty,
-                             "\(language.rawValue) embedded=\(embedded): OCR button is absent when disabled")
-                for _ in 0..<2 {
-                    FeatureRuntime.shared.available = true
-                    settle(host)
-                    let controls = buttons(host, label: strings.copyTextButton)
-                    suite.expect(controls.count == 1,
-                                 "\(language.rawValue) embedded=\(embedded): enabling OCR reveals exactly one localized button")
-                    let before = presses
-                    let performed = controls.first?.accessibilityPerformPress?() ?? false
-                    settle(host)
-                    suite.expect(performed && presses == before + 1,
-                                 "\(language.rawValue) embedded=\(embedded): pressing the rendered OCR button calls its action once")
-                    FeatureRuntime.shared.available = false
-                    settle(host)
-                    suite.expect(buttons(host, label: strings.copyTextButton).isEmpty,
-                                 "\(language.rawValue) embedded=\(embedded): disabling OCR removes the button from the same view")
-                }
-                // The island toolbar makes room for the button. The floating
-                // action row was already full in longer languages, so there
-                // the button rides on the thumbnail and the row keeps its width.
-                func rowWidth(ocr: Bool) -> CGFloat {
-                    FeatureRuntime.shared.available = ocr
-                    let row = NSHostingView(rootView: view.toolbar.defaultAppStorage(defaults))
-                    settle(row)
-                    return row.fittingSize.width
-                }
-                let withoutOCR = rowWidth(ocr: false)
-                let withOCR = rowWidth(ocr: true)
-                FeatureRuntime.shared.available = false
-                suite.expect(embedded ? withOCR > withoutOCR : withOCR == withoutOCR,
-                             "\(language.rawValue) embedded=\(embedded): only the island toolbar makes room for the OCR button")
+                             "\(language.rawValue): disabling OCR removes the button from the same view")
             }
         }
     }

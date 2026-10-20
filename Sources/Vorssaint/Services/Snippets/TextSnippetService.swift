@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AudioToolbox
@@ -440,7 +441,7 @@ final class TextSnippetService {
     }
 
     /// Whether one of this app's windows takes the keys. A panel that never
-    /// activates the app, like the island's scratchpad, is key while the app
+    /// activates the app, like the scratchpad, is key while the app
     /// behind it stays frontmost, and that app's field is not where the
     /// backspaces land. AppKit is read on the main thread, where both
     /// expansion paths post their backspaces; anywhere else counts as ours,

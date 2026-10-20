@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -50,8 +51,6 @@ final class ScreenshotQuickPreviewController {
     private let baseDismissDuration: TimeInterval?
     private var autoDismissDuration: TimeInterval?
     private var closed = false
-    private let presentationID = UUID()
-    private var shownInNotch = false
     private var didStartPreview = false
     private var pointerInside = false
 
@@ -82,10 +81,8 @@ final class ScreenshotQuickPreviewController {
         model.disabledActions = completedActions.intersection([.save, .copy])
     }
 
-    func show(inNotch: Bool = true) {
-        guard panel == nil, !shownInNotch, !closed else { return }
-        let wantsNotch = inNotch && NotchSupport.routes(.capture)
-            && NotchService.shared.acceptsSystemFeedback
+    func show() {
+        guard panel == nil, !closed else { return }
         let presentationPolicy = ScreenshotSupport.confirmationPreviewPresentationPolicy(
             dismissInterval: baseDismissDuration,
             defaults: .standard)
@@ -110,27 +107,7 @@ final class ScreenshotQuickPreviewController {
             copyText: { [weak self] in self?.copyText() },
             dismiss: { [weak self] in self?.close() },
             hoverChanged: { [weak self] inside in self?.hoverChanged(inside) },
-            showsDismissButton: presentationPolicy.showsDismissButton,
-            embedded: wantsNotch)
-        if wantsNotch, NotchService.shared.presentCapture(
-            id: presentationID, content: AnyView(content), actions: AnyView(content.toolbar), height: Self.size(showingLink: model.sharedRecord != nil).height,
-            takeFocus: presentationPolicy.takesFocus,
-            closeOnCollapse: presentationPolicy.closesOnCollapse,
-            fallback: { [weak self] in
-                guard let self else { return }
-                self.shownInNotch = false
-                self.pointerInside = false
-                if let keyMonitor = self.keyMonitor { NSEvent.removeMonitor(keyMonitor) }
-                self.keyMonitor = nil
-                self.show(inNotch: false)
-            },
-            close: { [weak self] in self?.close() },
-            hover: { [weak self] inside in self?.hoverChanged(inside) }) {
-            shownInNotch = true
-            if let window = NotchService.shared.presentationWindow { installKeyMonitor(for: window) }
-            finishShowing()
-            return
-        }
+            showsDismissButton: presentationPolicy.showsDismissButton)
         let host = NSHostingController(rootView: content)
         let size = Self.size(showingLink: model.sharedRecord != nil)
         let panel = ScreenshotQuickPreviewPanel(
@@ -248,10 +225,6 @@ final class ScreenshotQuickPreviewController {
         }
         panel?.orderOut(nil)
         panel = nil
-        if shownInNotch {
-            shownInNotch = false
-            NotchService.shared.removeCapture(id: presentationID)
-        }
         onClose()
     }
 
@@ -263,9 +236,9 @@ final class ScreenshotQuickPreviewController {
         dismissWork?.cancel()
         dismissWork = nil
         if requested == .edit {
-            // Release the island's non-activating key panel before promoting
-            // the app and constructing another SwiftUI window. Defer past the
-            // button's current update rather than nesting editor layout in it.
+            // Release the non-activating key panel before promoting the app
+            // and constructing another SwiftUI window. Defer past the button's
+            // current update rather than nesting editor layout in it.
             let action = action
             close()
             DispatchQueue.main.async { _ = action(requested) }
@@ -430,10 +403,6 @@ final class ScreenshotQuickPreviewController {
     }
 
     private func resizePanel(showingLink: Bool) {
-        if shownInNotch {
-            NotchService.shared.updateCaptureHeight(id: presentationID, height: Self.size(showingLink: showingLink).height)
-            return
-        }
         panel?.setFrame(previewFrame(for: Self.size(showingLink: showingLink)),
                         display: true,
                         animate: true)
@@ -452,7 +421,6 @@ final class ScreenshotQuickPreviewController {
     private func installKeyMonitor(for panel: NSPanel) {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self, weak panel] event in
             guard let self, !self.closed, let panel, panel.isVisible, event.window === panel,
-                  !self.shownInNotch || NotchService.shared.isCaptureVisible(id: self.presentationID),
                   panel.attachedSheet == nil, !(panel.firstResponder is NSText),
                   !ShortcutCapture.isCapturing else { return event }
             let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
@@ -539,39 +507,25 @@ private struct ScreenshotQuickPreviewView: View {
     let dismiss: () -> Void
     let hoverChanged: (Bool) -> Void
     let showsDismissButton: Bool
-    var embedded = false
-    var actionsOnly = false
-    var toolbar: Self {
-        var view = self
-        view.actionsOnly = true
-        return view
-    }
     @AppStorage(DefaultsKey.screenshotSharingEnabled) private var sharingEnabled = true
 
-    var body: some View {
-        if actionsOnly { actionBar }
-        else { preview }
-    }
+    var body: some View { preview }
 
     private var actionBar: some View {
-        HStack(spacing: embedded ? 2 : 5) {
+        HStack(spacing: 5) {
             Button {
                 perform(.discard)
             } label: {
                 Image(systemName: "trash")
-                    .frame(width: embedded ? 28 : 22, height: embedded ? 28 : 18)
+                    .frame(width: 22, height: 18)
             }
-            .modifier(ScreenshotPreviewActionStyle(embedded: embedded))
+            .buttonStyle(.bordered)
             .controlSize(.small)
             .screenshotSafeHelp("\(strings.discardConfirm)  (⌫)")
             .accessibilityLabel(strings.discardConfirm)
             if model.qr != nil {
                 qrControl
                     .transition(.scale.combined(with: .opacity))
-            }
-            // The floating preview shows Copy text on its thumbnail.
-            if embedded, featureRuntime.isAvailable(.screenOCR) {
-                textControl
             }
             actionButton(symbol: "square.and.arrow.down",
                          title: strings.saveButton,
@@ -585,37 +539,15 @@ private struct ScreenshotQuickPreviewView: View {
                          disabled: model.disabledActions.contains(.copy)) {
                 perform(.copy)
             }
-            if embedded {
-                Button(action: systemShare) {
-                    Image(systemName: "square.and.arrow.up").frame(width: 28, height: 28)
-                }
-                .modifier(ScreenshotPreviewActionStyle(embedded: true))
-                .controlSize(.small)
-                .background(ShelfSharePickerAnchor(anchor: shareAnchor))
-                .screenshotSafeHelp(strings.shareButton)
-                .accessibilityLabel(strings.shareButton)
-            }
             if sharingEnabled, model.sharedRecord == nil {
                 shareMenu
             }
-            if !embedded { Spacer(minLength: 4) }
-            if embedded {
-                Button {
-                    perform(.pin)
-                } label: {
-                    Image(systemName: "pin").frame(width: 28, height: 28)
-                }
-                .modifier(ScreenshotPreviewActionStyle(embedded: true))
-                .controlSize(.small)
-                .screenshotSafeHelp(strings.pinButton)
-                .accessibilityLabel(strings.pinButton)
-            }
+            Spacer(minLength: 4)
             Button { perform(.edit) } label: {
-                if embedded { Image(systemName: "pencil").frame(width: 28, height: 28) }
-                else { Text(strings.editButton) }
+                Text(strings.editButton)
             }
             .accessibilityLabel(strings.editButton)
-            .modifier(ScreenshotPreviewActionStyle(embedded: embedded, prominent: true))
+            .buttonStyle(.borderedProminent)
             .controlSize(.small)
             .screenshotSafeHelp("\(strings.editButton)  (⏎)")
         }
@@ -676,7 +608,7 @@ private struct ScreenshotQuickPreviewView: View {
                     .interpolation(.high)
                     .scaledToFit()
                     .frame(maxWidth: 320, maxHeight: 138)
-                    .frame(width: embedded ? nil : 320, height: 138)
+                    .frame(width: 320, height: 138)
                     .background(Color.black.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                     .overlay(
@@ -692,10 +624,10 @@ private struct ScreenshotQuickPreviewView: View {
                 if showsDismissButton { thumbnailDismissButton }
             }
             .overlay(alignment: .topTrailing) {
-                // The floating action row already fills its fixed width in
-                // longer languages, so Copy text, share and pin ride on the
-                // thumbnail there instead of squeezing Save, Copy and Edit.
-                if !embedded { thumbnailButtons }
+                // The action row already fills its fixed width in longer
+                // languages, so Copy text, share and pin ride on the
+                // thumbnail instead of squeezing Save, Copy and Edit.
+                thumbnailButtons
             }
 
             if let record = model.sharedRecord {
@@ -703,31 +635,20 @@ private struct ScreenshotQuickPreviewView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
 
-            if !embedded { actionBar }
+            actionBar
         }
         .padding(10)
-        .frame(width: embedded ? nil : ScreenshotQuickPreviewController.size(showingLink: false).width,
-               height: embedded ? nil : ScreenshotQuickPreviewController.size(
+        .frame(width: ScreenshotQuickPreviewController.size(showingLink: false).width,
+               height: ScreenshotQuickPreviewController.size(
                    showingLink: model.sharedRecord != nil).height)
         .background {
-            if !embedded {
-                RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.regularMaterial)
-            }
+            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.regularMaterial)
         }
         .overlay {
-            if !embedded {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.10), lineWidth: 1)
-            }
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.10), lineWidth: 1)
         }
-        .onHover(perform: previewHoverChanged)
-    }
-
-    private func previewHoverChanged(_ inside: Bool) {
-        // The island tracks the image and header together. Leaving just the
-        // image must not restart dismissal while its actions are still hovered.
-        guard !embedded else { return }
-        hoverChanged(inside)
+        .onHover(perform: hoverChanged)
     }
 
     private func sharedLinkRow(_ record: ScreenshotShareRecord) -> some View {
@@ -773,7 +694,7 @@ private struct ScreenshotQuickPreviewView: View {
             .accessibilityLabel(strings.deleteLink)
         }
         .padding(.horizontal, 9)
-        .frame(width: embedded ? nil : 320, height: 48)
+        .frame(width: 320, height: 48)
         .background(Color.primary.opacity(0.055),
                     in: RoundedRectangle(cornerRadius: 9, style: .continuous))
         .overlay(
@@ -786,41 +707,20 @@ private struct ScreenshotQuickPreviewView: View {
     private var qrControl: some View {
         Button(action: showQR) {
             Image(systemName: "qrcode")
-                .frame(width: embedded ? 28 : 22, height: embedded ? 28 : 18)
+                .frame(width: 22, height: 18)
         }
-        .modifier(ScreenshotPreviewActionStyle(embedded: embedded))
+        .buttonStyle(.bordered)
         .controlSize(.small)
         .tint(.accentColor)
         .screenshotSafeHelp(L10n.shared.s.qrResultTitle)
         .accessibilityLabel(L10n.shared.s.qrResultTitle)
     }
 
-    /// Runs OCR against the full-resolution capture and copies its text.
-    private var textControl: some View {
-        Button(action: copyText) {
-            Image(systemName: "text.viewfinder").frame(width: 28, height: 28)
-        }
-        .modifier(ScreenshotPreviewActionStyle(embedded: true))
-        .controlSize(.small)
-        .screenshotSafeHelp(strings.copyTextButton)
-        .accessibilityLabel(strings.copyTextButton)
-    }
-
-    @ViewBuilder private var shareMenu: some View {
-        if embedded {
-            // The island hides the menu arrow, so a primary action would leave
-            // the durations behind a press and hold that nothing hints at. A
-            // click there opens the durations, as it always has.
-            shareMenuChrome(Menu { shareDurations } label: { shareMenuLabel },
-                            help: strings.shareSectionTitle)
-                .menuStyle(.borderlessButton).menuIndicator(.hidden)
-                .frame(width: 28, height: 28)
-        } else {
-            shareMenuChrome(Menu { shareDurations } label: { shareMenuLabel } primaryAction: {
-                share(.saved())
-            }, help: "\(strings.shareSectionTitle) · \(ScreenshotShareDuration.saved().title(strings))")
-                .menuStyle(.button).buttonStyle(.bordered).controlSize(.small)
-        }
+    private var shareMenu: some View {
+        shareMenuChrome(Menu { shareDurations } label: { shareMenuLabel } primaryAction: {
+            share(.saved())
+        }, help: "\(strings.shareSectionTitle) · \(ScreenshotShareDuration.saved().title(strings))")
+            .menuStyle(.button).buttonStyle(.bordered).controlSize(.small)
     }
 
     private var shareDurations: some View {
@@ -838,7 +738,7 @@ private struct ScreenshotQuickPreviewView: View {
                 Image(systemName: "link")
             }
         }
-        .frame(width: embedded ? 28 : 22, height: embedded ? 28 : 18)
+        .frame(width: 22, height: 18)
     }
 
     private func shareMenuChrome(_ menu: some View, help: String) -> some View {
@@ -854,38 +754,16 @@ private struct ScreenshotQuickPreviewView: View {
                               disabled: Bool = false,
                               action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Group {
-                if embedded { Image(systemName: symbol).frame(width: 28, height: 28) }
-                else { Label(title, systemImage: symbol) }
-            }
+            Label(title, systemImage: symbol)
                 .font(.system(size: 11, weight: .medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
         }
-        .modifier(ScreenshotPreviewActionStyle(embedded: embedded))
+        .buttonStyle(.bordered)
         .controlSize(.small)
         .disabled(disabled)
         .opacity(disabled ? 0.4 : 1)
         .screenshotSafeHelp("\(title)  (\(shortcut))")
         .accessibilityLabel(title)
-    }
-}
-
-/// The island header has its own surface; native button bezels waste the space
-/// needed by its title at the minimum width. Keep 28-point targets in that host.
-private struct ScreenshotPreviewActionStyle: ViewModifier {
-    let embedded: Bool
-    var prominent = false
-
-    @ViewBuilder func body(content: Content) -> some View {
-        if embedded {
-            content.buttonStyle(NotchButtonStyle(cornerRadius: 8))
-                .background(prominent ? Color.white.opacity(0.14) : .clear,
-                            in: RoundedRectangle(cornerRadius: 8))
-        } else if prominent {
-            content.buttonStyle(.borderedProminent)
-        } else {
-            content.buttonStyle(.bordered)
-        }
     }
 }

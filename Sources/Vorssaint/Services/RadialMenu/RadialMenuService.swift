@@ -23,7 +23,6 @@ final class RadialMenuService: ObservableObject {
     /// Names of the submenus that were descended into, for the hub's back hint.
     @Published private(set) var trail: [String] = []
     @Published private(set) var highlightedIndex: Int?
-    @Published private(set) var nowPlayingState = RadialNowPlayingState.nothingPlaying
     /// True while a hold-capable session still owns its shortcut or mouse
     /// button; release behavior is determined by `sessionActivationMode`.
     @Published private(set) var holdPhase = false
@@ -386,13 +385,6 @@ final class RadialMenuService: ObservableObject {
         // to grow from.
         visible = false
         activeProfile = profile
-        if RadialMenuSupport.containsNowPlaying(items) {
-            let nowPlaying = RadialNowPlayingService.shared
-            nowPlaying.dismissDetails()
-            nowPlaying.refresh { [weak self] state in self?.nowPlayingState = state }
-        } else {
-            nowPlayingState = .nothingPlaying
-        }
 
         let shortcut = GlobalShortcut(storageValue: profile.shortcut) ?? .radialMenuDefault
         let activationMode = RadialMenuActivationMode.sanitized(
@@ -767,11 +759,7 @@ final class RadialMenuService: ObservableObject {
             }
         case .media:
             if let key = item.mediaKey {
-                if key == .nowPlaying {
-                    RadialNowPlayingService.shared.presentDetails(at: wheelCenter)
-                } else {
-                    postWhenModifiersReleased(attempt: 0) { Self.postMediaKey(key) }
-                }
+                postWhenModifiersReleased(attempt: 0) { Self.postMediaKey(key) }
             }
         case .tool:
             if let tool = item.tool { run(tool) }
@@ -893,9 +881,8 @@ final class RadialMenuService: ObservableObject {
     /// Posts the aux-button pair the physical media keys produce, so whatever
     /// player owns the media keys reacts exactly as if F8 was pressed.
     private static func postMediaKey(_ key: RadialMenuMediaKey) {
-        guard let auxKeyType = key.auxKeyType else { return }
-        postAuxKey(auxKeyType, down: true)
-        postAuxKey(auxKeyType, down: false)
+        postAuxKey(key.auxKeyType, down: true)
+        postAuxKey(key.auxKeyType, down: false)
     }
 
     private static func postAuxKey(_ type: Int32, down: Bool) {

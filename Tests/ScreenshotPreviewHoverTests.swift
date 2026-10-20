@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
 /// Production hover handlers and dismissal scheduling run with a controlled
 /// clock. Pointer crossings are supplied explicitly; no native UI is exercised.
 enum ScreenshotPreviewHoverTests {
-    typealias DispatchQueue = NotchScreenRefreshContract.DispatchQueue
+    typealias DispatchQueue = ManualScheduler.DispatchQueue
 
     enum Action: Hashable { case edit, copy, save }
 
@@ -28,8 +29,8 @@ enum ScreenshotPreviewHoverTests {
     }
 
     static func run(_ suite: TestSuite) {
-        defer { DispatchQueue.main = NotchScreenRefreshContract.Scheduler() }
-        DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+        defer { DispatchQueue.main = ManualScheduler.Scheduler() }
+        DispatchQueue.main = ManualScheduler.Scheduler()
         let editorPreview = Controller()
         var editorOpened = false
         editorPreview.action = { action in
@@ -48,55 +49,30 @@ enum ScreenshotPreviewHoverTests {
         failedCopy.action = { _ in [] }
         failedCopy.perform(.copy)
         suite.expect(!failedCopy.closed, "failed Copy still leaves the preview available for retry")
-        DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+        DispatchQueue.main = ManualScheduler.Scheduler()
 
         for duration in [3.0, 12.0] {
-            DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+            DispatchQueue.main = ManualScheduler.Scheduler()
             let controller = Controller()
             controller.autoDismissDuration = duration
-            let embedded = Preview(embedded: true, hoverChanged: controller.hoverChanged)
             controller.scheduleAutoDismiss()
-            controller.hoverChanged(true) // Enter the island through the header.
+            controller.hoverChanged(true)
             DispatchQueue.main.advance(duration)
-            suite.expect(!controller.closed, "entering the capture header cancels automatic dismissal")
-
-            for _ in 0..<2 {
-                embedded.previewHoverChanged(true) // Header to image.
-                embedded.previewHoverChanged(false) // Image to header, still in the island.
-                DispatchQueue.main.advance(duration)
-                suite.expect(controller.pointerInside && !controller.closed && DispatchQueue.main.pending == 0,
-                             "moving between the image and header actions keeps the embedded preview open")
-            }
-
-            controller.hoverChanged(false) // Leave the whole island.
+            suite.expect(controller.pointerInside && !controller.closed,
+                         "the preview cancels dismissal while hovered")
+            controller.hoverChanged(false)
             DispatchQueue.main.advance(duration - 0.5)
-            suite.expect(!controller.closed, "leaving the island keeps the configured dismissal delay")
+            suite.expect(!controller.closed, "leaving the preview keeps the configured dismissal delay")
             controller.hoverChanged(true) // Return before the deadline.
             DispatchQueue.main.advance(duration)
-            suite.expect(!controller.closed, "returning to the header cancels an outstanding dismissal")
+            suite.expect(!controller.closed, "returning to the preview cancels an outstanding dismissal")
             controller.hoverChanged(false)
             DispatchQueue.main.advance(duration)
-            suite.expect(controller.closed, "leaving the island still dismisses an unused capture")
-
-            // Disabling the island rebuilds the preview as a floating view.
-            DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
-            let floatingController = Controller()
-            floatingController.autoDismissDuration = duration
-            let floating = Preview(embedded: false, hoverChanged: floatingController.hoverChanged)
-            floatingController.scheduleAutoDismiss()
-            floating.previewHoverChanged(true)
-            DispatchQueue.main.advance(duration)
-            suite.expect(floatingController.pointerInside && !floatingController.closed,
-                         "the floating preview still cancels dismissal while hovered")
-            floating.previewHoverChanged(false)
-            DispatchQueue.main.advance(duration - 0.5)
-            suite.expect(!floatingController.closed, "the floating preview retains its dismissal delay")
-            DispatchQueue.main.advance(0.5)
-            suite.expect(floatingController.closed, "leaving the floating preview still dismisses it")
+            suite.expect(controller.closed, "leaving the preview still dismisses an unused capture")
 
             // The system share sheet opens outside the preview, so the pointer
             // leaves it while a target is being picked.
-            DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+            DispatchQueue.main = ManualScheduler.Scheduler()
             let sharingController = Controller()
             sharingController.autoDismissDuration = duration
             sharingController.systemSharing = true
@@ -111,18 +87,12 @@ enum ScreenshotPreviewHoverTests {
             suite.expect(sharingController.closed, "a cancelled share sheet resumes the dismissal delay")
         }
 
-        DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+        DispatchQueue.main = ManualScheduler.Scheduler()
         let persistentController = Controller()
         persistentController.autoDismissDuration = nil
         persistentController.scheduleAutoDismiss()
         DispatchQueue.main.advance(60)
         suite.expect(!persistentController.closed && DispatchQueue.main.pending == 0,
                      "a persistent confirmation preview does not schedule automatic dismissal")
-    }
-}
-
-extension NotchScreenRefreshContract.Scheduler {
-    func async(execute work: @escaping () -> Void) {
-        asyncAfter(deadline: .init(seconds: now), execute: DispatchWorkItem(block: work))
     }
 }

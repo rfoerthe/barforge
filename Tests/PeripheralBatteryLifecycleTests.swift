@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -22,7 +23,6 @@ enum PeripheralBatteryLifecycleTests {
     }
 
     static func run(_ suite: TestSuite) {
-        freshness(suite)
         cachedSources(suite)
         refreshHandoff(suite)
         cancellation(suite)
@@ -33,39 +33,6 @@ enum PeripheralBatteryLifecycleTests {
 
     private static func device(_ percent: Int, id: String = "HID:fixture") -> PeripheralBatteryDevice {
         PeripheralBatteryDevice(id: id, name: "Keyboard", percent: percent, kind: .keyboard)
-    }
-
-    private static func sample(_ percent: Int, at observedAt: TimeInterval, id: String = "HID:fixture") -> PeripheralBatterySample {
-        PeripheralBatterySample(devices: [device(percent, id: id)], observedAt: [id: observedAt])
-    }
-
-    private static func freshness(_ suite: TestSuite) {
-        var state = NotchAccessoryBatteryState()
-        suite.expect(state.consume(sample(35, at: 1), observedAfter: 10).isEmpty,
-               "a previously high snapshot cannot establish the new accessory baseline")
-        suite.expect(state.consume(sample(35, at: 1), observedAfter: 10).isEmpty,
-               "republishing a cache cannot turn it into a new reading")
-        suite.expect(state.consume(sample(19, at: 11), observedAfter: 10).isEmpty,
-               "cache 35 then first actual 19 starts a silent low episode")
-        suite.expect(state.consume(sample(35, at: 1), observedAfter: 10).isEmpty
-               && state.consume(sample(18, at: 12), observedAfter: 10).isEmpty,
-               "an older high value cannot rearm an established low episode")
-        suite.expect(state.consume(sample(25, at: 13), observedAfter: 10).isEmpty,
-               "a fresh recovery rearms without warning")
-        suite.expect(state.consume(sample(20, at: 14), observedAfter: 10).count == 1,
-               "a later observed fall after the fresh baseline warns exactly once")
-        suite.expect(state.consume(sample(20, at: 14), observedAfter: 10).isEmpty,
-               "a repeated fresh snapshot does not replay its alert")
-        suite.expect(state.consume(sample(35, at: 19), observedAfter: 20).isEmpty
-               && state.consume(sample(15, at: 21, id: "Bluetooth:fixture"), observedAfter: 20).isEmpty,
-               "suspension keeps the low episode while ignoring caches from before resumption")
-        _ = state.consume(sample(30, at: 22), observedAfter: 20)
-        suite.expect(state.consume(sample(20, at: 23), observedAfter: 20).count == 1,
-               "a measured recharge after resumption allows the next real fall")
-        var freshHigh = NotchAccessoryBatteryState()
-        _ = freshHigh.consume(sample(35, at: 10), observedAfter: 10)
-        suite.expect(freshHigh.consume(sample(19, at: 20), observedAfter: 19).count == 1,
-               "sleep preserves a genuinely established high baseline too")
     }
 
     private static func cachedSources(_ suite: TestSuite) {
@@ -93,15 +60,11 @@ enum PeripheralBatteryLifecycleTests {
         suite.expect(mixed.observedAt["HID:mouse"] == 20
                && mixed.observedAt["BluetoothGATT:fixture"] == 1,
                "a new HID read cannot refresh the age of cached Bluetooth data")
-        var state = NotchAccessoryBatteryState()
-        _ = state.consume(mixed, observedAfter: 10)
         clock = 302
         _ = sampler.sample(now: clock)
         queue.sync { readers[1].emit(19) }
         let actual = sampler.sample(now: clock)
-        suite.expect(state.consume(actual, observedAfter: 10).isEmpty,
-               "the production sampler's old Bluetooth 35 then actual 19 is silent on first observation")
-        suite.expect(actual.observedAt["BluetoothGATT:fixture"] == 302,
+        suite.expect(actual.devices.first?.percent == 19 && actual.observedAt["BluetoothGATT:fixture"] == 302,
                "the completed refresh supplies its own observation time")
         clock = 303
         suite.expect(sampler.sample(now: clock).observedAt == actual.observedAt,

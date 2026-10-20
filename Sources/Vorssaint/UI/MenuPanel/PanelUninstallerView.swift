@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -10,7 +11,6 @@ struct PanelUninstallerView: View {
     @ObservedObject private var permissions = Permissions.shared
     @ObservedObject private var uninstaller = AppUninstaller.shared
     @ObservedObject private var homebrew = HomebrewManager.shared
-    @Environment(\.notchPresentation) private var inNotch
     @State private var dropTargeted = false
     @State private var showingAppPicker = false
     @State private var pendingHomebrewRemoval: AppUninstaller.HomebrewRemovalConfirmation?
@@ -352,18 +352,6 @@ struct PanelUninstallerView: View {
     }
 
     private func presentHomebrewRemovalConfirmation(_ confirmation: AppUninstaller.HomebrewRemovalConfirmation) {
-        // The alert would hang from the island as a sheet; there it asks on its own.
-        guard !inNotch else {
-            DispatchQueue.main.async {
-                guard NSAlert.confirmAboveIsland(l10n.s.homebrewConfirmUninstallTitle,
-                                                 message: String(format: l10n.s.homebrewConfirmUninstallBodyFormat,
-                                                                 confirmation.package.displayName),
-                                                 action: l10n.s.homebrewUninstall, destructive: true,
-                                                 cancel: l10n.s.uninstallerCancel) else { return }
-                uninstaller.removeSelectedWithHomebrew(confirmation: confirmation)
-            }
-            return
-        }
         PanelInteractionState.shared.isPresentingPopoverModal = true
         pendingHomebrewRemoval = confirmation
     }

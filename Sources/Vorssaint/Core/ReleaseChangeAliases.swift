@@ -23,11 +23,13 @@ import Foundation
 /// 4. Family aliases ("System monitor", "mouse settings") name a whole
 ///    Settings page. They report every feature of the family, but only when
 ///    no feature of that page matched on its own.
-/// 5. The section title is matched the same way, so "### Dynamic Island"
-///    implies `.notch` and "### Added (switcher)" implies `.switcher`.
+/// 5. The section title is matched the same way, so "### Added (switcher)"
+///    implies `.switcher`.
 /// A bullet that matches nothing is app-wide (Settings, menu bar panel,
-/// languages, updates). Dynamic Island extensions are reported as
-/// themselves; the window rolls them up under the Dynamic Island row.
+/// languages, updates). Barforge has no Dynamic Island: a bullet about it,
+/// its extensions or the radial menu's Now Playing card, and nothing that
+/// remains, is about a removed feature, as is every bullet under a Dynamic
+/// Island section.
 enum ReleaseChangeAliases {
     struct Alias: Hashable, ExpressibleByStringLiteral {
         let text: String
@@ -91,12 +93,12 @@ enum ReleaseChangeAliases {
         case .superKey: return ["super key"]
         case .quitWindowProtection: return ["quit protection", "quit & close protection",
             "quit and close protection", "command q and command w"]
-        case .clipboardHistory: return ["clipboard history", .exact("Clipboard"), .island("clipboard"),
+        case .clipboardHistory: return ["clipboard history", .exact("Clipboard"),
             "clear unpinned", "clipboard previews", "clipboard items"]
         case .pastePlain: return ["paste as plain text", "paste plain text"]
         case .finderCutPaste: return ["cut & paste", "cut and paste", "cut files", "finder cut", "cut operations"]
         case .finderRename: return ["finder shortcuts", "rename shortcut", "renames selected files"]
-        case .shelf: return [.exact("Shelf"), .island("shelf"), "drop zone", "docked shelf", "temporary shelf",
+        case .shelf: return [.exact("Shelf"), "drop zone", "docked shelf", "temporary shelf",
             "on the shelf", "shelf files"]
         case .urlCleaner: return ["clean url", "url cleaner", "url cleaning"]
         case .diskImageInstaller: return ["disk image installer", "disk images", "disk image",
@@ -140,28 +142,6 @@ enum ReleaseChangeAliases {
         case .wallpaper: return [.exact("Wallpaper"), "wallpaper gallery", "wallpapers"]
         case .killProcess: return ["kill process", "force kill", "process tree"]
         case .portManager: return ["port manager"]
-        case .notch: return ["dynamic island", "island", "islands", "notch", "volume keys", "volume key",
-            "mute key", "volume feedback", "volume indicator", "volume notice", "new track indicator",
-            "displays without a notch", "displays without a camera cutout"]
-        case .notchCalendar: return [.island("calendar"), "event countdown", "event countdowns", "week numbers",
-            "calendar indicator", .island("appointment"), .island("appointments"), .island("next event"),
-            .island("upcoming event")]
-        case .notchNotifications: return [.island("notifications"), .island("notification"), "notification banners",
-            "system banner"]
-        case .notchGestures: return ["dynamic island gestures", .island("gestures"), .island("gesture")]
-        case .notchTimer: return [.exact("Timer"), .exact("Timers"), .island("timer"), .island("timers"),
-            "pomodoro", "stopwatch", "focus cycles"]
-        case .notchAccessories: return ["accessory alerts", "accessory notices", .island("accessory")]
-        case .notchLyrics: return ["lyrics", "lyric"]
-        case .notchQueue: return ["up next", .island("queue")]
-        case .notchLiveEqualizer: return ["bars follow the music", "live music bars",
-            "music bars that follow playback"]
-        case .notchDownloads: return [.island("downloads"), .island("download"), "safari downloads",
-            "downloads folder", "downloads page", "completed download", "completed downloads"]
-        case .notchAgents: return ["ai agents", "ai agent", "claude code", "claude code timer", "codex", "ai usage",
-            "opencode", "github copilot", .island("agent"), .island("agents")]
-        case .notchWatch: return [.exact("Watch")]
-        case .notchMascot: return ["companion"]
         case .monitorCPU: return ["cpu temperature", "cpu load", "cpu readings", "per core", "per-core",
             "processor temperature", "process breakdowns", "cpu alert", "cpu and gpu temperatures"]
         case .monitorGPU: return ["gpu usage", "gpu load", "gpu temperature", "gpu temperatures",
@@ -206,6 +186,24 @@ enum ReleaseChangeAliases {
         ),
     ]
 
+    /// What upstream's notes call the Dynamic Island, its extensions and the
+    /// radial menu's Now Playing card, none of which Barforge has.
+    static let removedFeatureAliases: [Alias] = [
+        "dynamic island", "island", "islands", "notch", "volume keys", "volume key", "mute key", "volume feedback",
+        "volume indicator", "volume notice", "new track indicator", "displays without a notch",
+        "displays without a camera cutout", .island("calendar"), "event countdown", "event countdowns",
+        "week numbers", "calendar indicator", .island("appointment"), .island("appointments"),
+        .island("next event"), .island("upcoming event"), .island("notifications"), .island("notification"),
+        "notification banners", "system banner", "dynamic island gestures", .island("gestures"),
+        .island("gesture"), .exact("Timer"), .exact("Timers"), .island("timer"), .island("timers"), "pomodoro",
+        "stopwatch", "focus cycles", "accessory alerts", "accessory notices", .island("accessory"), "lyrics",
+        "lyric", "up next", .island("queue"), "bars follow the music", "live music bars",
+        "music bars that follow playback", .island("downloads"), .island("download"), "safari downloads",
+        "downloads folder", "downloads page", "completed download", "completed downloads", "ai agents", "ai agent",
+        "claude code", "claude code timer", "codex", "ai usage", "opencode", "github copilot", .island("agent"),
+        .island("agents"), .exact("Watch"), "companion", "now playing"
+    ]
+
     static let ignoredPhrases: [String] = ["wheel notch", "wheel notches", "shortcut recording",
         "recording a shortcut", "keeps recording", "incompatible recordings", "activity monitor", "media key",
         "media keys"]
@@ -227,13 +225,18 @@ enum ReleaseChangeAliases {
                 found.formUnion(family.members)
             }
         }
-        // Under a Dynamic Island section, other tools are named as a place
-        // or a part of the island ("can carry the Command Bar out of the
-        // island"), not as what changed.
-        if sectionMatch.features.contains(.notch) {
-            found = found.filter { $0.group == .dynamicIsland }
-        }
         return AppFeature.allCases.filter { found.contains($0) }
+    }
+
+    /// Whether the bullet is about a feature Barforge removed. Under a Dynamic
+    /// Island section, other tools are named as a place or a part of the
+    /// island ("can carry the Command Bar out of the island"), not as what
+    /// changed, so the whole section goes.
+    static func isAboutRemovedFeature(_ text: String, section: String) -> Bool {
+        let sectionMatch = match(section, islandContext: nil)
+        if sectionMatch.removed { return true }
+        let textMatch = match(text, islandContext: sectionMatch.islandContext ? true : nil)
+        return textMatch.removed && textMatch.features.isEmpty && textMatch.families.isEmpty
     }
 
     /// Whether the bullet also changes something every person has.
@@ -247,6 +250,7 @@ enum ReleaseChangeAliases {
         let pattern: Pattern
         var features: [AppFeature]
         let family: Int?
+        var removed = false
     }
 
     /// An alias as scalars, plus its first word: an alias can only match
@@ -284,6 +288,14 @@ enum ReleaseChangeAliases {
         }
         for (index, family) in families.enumerated() {
             for alias in family.aliases { add(alias, family.members, family: index) }
+        }
+        for alias in removedFeatureAliases {
+            if let position = positions[alias] {
+                result[position].removed = true
+            } else {
+                positions[alias] = result.count
+                result.append(Entry(alias: alias, pattern: Pattern(alias), features: [], family: nil, removed: true))
+            }
         }
         return result.enumerated().sorted { lhs, rhs in
             let left = lhs.element.pattern.scalars.count
@@ -342,7 +354,7 @@ enum ReleaseChangeAliases {
     }
 
     private static func match(_ string: String, islandContext forced: Bool?)
-        -> (features: Set<AppFeature>, families: Set<Int>, islandContext: Bool) {
+        -> (features: Set<AppFeature>, families: Set<Int>, islandContext: Bool, removed: Bool) {
         let text = Scalars(string)
         var claimed = ignoredPatterns
             .filter { text.mayContain($0, matchingCase: false) }
@@ -355,11 +367,13 @@ enum ReleaseChangeAliases {
         }
         var features: Set<AppFeature> = []
         var familyHits: Set<Int> = []
+        var removed = false
         for entry in entries where (islandContext || !entry.alias.needsIsland)
             && text.mayContain(entry.pattern, matchingCase: entry.alias.matchesCase) {
             for range in ranges(of: entry.pattern.scalars, in: text.haystack(for: entry.alias))
             where !claimed.contains(where: { $0.overlaps(range) }) {
                 claimed.append(range)
+                if entry.removed { removed = true }
                 if let family = entry.family {
                     familyHits.insert(family)
                 } else {
@@ -367,7 +381,7 @@ enum ReleaseChangeAliases {
                 }
             }
         }
-        return (features, familyHits, islandContext)
+        return (features, familyHits, islandContext, removed)
     }
 
     /// Whole-word occurrences, scanning left to right without overlaps.

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -200,7 +201,6 @@ enum ShelfFeatureTests {
             "com.vorssaint.tests.not-a-real-pasteboard-type"),
                "unrelated pasteboard types do not activate the shelf")
         ShelfFilePromiseTests.run(suite)
-        ShelfDropRoutingTests.run(suite)
 
         // MARK: Shelf and the screenshot editor (#2812)
 
@@ -350,24 +350,6 @@ enum ShelfFeatureTests {
                                          spacing: 10,
                                          inset: 4) == CGRect(x: 4, y: 200, width: 78, height: 88),
                "a single column puts every tile in its own row")
-        suite.expect(ShelfTileLayout.rowCount(contentHeight: 140, tileHeight: 88, spacing: 10, inset: 4) == 1
-               && ShelfTileLayout.rowCount(contentHeight: 194, tileHeight: 88, spacing: 10, inset: 4) == 2
-               && ShelfTileLayout.rowCount(contentHeight: 0, tileHeight: 88, spacing: 10, inset: 4) == 1,
-               "a sideways shelf fits as many rows as the island's height holds, never fewer than one")
-        suite.expect(ShelfTileLayout.sidewaysTileFrame(index: 1, rows: 2, tileSize: revealTile, spacing: 10, inset: 4)
-               == CGRect(x: 4, y: 102, width: 78, height: 88)
-               && ShelfTileLayout.sidewaysTileFrame(index: 2, rows: 2, tileSize: revealTile, spacing: 10, inset: 4)
-               == CGRect(x: 92, y: 4, width: 78, height: 88)
-               && ShelfTileLayout.sidewaysTileFrame(index: 3, rows: 1, tileSize: revealTile, spacing: 10, inset: 4)
-               == CGRect(x: 268, y: 4, width: 78, height: 88),
-               "a sideways shelf fills each column top to bottom before starting the next")
-        suite.expect(ShelfTileLayout.sidewaysDocumentSize(itemCount: 3, rows: 1, visibleSize: .zero,
-                                                          tileSize: revealTile, spacing: 10, inset: 4)
-               == CGSize(width: 262, height: 96)
-               && ShelfTileLayout.sidewaysDocumentSize(itemCount: 3, rows: 2, visibleSize: CGSize(width: 424, height: 240),
-                                                       tileSize: revealTile, spacing: 10, inset: 4)
-               == CGSize(width: 424, height: 240),
-               "a sideways strip laid out before it has a size still covers its tiles, and fills the visible area once it has one")
 
         let singleScreen = [ShelfEdgeScreen(frame: CGRect(x: 0, y: 0, width: 1920, height: 1080),
                                             visibleFrame: CGRect(x: 0, y: 0, width: 1920, height: 1080))]
@@ -482,7 +464,6 @@ enum ShelfFeatureTests {
         placementDefaults.removePersistentDomain(forName: placementDomain)
         defer { placementDefaults.removePersistentDomain(forName: placementDomain) }
         for (key, value) in AppFeature.availabilityDefaults { placementDefaults.set(value, forKey: key) }
-        placementDefaults.set(false, forKey: DefaultsKey.notchEnabled)
         suite.expect(ShelfDockPlacement.current(in: placementDefaults) == .menuBar,
                      "an unset placement keeps the shelf under the menu bar icon")
         placementDefaults.set("elsewhere", forKey: DefaultsKey.shelfDockPlacement)
@@ -490,11 +471,7 @@ enum ShelfFeatureTests {
                      "an unknown placement falls back to the menu bar icon")
         placementDefaults.set(ShelfDockPlacement.topCenter.rawValue, forKey: DefaultsKey.shelfDockPlacement)
         suite.expect(ShelfDockPlacement.current(in: placementDefaults) == .topCenter,
-                     "the top center placement applies while the Dynamic Island is off")
-        placementDefaults.set(true, forKey: DefaultsKey.notchEnabled)
-        suite.expect(NotchSupport.isEnabled(in: placementDefaults)
-                     && ShelfDockPlacement.current(in: placementDefaults) == .menuBar,
-                     "the Dynamic Island keeps the top center, so the shelf stays under the icon")
+                     "the top center placement applies when chosen")
 
         let dockVisible = CGRect(x: 0, y: 0, width: 1512, height: 950)
         let badgeSize = CGSize(width: 180, height: 40)

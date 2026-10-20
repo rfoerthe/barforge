@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Foundation
@@ -119,47 +120,6 @@ enum ShelfTileLayout {
                             inset: CGFloat) -> Int {
         let usable = contentWidth - inset * 2 + spacing
         return max(1, Int(usable / (tileWidth + spacing)))
-    }
-
-    /// How many tile rows fit a given height, for a strip that flows sideways.
-    static func rowCount(contentHeight: CGFloat,
-                         tileHeight: CGFloat,
-                         spacing: CGFloat,
-                         inset: CGFloat) -> Int {
-        let usable = contentHeight - inset * 2 + spacing
-        return max(1, Int(usable / (tileHeight + spacing)))
-    }
-
-    /// Where the tile at `index` sits when tiles fill each column top to
-    /// bottom and continue to the right.
-    static func sidewaysTileFrame(index: Int,
-                                  rows: Int,
-                                  tileSize: CGSize,
-                                  spacing: CGFloat,
-                                  inset: CGFloat) -> CGRect {
-        let safeRows = max(1, rows)
-        let column = index / safeRows
-        let row = index % safeRows
-        return CGRect(x: inset + CGFloat(column) * (tileSize.width + spacing),
-                      y: inset + CGFloat(row) * (tileSize.height + spacing),
-                      width: tileSize.width,
-                      height: tileSize.height)
-    }
-
-    /// The document size for a sideways strip: wide enough for every column
-    /// and tall enough for every row, and never smaller than the visible area.
-    static func sidewaysDocumentSize(itemCount: Int,
-                                     rows: Int,
-                                     visibleSize: CGSize,
-                                     tileSize: CGSize,
-                                     spacing: CGFloat,
-                                     inset: CGFloat) -> CGSize {
-        let safeRows = max(1, rows)
-        let columns = max(1, Int(ceil(Double(itemCount) / Double(safeRows))))
-        let filledRows = min(safeRows, max(1, itemCount))
-        let width = inset * 2 + CGFloat(columns) * tileSize.width + CGFloat(columns - 1) * spacing
-        let height = inset * 2 + CGFloat(filledRows) * tileSize.height + CGFloat(filledRows - 1) * spacing
-        return CGSize(width: max(width, visibleSize.width), height: max(height, visibleSize.height))
     }
 
     /// Where the tile at `index` sits in the flipped document view.
@@ -566,13 +526,8 @@ enum ShelfEdgeDragSupport {
 enum ShelfDockPlacement: String {
     case menuBar, topCenter
 
-    /// The Dynamic Island owns the top center of the screen while it is on,
-    /// so the top center placement waits until it is off.
     static func current(in defaults: UserDefaults = .standard) -> Self {
-        guard !NotchSupport.isEnabled(in: defaults),
-              defaults.string(forKey: DefaultsKey.shelfDockPlacement) == Self.topCenter.rawValue
-        else { return .menuBar }
-        return .topCenter
+        defaults.string(forKey: DefaultsKey.shelfDockPlacement) == Self.topCenter.rawValue ? .topCenter : .menuBar
     }
 
     /// The docked panel's frame: its top edge just below the menu bar, either

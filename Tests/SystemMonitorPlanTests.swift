@@ -10,10 +10,6 @@ enum SystemMonitorPlanTests {
 
     class Fixture {
         var menuPanelNeeds = SystemMonitorPanelNeeds.none
-        var notchDetailNeeds = SystemMonitorPanelNeeds.none
-        var fullMonitorVisible = false
-        var notchVisible = false
-        var notchAccessoryMonitoring = false
         static var fanTelemetryAvailable: Bool { true }
     }
 
@@ -47,20 +43,10 @@ enum SystemMonitorPlanTests {
         monitor.menuPanelNeeds = SystemMonitorPanelNeeds(connectedDevices: true)
         suite.expect(monitor.currentPlan(defaults: defaults).needConnectedDevices,
                      "the device list still reads connected devices with the System row hidden")
-        monitor.menuPanelNeeds = .none
-        monitor.notchDetailNeeds = SystemMonitorPanelNeeds(connectedDevices: true)
-        suite.expect(monitor.currentPlan(defaults: defaults).needConnectedDevices,
-                     "the island System page's device card ignores the panel row's toggle")
-        monitor.notchDetailNeeds = .none
-        monitor.fullMonitorVisible = true
-        let preview = monitor.currentPlan(defaults: defaults)
-        suite.expect(preview.needConnectedDevices && preview.needFanSpeed,
-                     "the Settings island preview reads connected devices for its card, like the fan card")
         defaults.set(false, forKey: AppFeature.connectedDevices.availabilityKey)
         suite.expect(!monitor.currentPlan(defaults: defaults).needConnectedDevices,
-                     "an uninstalled connected devices feature is not read, even for the preview")
+                     "an uninstalled connected devices feature is not read")
 
-        monitor.fullMonitorVisible = false
         monitor.menuPanelNeeds = SystemMonitorPanelNeeds(system: true)
         defaults.set(true, forKey: AppFeature.monitorCPU.availabilityKey)
         defaults.set(true, forKey: DefaultsKey.menuBarCPU)
@@ -113,24 +99,12 @@ enum SystemMonitorPlanTests {
         suite.expect(!monitor.currentPlan(defaults: defaults).needPeripheralBattery,
                      "the Power and Battery time detail does not read peripheral batteries")
         monitor.menuPanelNeeds = .none
-        monitor.notchDetailNeeds = MetricDetailKind.power.monitorNeeds
-        suite.expect(!monitor.currentPlan(defaults: defaults).needPeripheralBattery,
-                     "the island's Power detail does not read peripheral batteries")
-        monitor.notchDetailNeeds = .none
-        monitor.fullMonitorVisible = true
-        suite.expect(!monitor.currentPlan(defaults: defaults).needPeripheralBattery,
-                     "the Settings island preview shows no peripheral battery and does not read one")
-        monitor.fullMonitorVisible = false
         defaults.set(false, forKey: DefaultsKey.monitorPwrPeripherals)
         panel.selectedMetric = .battery
         monitor.menuPanelNeeds = panel.monitorNeeds
         suite.expect(monitor.currentPlan(defaults: defaults).needPeripheralBattery,
                      "the Battery detail still lists peripherals with the Power row hidden")
         monitor.menuPanelNeeds = .none
-        monitor.notchDetailNeeds = MetricDetailKind.battery.monitorNeeds
-        suite.expect(monitor.currentPlan(defaults: defaults).needPeripheralBattery,
-                     "the island's Battery detail still lists peripherals with the Power row hidden")
-        monitor.notchDetailNeeds = .none
 
         panel.selectedMetric = nil
         panel.activeSection = .system

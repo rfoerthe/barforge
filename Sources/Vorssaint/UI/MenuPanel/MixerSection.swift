@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -9,14 +10,12 @@ import SwiftUI
 /// 100% is untouched passthrough; below it attenuates and above it (up to 200%)
 /// boosts, with the slider and percentage turning amber in the boost range.
 struct MixerSection: View {
-    @Environment(\.notchPresentation) private var inNotch
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var mixer = AppVolumeMixer.shared
     @ObservedObject private var inputManager = AudioInputDeviceManager.shared
     @ObservedObject private var audioPriority = AudioPriorityService.shared
     @ObservedObject private var micMute = MicMuteService.shared
     @AppStorage(DefaultsKey.liquidGlassEnabled) private var windowsGlass = false
-    @AppStorage(DefaultsKey.notchLiquidGlassEnabled) private var islandGlass = false
     @AppStorage(DefaultsKey.mixerAppArrangement)
     private var arrangementValue = ""
     @AppStorage(DefaultsKey.mixerHideInactiveApps)
@@ -32,7 +31,7 @@ struct MixerSection: View {
     var settingsMode = false
 
     private var glassEnabled: Bool {
-        LiquidGlassSupport.isEnabled(inNotch: inNotch, windows: windowsGlass, island: islandGlass)
+        LiquidGlassSupport.isEnabled(windows: windowsGlass)
     }
 
     var body: some View {
@@ -43,7 +42,7 @@ struct MixerSection: View {
                 }
             } else {
                 PanelSection(.mixer, title: l10n.s.mixerSection, collapsible: collapsible) {
-                    mixerControls.panelCard(interactive: false)
+                    mixerControls.panelCard()
                 }
             }
         }
@@ -260,11 +259,7 @@ struct MixerSection: View {
     }
 
     private func setSystemOutputVolume(_ value: Double) {
-        if inNotch {
-            // The slider shows the level; the island's header need not repeat it.
-            NotchService.shared.noteOwnLevelAdjustment(.volume)
-            mixer.requestOutputAdjustment(volume: value)
-        } else { mixer.setCurrentOutputVolume(value) }
+        mixer.setCurrentOutputVolume(value)
     }
 
     private var systemOutputVolumeBinding: Binding<Double> {
@@ -461,9 +456,7 @@ struct MixerSection: View {
                     icon: ResponsibleProcess.icon(for: app.ownerPid, pointSize: 32),
                     draggingID: $draggingAppID,
                     target: $dropTarget,
-                    dragChanged: { active in
-                        if inNotch { NotchService.shared.fileDragChanged(active, internalDrag: true) }
-                    },
+                    dragChanged: { _ in },
                     canMove: { source, target in
                         let ids = visibleApps.compactMap(\.persistenceID)
                         return ids.contains(source) && ids.contains(target)
@@ -535,8 +528,7 @@ struct MixerSection: View {
     }
 }
 
-/// The options under the routing, shared with the island's mixer page so
-/// both surfaces offer the same switches: idle rows, the headphone guard, the
+/// The options under the routing: idle rows, the headphone guard, the
 /// precise roller, the output switcher and the hidden apps.
 struct MixerOptionsControls: View {
     @ObservedObject private var l10n = L10n.shared

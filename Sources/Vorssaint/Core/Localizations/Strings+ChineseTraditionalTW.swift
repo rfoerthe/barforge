@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -550,7 +551,6 @@ extension Strings {
         shelfDockPlacement: "位置",
         shelfDockMenuBar: "選單列圖示下方",
         shelfDockTopCenter: "螢幕頂部置中",
-        shelfDockIslandNote: "Dynamic Island開啟時會佔用螢幕頂部中間。",
         shelfCollapse: "收合",
         shelfBehaviorTitle: "使用後",
         shelfCloseAfterDrop: "拖放到其他 App 後關閉",
@@ -684,7 +684,6 @@ extension Strings {
         aboutDescription: "你的 Mac 實用工具中心。\n電源、系統監控、捲動與視窗切換器，全都在選單列中。",
         versionPrefix: "版本",
         reviewIntro: "重看介紹",
-        reviewHighlights: "重看新功能導覽",
         viewOnGitHub: "在 GitHub 上查看",
 
         obContinue: "繼續",
@@ -1019,7 +1018,6 @@ extension Strings {
         qrResultTitle: "QR 碼",
         qrResultCopy: "拷貝",
         qrResultOpen: "打開連結",
-        highlightsTitle: "本次更新亮點",
         highlightsTitleClipboardRedesign: "剪貼簿全新設計",
         highlightsTitleWindowLayout: "視窗佈局",
         highlightsTitleQuitProtection: "⌘Q 與 ⌘W 保護",

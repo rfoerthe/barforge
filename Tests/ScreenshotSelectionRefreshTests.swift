@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Foundation
@@ -7,21 +8,6 @@ import Foundation
 /// Real selection methods run with controlled capture replies and inert panels.
 /// Images carry exclusion identities; no desktop pixels or input events are used.
 enum ScreenshotSelectionRefreshContract {
-    final class SurfaceOptions {
-        var onCaptureControlsSurfaceChange: ((CGRect, CGFloat) -> Void)?
-    }
-    final class SurfaceController {
-        var placements: [(CGRect, CGFloat)] = []
-        func placeFullScreenControlBelowNotch(screenFrame: CGRect, surfaceHeight: CGFloat) {
-            placements.append((screenFrame, surfaceHeight))
-        }
-    }
-    final class SurfaceService {
-        typealias ScreenCaptureSelectionOptions = SurfaceOptions
-        typealias ScreenshotSelectionController = SurfaceController
-        var options: SurfaceOptions?
-        var selection: SurfaceController?
-    }
     struct CGImage {
         let excluded: Set<CGWindowID>
         let width = 100
@@ -61,10 +47,6 @@ enum ScreenshotSelectionRefreshContract {
         var highlightWindows = true
         var needsLayout = false, needsDisplay = false
         var guideVisibilityRefreshes = 0
-        var notchCaptureControlsHeight: CGFloat?
-        var fullScreenControlHovered = false
-        var deferredNotchCaptureControlsHeight: CGFloat?
-        var hasDeferredNotchCaptureControlsHeight = false
         func refreshGuideVisibility() { guideVisibilityRefreshes += 1 }
         func refreshCaptureGuide() {}
         func refreshPointerState() {}
@@ -160,7 +142,6 @@ enum ScreenshotSelectionRefreshContract {
         var isPickingColor: Bool { activeMode == .color }
         final class Options {
             var offersRepeatLastRegion = false
-            var onSelectionProgressChange: ((Bool) -> Void)?
         }
         var screenCaptureOptions: Options? = Options()
         var capturePolicy: ScreenshotSupport.UnifiedCapturePolicy
@@ -324,46 +305,14 @@ enum ScreenshotSelectionRefreshContract {
         scrolling.captureFullScreenFromControl(on: scrolling.panels[0])
         expect(scrolling.outcome == nil,
                "scrolling capture keeps its region workflow instead of taking a full-screen capture")
-        let placement = Chooser(.screenshot)
-        placement.placeFullScreenControlBelowNotch(
-            screenFrame: placement.panels[1].screenFrame,
-            surfaceHeight: 72)
-        expect(placement.panels[0].overlayView.notchCaptureControlsHeight == nil
-                && placement.panels[1].overlayView.notchCaptureControlsHeight == 72,
-               "the island surface height applies only to the display that owns the notch")
-        placement.placeFullScreenControlBelowNotch(
-            screenFrame: placement.panels[0].screenFrame,
-            surfaceHeight: 40)
-        expect(placement.panels[0].overlayView.notchCaptureControlsHeight == 40
-                && placement.panels[1].overlayView.notchCaptureControlsHeight == nil,
-               "moving capture controls to another display clears the old pill offset")
-        let surfaceService = SurfaceService()
-        let surfaceOptions = SurfaceOptions()
-        let surfaceController = SurfaceController()
-        surfaceService.options = surfaceOptions
-        surfaceService.selection = surfaceController
-        surfaceService.connectCaptureControlsSurface(surfaceOptions, controller: surfaceController)
-        let surfaceFrame = CGRect(x: 40, y: 50, width: 60, height: 70)
-        surfaceOptions.onCaptureControlsSurfaceChange?(surfaceFrame, 88)
-        expect(surfaceController.placements.count == 1
-                && surfaceController.placements[0].0 == surfaceFrame
-                && surfaceController.placements[0].1 == 88,
-               "the capture service forwards live island geometry to its active selection")
-        surfaceService.selection = SurfaceController()
-        surfaceOptions.onCaptureControlsSurfaceChange?(.zero, 12)
-        expect(surfaceController.placements.count == 1,
-               "a stale island geometry callback cannot move a replacement selection")
         let visibility = Chooser(.screenshot)
         visibility.currentPointerLocation = CGPoint(x: 50, y: 50)
-        var progressChanges: [Bool] = []
-        visibility.screenCaptureOptions?.onSelectionProgressChange = { progressChanges.append($0) }
         visibility.setSelectionInProgress(true)
         visibility.setSelectionInProgress(false)
         expect(visibility.panels.allSatisfy { $0.overlayView.guideVisibilityRefreshes == 2 }
                 && !visibility.panels[0].overlayView.fullScreenHost.isHidden
-                && visibility.panels[1].overlayView.fullScreenHost.isHidden
-                && progressChanges == [true, false],
-               "selection progress refreshes both chooser surfaces and notifies the island")
+                && visibility.panels[1].overlayView.fullScreenHost.isHidden,
+               "selection progress refreshes both chooser surfaces")
         let hover = Chooser(.screenshot)
         hover.currentPointerLocation = CGPoint(x: 50, y: 50)
         let hoverView = hover.panels[0].overlayView
@@ -388,28 +337,6 @@ enum ScreenshotSelectionRefreshContract {
         hoverView.updatePointerHover(CGPoint(x: 25, y: 25))
         expect(hoverView.hoveredWindow?.windowID == 11,
                "enabling window highlights restores the hover target")
-        hoverView.setNotchCaptureControlsHeight(180)
-        hoverView.needsLayout = false
-        hoverView.fullScreenControlHoverChanged(true)
-        hoverView.setNotchCaptureControlsHeight(40)
-        expect(hoverView.notchCaptureControlsHeight == 180 && !hoverView.needsLayout,
-               "an island collapse cannot move the full-screen action while it is hovered")
-        hoverView.fullScreenControlHoverChanged(false)
-        expect(hoverView.notchCaptureControlsHeight == 40 && hoverView.needsLayout,
-               "the latest island geometry is applied as soon as the pointer leaves the action")
-        let hiddenHover = Chooser(.screenshot)
-        hiddenHover.currentPointerLocation = CGPoint(x: 50, y: 50)
-        let hiddenHoverView = hiddenHover.panels[0].overlayView
-        hiddenHoverView.refreshFullScreenControlVisibility()
-        hiddenHoverView.fullScreenControlHoverChanged(true)
-        hiddenHoverView.setNotchCaptureControlsHeight(180)
-        hiddenHover.activeTool = .recording
-        hiddenHoverView.refreshFullScreenControlVisibility()
-        expect(hiddenHoverView.fullScreenHost.isHidden
-                && !hiddenHoverView.fullScreenControlHovered
-                && hiddenHoverView.notchCaptureControlsHeight == 180
-                && !hiddenHoverView.hasDeferredNotchCaptureControlsHeight,
-               "hiding a hovered full-screen action clears hover and applies deferred island geometry")
         for other in [ScreenCaptureTool.screenshot, .text, .color] {
             for (from, to) in [
                 (ScreenCaptureTool.recording, other), (other, ScreenCaptureTool.recording),
@@ -421,7 +348,7 @@ enum ScreenshotSelectionRefreshContract {
                 expect(c.panels.allSatisfy { $0.overlayView.fullScreenHost.isHidden },
                        "changing capture tool hides the full-screen action until the refreshed source is ready")
                 expect(c.screenCaptureOptions?.offersRepeatLastRegion == c.offersRepeatLastRegion,
-                       "changing capture tool updates the island hint from the same decision as the overlay")
+                       "changing capture tool updates the chooser hint from the same decision as the overlay")
                 expect(
                     !c.acceptsCaptureInput, "changing tool blocks capture before the refresh task starts")
                 c.confirmRegion(CGRect(x: 0, y: 0, width: 20, height: 20), on: c.panels[0])

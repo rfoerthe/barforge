@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -91,7 +92,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return [.scrollInverter, .linearScroll, .focusFollowsMouse, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts, .switcher,
                                 .finderCutPaste, .autoQuit,
                                 .shelf, .windowMaximizer, .dockPreview, .keyboardDebounce, .dockClick, .spacesOrder,
-                                .middleClick, .textSnippets, .superKey, .radialMenu, .mouseClickDebounce, .notch]
+                                .middleClick, .textSnippets, .superKey, .radialMenu, .mouseClickDebounce]
         case .toggles: return [.quickToggles, .micMute]
         case .wallpaper: return [.wallpaper]
         }
@@ -380,7 +381,7 @@ struct PanelReorderableItem<Item: PanelOrderItem, Content: View>: View {
                 .onDrag(itemProvider) {
                     content()
                         .frame(minWidth: 220, alignment: .leading)
-                        .panelCard(interactive: false, padded: false)
+                        .panelCard(padded: false)
                 }
         } else {
             content()

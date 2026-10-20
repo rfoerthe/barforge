@@ -46,10 +46,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     private var feedbackWindow: NSWindow?
     private var onboardingWindow: NSWindow?
     private var supportIntroWindow: NSWindow?
-    private var updateHighlightsWindow: NSWindow?
     private var supportIntroCanClose = false
     private var supportIntroIsReview = false
-    private var updateHighlightsIsReview = false
     private var updateShowcaseWindow: NSWindow?
     private var updatePreviewWindow: NSWindow?
     private var whatsNewWindow: NSWindow?
@@ -180,7 +178,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
                     .dockPreview, .finderCutPaste, .finderRename, .autoQuit, .dockClick,
                     .middleClick, .windowMaximizer, .keyboardDebounce, .windowLayout,
                     .textSnippets, .brightness, .radialMenu, .mouseButtonShortcuts,
-                    .mouseClickDebounce, .superKey, .quitWindowProtection, .mixer, .musicBlock, .notch,
+                    .mouseClickDebounce, .superKey, .quitWindowProtection, .mixer, .musicBlock,
                     .logitechMX,
                 ])
             }
@@ -212,10 +210,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             #if VORSSAINT_DEVELOPMENT
-            if CommandLine.arguments.contains("--preview-notch-tour") {
-                self.showUpdateHighlights(isReview: true)
-                return
-            }
             // `--preview-whats-new [version]`: the post-update window for an
             // update from that version (this one by default), with the
             // changelog's unreleased notes on top. Nothing is marked as seen.
@@ -234,7 +228,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
                 // queued for the What's New window first, so a start that
                 // goes wrong before the window opens still shows it next time.
                 let previousVersion = defaults.string(forKey: DefaultsKey.lastUpdateIntroVersion)
-                self.queueBrightnessUpdatePromptIfNeeded(previousVersion: previousVersion)
                 self.queueWhatsNewIfNeeded(previousVersion: previousVersion)
                 defaults.set(OnboardingInfo.currentFeatureSet, forKey: DefaultsKey.featuresOnboardingVersion)
                 defaults.set(AppInfo.version, forKey: DefaultsKey.lastUpdateIntroVersion)
@@ -300,7 +293,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     func applicationWillTerminate(_ notification: Notification) {
         isTerminating = true
         CommandBarService.shared.restoreBorrowedInputSource()
-        if AppFeature.notch.isAvailable { NotchService.shared.stop(restoreCapture: false) }
         // Quitting properly means the start worked, whenever it happened.
         endStartupWatch()
         if AppFeature.brightness.isAvailable {
@@ -373,7 +365,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         // born in (the far right of the status area) while the icon draws at the
         // user's arranged spot, and that mismatch strands the panel against the
         // screen edge and survives relaunches. An item the app took out of the
-        // bar itself, for Dynamic Island or for metrics, is not missing either:
+        // bar itself, for metrics, is not missing either:
         // a rebuild would only hide it again, and Settings opens below.
         if statusController?.mainItemHiddenByChoice != true, !iconIsOnScreen() {
             statusController?.recreateStatusItem()
@@ -487,9 +479,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     private func toggleMainPopover() {
-        if NotchSupport.routesAppPanel(), NotchService.shared.acceptsSystemFeedback {
-            NotchService.shared.openAppPanel(toggle: true); return
-        }
         if !popoverIsOpen {
             MenuPanelFocus.shared.showNormalPanel()
         }
@@ -502,10 +491,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     private func showMetricPanel(for metric: MenuBarMetric, anchoredTo button: NSStatusBarButton) {
         let detailKind = metric.detailKind
-        if NotchSupport.routesAppPanel(), NotchService.shared.acceptsSystemFeedback,
-           NotchSupport.modules().contains(.system) {
-            NotchService.shared.showMetric(detailKind, toggle: true); return
-        }
         if popoverIsOpen {
             if MenuPanelFocus.shared.activeMetric == detailKind {
                 metricAnchorSwitchSerial &+= 1
@@ -1199,9 +1184,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     /// Callers other than the dismissal paths are panel actions, so `reason`
     /// defaults to one that leaves activation alone.
     func closePopover(animated: Bool = true, after delay: TimeInterval = 0,
-                      preservingNotch: Bool = false, reason: PanelCloseReason = .action,
+                      reason: PanelCloseReason = .action,
                       completion: (() -> Void)? = nil) {
-        if !preservingNotch, NotchSupport.isEnabled() { NotchService.shared.collapse() }
         if delay <= 0 {
             closePopoverNow(animated: animated, reason: reason, completion: completion)
             return
@@ -1899,11 +1883,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     /// after the frame settles this checks the icon really made it on screen
     /// and, if not, says so instead of looking like the button did nothing.
     func reshowStatusItem() {
-        // The button is an explicit "I want the icon back": neither hiding
-        // option may immediately re-hide what the user just asked to see
+        // The button is an explicit "I want the icon back": the hiding
+        // option may not immediately re-hide what the user just asked to see
         // (and then trip the "still hidden" alert).
         UserDefaults.standard.set(false, forKey: DefaultsKey.menuBarHideIconWithMetrics)
-        UserDefaults.standard.set(false, forKey: DefaultsKey.notchHidesMenuBarIcon)
         guard !isReshowingStatusItem else { return }
         isReshowingStatusItem = true
         statusController?.recreateStatusItem()
@@ -1929,9 +1912,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.reshowVerifyInterval) { [weak self] in
             guard let self else { return }
             // A later choice to hide the icon cancels the explicit recovery.
-            guard !UserDefaults.standard.bool(forKey: DefaultsKey.menuBarHideIconWithMetrics),
-                  !MenuBarSpacingSupport.islandHidesStatusIcon(
-                    in: .standard, hiddenInFullscreen: self.statusController?.islandHiddenInFullscreen == true) else {
+            guard !UserDefaults.standard.bool(forKey: DefaultsKey.menuBarHideIconWithMetrics) else {
                 self.isReshowingStatusItem = false
                 return
             }
@@ -2064,113 +2045,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     /// retain their own release gates.
     private func presentUpdateIntros() {
         if showWhatsNewIfNeeded() { return }
-        if showUpdateHighlightsIfNeeded() { return }
         if !AppInfo.isBeta {
             if showSupportUpdateIntroIfNeeded() { return }
             if showUpdateShowcaseIntroIfNeeded() { return }
-        }
-        showBrightnessUpdatePromptIfNeeded()
-    }
-
-    private func brightnessSetupNeeded() -> Bool {
-        let defaults = UserDefaults.standard
-        return BrightnessUpdatePromptInfo.needsSetup(
-            notchAvailable: AppFeature.notch.isAvailable,
-            brightnessAvailable: AppFeature.brightness.isAvailable,
-            notchEnabled: defaults.bool(forKey: DefaultsKey.notchEnabled),
-            notchBrightness: defaults.bool(forKey: DefaultsKey.notchBrightness),
-            brightnessEnabled: defaults.bool(forKey: DefaultsKey.brightnessControlEnabled))
-    }
-
-    private func queueBrightnessUpdatePromptIfNeeded(previousVersion: String?) {
-        let defaults = UserDefaults.standard
-        guard defaults.string(forKey: DefaultsKey.brightnessUpdatePromptState) == nil,
-              !AppInfo.isDeveloperBuild,
-              BrightnessUpdatePromptInfo.isUpgrade(appVersion: AppInfo.version,
-                                                   previousVersion: previousVersion) else { return }
-        defaults.set(brightnessSetupNeeded() ? BrightnessUpdatePromptInfo.pending : BrightnessUpdatePromptInfo.handled,
-                     forKey: DefaultsKey.brightnessUpdatePromptState)
-    }
-
-    private func showBrightnessUpdatePromptIfNeeded() {
-        let defaults = UserDefaults.standard
-        guard !isTerminating,
-              defaults.string(forKey: DefaultsKey.brightnessUpdatePromptState)
-                == BrightnessUpdatePromptInfo.pending else { return }
-        guard brightnessSetupNeeded() else {
-            defaults.set(BrightnessUpdatePromptInfo.handled, forKey: DefaultsKey.brightnessUpdatePromptState)
-            return
-        }
-        let language = L10n.shared.language
-        let strings = FeatureStrings.brightness(language)
-        let alert = NSAlert()
-        alert.alertStyle = .informational
-        alert.messageText = strings.islandPromptTitle
-        alert.informativeText = strings.islandPromptMessage
-        alert.addButton(withTitle: FeatureStrings.commandBar(language).actionOpenSettings)
-        // The invitation is not repeated, so the other choice says what stays.
-        alert.addButton(withTitle: strings.islandPromptKeepOff)
-        NSApp.activate(ignoringOtherApps: true)
-        let response = alert.runModal()
-        defaults.set(BrightnessUpdatePromptInfo.handled, forKey: DefaultsKey.brightnessUpdatePromptState)
-        if response == .alertFirstButtonReturn {
-            SettingsRouter.shared.request(AppFeature.brightness.settingsDestination)
-            openSettingsWindow()
-        }
-    }
-
-    private func showUpdateHighlightsIfNeeded() -> Bool {
-        guard UpdateHighlightsInfo.shouldShow(
-            appVersion: AppInfo.version,
-            lastSeenVersion: UserDefaults.standard.string(forKey: DefaultsKey.updateHighlightsSeenVersion)
-        ) else { return false }
-        showUpdateHighlights()
-        return true
-    }
-
-    func showUpdateHighlights(isReview: Bool = false) {
-        closePopover()
-        if let window = updateHighlightsWindow {
-            centerIntroWindow(window)
-            NSApp.activate(ignoringOtherApps: true)
-            window.makeKeyAndOrderFront(nil)
-            return
-        }
-        let host = NSHostingController(rootView: UpdateHighlightsView(
-            onFinish: { [weak self] in self?.updateHighlightsWindow?.close() }
-        ))
-        host.sizingOptions = .preferredContentSize
-        let window = NSPanel(contentViewController: host)
-        window.title = L10n.shared.s.highlightsTitle
-        window.styleMask = [.titled, .closable, .fullSizeContentView]
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
-        window.isReleasedWhenClosed = false
-        window.isRestorable = false
-        window.isMovableByWindowBackground = true
-        window.isFloatingPanel = true
-        window.level = .floating
-        window.hidesOnDeactivate = false
-        window.delegate = self
-        centerIntroWindow(window)
-        updateHighlightsIsReview = isReview
-        updateHighlightsWindow = window
-        NSApp.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-        DispatchQueue.main.async { [weak self, weak window] in
-            guard let self, let window, window === self.updateHighlightsWindow else { return }
-            self.centerIntroWindow(window)
-        }
-    }
-
-    func openSettingsFromHighlights() {
-        openSettingsWindow()
-        // Run after Settings has applied its own initial placement. Ordering the
-        // panel does not take keyboard focus away from the configuration controls.
-        DispatchQueue.main.async { [weak self] in
-            guard let self, let tour = self.updateHighlightsWindow, tour.isVisible else { return }
-            self.positionTourBesideSettings(tour)
-            tour.orderFront(nil)
         }
     }
 
@@ -2181,12 +2058,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             settingsSize: settings.frame.size, tourSize: tour.frame.size, visibleFrame: visible)
         settings.setFrameOrigin(placement.settings.origin)
         tour.setFrameOrigin(placement.tour.origin)
-    }
-
-    private func markUpdateHighlightsSeen() {
-        guard let marker = UpdateHighlightsInfo.seenVersion(for: AppInfo.version) else { return }
-        UserDefaults.standard.set(marker,
-                                  forKey: DefaultsKey.updateHighlightsSeenVersion)
     }
 
     /// Records an update the What's New window still has to cover. A second
@@ -2417,10 +2288,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     /// the top instead of hanging below it.
     private func centerIntroWindow(_ window: NSWindow) {
         let visible = (window.screen ?? popover.contentViewController?.view.window?.screen)?.visibleFrame ?? NSScreen.pointerVisibleFrame
-        if let host = window.contentViewController as? NSHostingController<UpdateHighlightsView>,
-           host.rootView.availableSize != visible.size {
-            host.rootView.availableSize = visible.size
-        }
         if let host = window.contentViewController as? NSHostingController<WhatsNewDigestView>,
            host.rootView.availableSize != visible.size {
             host.rootView.availableSize = visible.size
@@ -2574,18 +2441,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             markUpdateShowcaseIntroSeen()
             finishedUpdateIntro = true
         }
-        if window === updateHighlightsWindow {
-            updateHighlightsWindow = nil
-            let isReview = updateHighlightsIsReview
-            updateHighlightsIsReview = false
-            guard !isTerminating else { return }
-            if isReview {
-                DispatchQueue.main.async { [weak self] in self?.showSupportUpdateIntro(isReview: true) }
-                return
-            }
-            markUpdateHighlightsSeen()
-            finishedUpdateIntro = true
-        }
         if window === whatsNewWindow {
             whatsNewWindow = nil
             let isReview = whatsNewIsReview
@@ -2608,13 +2463,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         UserDefaults.standard.set(true, forKey: DefaultsKey.hasOnboarded)
         UserDefaults.standard.set(OnboardingInfo.currentFeatureSet, forKey: DefaultsKey.featuresOnboardingVersion)
         UserDefaults.standard.set(AppInfo.version, forKey: DefaultsKey.lastUpdateIntroVersion)
-        UserDefaults.standard.set(BrightnessUpdatePromptInfo.handled,
-                                  forKey: DefaultsKey.brightnessUpdatePromptState)
         markSupportUpdateIntroSeenIfCurrentUpdate()
         markUpdateShowcaseIntroSeenIfCurrentUpdate()
-        // A clean install that just saw everything in onboarding should not
-        // then get the update tour; only people who updated get it.
-        markUpdateHighlightsSeen()
         // Nor treat the features it was just offered as new on the next
         // update, or a restored backup's older version as an update.
         if UserDefaults.standard.string(forKey: DefaultsKey.whatsNewKnownFeatures) == nil {
@@ -2623,9 +2473,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         UserDefaults.standard.set(
             WhatsNewInfo.later(UserDefaults.standard.string(forKey: DefaultsKey.whatsNewSeenVersion), AppInfo.version),
             forKey: DefaultsKey.whatsNewSeenVersion)
-        // Setup just picked the installed features; a beta adds the companion
-        // for a Command Bar user now.
-        Defaults.installCompanionForBetaCommandBar(in: .standard)
     }
 
     private func markSupportUpdateIntroSeenIfCurrentUpdate() {

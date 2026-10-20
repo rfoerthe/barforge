@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -404,11 +405,7 @@ private struct RadialCanvasChip: View {
 
     @ViewBuilder
     private var chipIcon: some View {
-        if item.mediaKey == .nowPlaying {
-            Image(systemName: "music.note")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(isHighlighted ? AnyShapeStyle(.white) : AnyShapeStyle(.white.opacity(0.9)))
-        } else if item.symbolName.isEmpty, let customImage = RadialMenuIconStore.customIcon(for: item) {
+        if item.symbolName.isEmpty, let customImage = RadialMenuIconStore.customIcon(for: item) {
             Image(nsImage: customImage)
                 .resizable()
                 .interpolation(.high)

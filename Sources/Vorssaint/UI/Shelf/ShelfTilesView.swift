@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -96,9 +97,6 @@ struct ShelfTilesView: NSViewRepresentable {
     var pinnedIDs: Set<UUID>
     var revealID: UUID?
     var revealSerial: Int
-    /// The island lays tiles out sideways: rows fill its height and columns
-    /// continue past its edge, so a short strip never scrolls down.
-    var sideways = false
 
     static let tileSize = NSSize(width: 78, height: 88)
     static let spacing: CGFloat = 10
@@ -108,31 +106,16 @@ struct ShelfTilesView: NSViewRepresentable {
         // A view built now has nothing to reveal: the docked shelf rebuilds
         // one whenever a drag comes near, and it must open where it left off.
         context.coordinator.revealedSerial = revealSerial
-        let scroll = ResizingScrollView()
-        // SwiftUI lays the strip out before it has a size, so the sideways
-        // strip lays out again on resize, keeping its tiles while one is dragged.
-        let coordinator = context.coordinator
-        scroll.sizeChanged = { [weak scroll, sideways] in
-            guard sideways, let scroll, let items = coordinator.lastRebuiltItems,
-                  !ShelfService.shared.isInternalDragActive else { return }
-            Self.rebuildTiles(scroll: scroll, items: items,
-                              selection: coordinator.lastRebuiltSelection ?? [],
-                              expandedBatches: coordinator.lastRebuiltExpandedBatches ?? [],
-                              pinnedIDs: coordinator.lastRebuiltPinnedIDs ?? [],
-                              coordinator: coordinator)
-        }
+        let scroll = NSScrollView()
         scroll.drawsBackground = false
         scroll.hasHorizontalScroller = false
         scroll.hasVerticalScroller = false
         scroll.scrollerStyle = .overlay
-        scroll.horizontalScrollElasticity = sideways ? .allowed : .none
-        scroll.verticalScrollElasticity = sideways ? .none : .allowed
+        scroll.horizontalScrollElasticity = .none
+        scroll.verticalScrollElasticity = .allowed
         scroll.contentView.drawsBackground = false
         let document = FlippedView()
-        // The island's own surface takes drops there, so a media drop can
-        // still offer optimizing instead of landing straight on the shelf.
-        document.acceptsDrops = !sideways
-        document.sideways = sideways
+        document.acceptsDrops = true
         scroll.documentView = document
         return scroll
     }
@@ -168,22 +151,14 @@ struct ShelfTilesView: NSViewRepresentable {
         let tile = Self.tileSize
         let inset = Self.inset
         let spacing = Self.spacing
-        // The document remembers its flow, so a rebuild started by a tile
-        // after a merge lays out the same way SwiftUI did.
-        let sideways = (document as? FlippedView)?.sideways == true
         let contentWidth = max(scroll.contentSize.width, 276)
         let columns = ShelfTileLayout.columnCount(contentWidth: contentWidth,
                                                    tileWidth: tile.width,
                                                    spacing: spacing,
                                                    inset: inset)
-        let rows = sideways
-            ? ShelfTileLayout.rowCount(contentHeight: scroll.contentSize.height, tileHeight: tile.height,
-                                       spacing: spacing, inset: inset)
-            : max(1, Int(ceil(Double(items.count) / Double(columns))))
+        let rows = max(1, Int(ceil(Double(items.count) / Double(columns))))
         let frame: (Int) -> CGRect = { index in
-            sideways
-                ? ShelfTileLayout.sidewaysTileFrame(index: index, rows: rows, tileSize: tile, spacing: spacing, inset: inset)
-                : ShelfTileLayout.tileFrame(index: index, columns: columns, tileSize: tile, spacing: spacing, inset: inset)
+            ShelfTileLayout.tileFrame(index: index, columns: columns, tileSize: tile, spacing: spacing, inset: inset)
         }
 
         // Item.== is id-only (by design, for selection/lookup purposes
@@ -225,20 +200,12 @@ struct ShelfTilesView: NSViewRepresentable {
             view.frame = frame(index)
             document.addSubview(view)
         }
-        if sideways {
-            let size = ShelfTileLayout.sidewaysDocumentSize(itemCount: items.count, rows: rows,
-                                                             visibleSize: scroll.contentSize, tileSize: tile,
-                                                             spacing: spacing, inset: inset)
-            scroll.hasHorizontalScroller = size.width > scroll.contentSize.width + 1
-            document.frame = NSRect(origin: .zero, size: size)
-        } else {
-            let contentHeight = inset * 2 + CGFloat(rows) * tile.height + CGFloat(max(0, rows - 1)) * spacing
-            scroll.hasVerticalScroller = contentHeight > scroll.contentSize.height + 1
-            document.frame = NSRect(x: 0,
-                                    y: 0,
-                                    width: contentWidth,
-                                    height: max(contentHeight, scroll.contentSize.height))
-        }
+        let contentHeight = inset * 2 + CGFloat(rows) * tile.height + CGFloat(max(0, rows - 1)) * spacing
+        scroll.hasVerticalScroller = contentHeight > scroll.contentSize.height + 1
+        document.frame = NSRect(x: 0,
+                                y: 0,
+                                width: contentWidth,
+                                height: max(contentHeight, scroll.contentSize.height))
         if let coordinator {
             revealIfNeeded(in: document, frame: frame, items: items,
                            revealID: revealID, revealSerial: revealSerial, coordinator: coordinator)
@@ -291,26 +258,8 @@ struct ShelfTilesView: NSViewRepresentable {
         }
     }
 
-    private final class ResizingScrollView: NSScrollView {
-        var sizeChanged: (() -> Void)?
-
-        override func setFrameSize(_ newSize: NSSize) {
-            let oldSize = frame.size
-            super.setFrameSize(newSize)
-            if newSize != oldSize { sizeChanged?() }
-        }
-    }
-
     private final class FlippedView: ShelfPanelMoveView {
-        var sideways = false
         override var isFlipped: Bool { true }
-
-        // The island is a fixed window, so its empty tile space must not
-        // drag it the way it drags the floating shelf.
-        override func mouseDown(with event: NSEvent) {
-            guard !sideways else { return }
-            super.mouseDown(with: event)
-        }
     }
 }
 
@@ -526,7 +475,7 @@ final class ShelfTileView: NSView, NSDraggingSource {
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
-    // A window that is not key, like the reopened island, only passes the
+    // A window that is not key only passes the
     // first click to a view that accepts first mouse, which the thumbnail and
     // title do not. The buttons keep their own clicks.
     override func hitTest(_ point: NSPoint) -> NSView? {

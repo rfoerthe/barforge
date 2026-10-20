@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -204,7 +205,6 @@ enum ScreenshotFeatureTests {
             hideVorssaintWindows: false,
             protectedWindowIDs: protectedScreenshotWindows
         ), "screenshot cannot pick its own protected capture UI")
-        islandCaptureChecks(suite)
 
         // Another process can draw a border around a window as a window of its
         // own; clicking there has to capture the window it surrounds.
@@ -898,11 +898,11 @@ enum ScreenshotFeatureTests {
             dismissInterval: 3, prefersFocus: false)
         let persistentPolicy = ScreenshotSupport.confirmationPreviewPresentationPolicy(
             dismissInterval: nil, prefersFocus: true)
-        suite.expect(focusedTimedPolicy.takesFocus && !focusedTimedPolicy.closesOnCollapse
+        suite.expect(focusedTimedPolicy.takesFocus
                 && !focusedTimedPolicy.showsDismissButton
-                && !quietTimedPolicy.takesFocus && !quietTimedPolicy.closesOnCollapse
+                && !quietTimedPolicy.takesFocus
                 && !quietTimedPolicy.showsDismissButton
-                && !persistentPolicy.takesFocus && persistentPolicy.closesOnCollapse
+                && !persistentPolicy.takesFocus
                 && persistentPolicy.showsDismissButton,
                "preview presentation keeps timed focus behavior while persistent confirmations stay dismissible without taking focus")
         let focusDefaultsDomain = "com.vorssaint.tests.screenshot-preview-focus.\(UUID().uuidString)"
@@ -1251,17 +1251,13 @@ enum ScreenshotFeatureTests {
                     selectionInProgress: false,
                     capturePending: false),
                "the full-screen action stays on the pointer display and disappears as soon as selection or capture starts")
-        suite.expect(ScreenshotSupport.fullScreenCaptureControlTopInset(
-            screenChromeHeight: 32,
-            notchControlsHeight: nil) == 44
-                && ScreenshotSupport.fullScreenCaptureControlTopInset(
-                    screenChromeHeight: 32,
-                    notchControlsHeight: 168) == 180,
-               "the full-screen action sits below screen chrome and any active notch capture controls")
+        suite.expect(ScreenshotSupport.fullScreenCaptureControlTopInset(screenChromeHeight: 32) == 44
+                && ScreenshotSupport.fullScreenCaptureControlTopInset(screenChromeHeight: .nan) == 12,
+               "the full-screen action sits below screen chrome")
         let fullScreenClickHost = PassThroughHostingView(interactiveRootView: Text("Full screen"))
         suite.expect(!fullScreenClickHost.passesThrough
                 && fullScreenClickHost.acceptsFirstMouse(for: nil),
-               "the interactive full-screen host receives its first click while Dynamic Island owns key focus")
+               "the interactive full-screen host receives its first click on a display that is not key")
         suite.expect(ScreenshotSupport.offersRepeatLastRegion(isPickingColor: false,
                                                         storedRegionDisplayIsAvailable: true),
                "the repeat hint is offered once a region is stored on a display still in the session")
@@ -1324,18 +1320,12 @@ enum ScreenshotFeatureTests {
                 && routeBody.components(separatedBy: "autoShelve(").count == 2
                 && routeBody.contains("autoShelve(capture, saved: result.saved?.url)"),
                "a capture that does not open in the editor is offered to the shelf once, and discarding it from its preview takes it back")
-        // In the island the menu arrow is hidden, so a click there must open
-        // the durations rather than publish at once.
         let shareMenuCode = ((try? String(
             contentsOfFile: "Sources/Vorssaint/Services/QuickTools/ScreenshotQuickPreviewController.swift",
-            encoding: .utf8)) ?? "").components(separatedBy: "@ViewBuilder private var shareMenu: some View {")
+            encoding: .utf8)) ?? "").components(separatedBy: "    private var shareMenu: some View {")
             .dropFirst().first?.components(separatedBy: "private var shareDurations").first ?? ""
-        let embeddedShareMenu = shareMenuCode.components(separatedBy: "} else {").first ?? ""
-        let floatingShareMenu = shareMenuCode.components(separatedBy: "} else {").dropFirst().first ?? ""
-        suite.expect(embeddedShareMenu.contains("Menu { shareDurations } label: { shareMenuLabel },")
-                && !embeddedShareMenu.contains("primaryAction")
-                && floatingShareMenu.contains("primaryAction: {\n                share(.saved())"),
-               "the island's link button opens the durations on a click, while the floating preview keeps its split button")
+        suite.expect(shareMenuCode.contains("Menu { shareDurations } label: { shareMenuLabel } primaryAction: {\n            share(.saved())"),
+               "the preview's link button publishes on a click and opens the durations from its arrow")
         let captureServiceSource = (try? String(
             contentsOfFile: "Sources/Vorssaint/Services/QuickTools/ScreenCaptureService.swift",
             encoding: .utf8)) ?? ""
@@ -1376,11 +1366,6 @@ enum ScreenshotFeatureTests {
                 && presentLines[makeKeyLine - 1].trimmingCharacters(in: .whitespaces)
                     == "if presentationPolicy.takesFocus {",
                "the screenshot preview takes key focus only behind the presentation policy, once the panel is on screen")
-        // The island reads the same policy: whether it takes the keyboard and
-        // whether a collapse closes the preview come from it, never a literal.
-        suite.expect(quickPreviewCode.contains("takeFocus: presentationPolicy.takesFocus,")
-                && quickPreviewCode.contains("closeOnCollapse: presentationPolicy.closesOnCollapse,"),
-               "the island preview takes the keyboard and closes on collapse exactly as the presentation policy says")
         let makeKeyCount = quickPreviewCode.components(separatedBy: "makeKey").count - 1
         let panelMakeKeyCount = panelBody.components(separatedBy: "makeKey").count - 1
         suite.expect(makeKeyCount == panelMakeKeyCount + 1 && panelMakeKeyCount >= 1,
@@ -3792,9 +3777,8 @@ enum ScreenshotFeatureTests {
         ]
         suite.expect(scratchpadHitTargetContracts.allSatisfy { scratchpadViewSource.contains($0) },
                "the scratchpad tab bar and header controls keep their full padded hit targets")
-        // The island's toggle runs in NotchCompactTests; the floating pad hands
-        // its checkboxes to the same service method, which edits through the
-        // registered text view.
+        // The floating pad hands its checkboxes to the service, which edits
+        // through the registered text view.
         suite.expect(scratchpadViewSource.contains("onToggleTask: { service.toggleTask(box: $0) }"),
                "the floating pad's checkboxes edit through the service, so a click is one undoable edit")
         suite.expect(ScratchpadRetention.sanitized("day") == .day
@@ -3992,7 +3976,6 @@ enum ScreenshotFeatureTests {
         // pointed at a device of its own has to go silent too.
         suite.expect(MicMuteSupport.isOwnDevice(name: "Barforge Mixer")
                 && MicMuteSupport.isOwnDevice(name: "Barforge AirPlay")
-                && MicMuteSupport.isOwnDevice(name: "Barforge Island Levels")
                 && MicMuteSupport.isOwnDevice(name: "Barforge Recorder")
                 && !MicMuteSupport.isOwnDevice(name: "MacBook Air Microphone"),
                "the mute skips the app's own aggregate devices and no other")
@@ -4125,48 +4108,6 @@ enum ScreenshotFeatureTests {
                 == [.screenshot, .colorPicker],
                "capture roles are reordered for display and other roles fall away")
         GlobalShortcut.refreshLayoutLabels()
-    }
-
-    /// The island follows "Show in screenshots and videos" in Vorssaint's own
-    /// captures too, area selections included, except while it is the tool
-    /// taking the picture.
-    private static func islandCaptureChecks(_ suite: TestSuite) {
-        let island: CGWindowID = 20, copy: CGWindowID = 21, editor: CGWindowID = 11, overlay: CGWindowID = 12
-        let islandWindows: Set<CGWindowID> = [island, copy]
-        let ownWindows: Set<CGWindowID> = [editor, overlay, island, copy]
-        func shown(preference: Bool, tool: Bool) -> Set<CGWindowID> {
-            ScreenshotCapturePolicy.islandCaptureWindowIDs(
-                islandWindowIDs: islandWindows, mainWindowID: island,
-                showsInCaptures: preference, showsCaptureTool: tool)
-        }
-        suite.expect(shown(preference: true, tool: false) == islandWindows,
-                     "the island at rest, or open on a page, is in the picture when it shows in captures")
-        suite.expect(shown(preference: true, tool: true) == [copy],
-                     "the capture controls or a capture just taken stay out; copies on other displays stay in")
-        suite.expect(shown(preference: false, tool: false).isEmpty && shown(preference: false, tool: true).isEmpty,
-                     "the island stays out of every capture when it does not show in captures")
-
-        for tool in [false, true] {
-            let visible = shown(preference: true, tool: tool)
-            // What NotchService protects: the island windows not shown.
-            let protected = islandWindows.subtracting(visible).union([overlay])
-            let hidden = ScreenshotCapturePolicy.excludedWindowIDs(
-                hideVorssaintWindows: true, ownWindowIDs: ownWindows,
-                protectedWindowIDs: protected, islandWindowIDs: visible)
-            suite.expect(hidden == ownWindows.subtracting(visible),
-                         "hiding Barforge windows leaves the shown island in (capture tool: \(tool))")
-            let kept = ScreenshotCapturePolicy.excludedWindowIDs(
-                hideVorssaintWindows: false, ownWindowIDs: ownWindows,
-                protectedWindowIDs: protected, islandWindowIDs: visible)
-            suite.expect(kept == protected,
-                         "showing Barforge windows still keeps the capture interface out (capture tool: \(tool))")
-        }
-        // Watch reads an area and must never see the island, whatever the preference says.
-        suite.expect(ScreenshotCapturePolicy.excludedWindowIDs(
-            hideVorssaintWindows: true, ownWindowIDs: ownWindows,
-            protectedWindowIDs: islandWindows.union([overlay]),
-            islandWindowIDs: shown(preference: true, tool: false)) == ownWindows,
-                     "a caller that protects the island keeps it out even when it shows in captures")
     }
 }
 

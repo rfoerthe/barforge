@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import CoreServices
@@ -225,14 +226,14 @@ private enum MusicReplacementPlayback {
 
     static func start(_ app: NSRunningApplication) {
         guard let url = app.bundleURL,
-              let command = NotchMusicAutomationCapabilities.load(bundleURL: url)?.playCommand else { return }
+              let command = MusicPlayCommand.load(bundleURL: url) else { return }
         let launching = !app.isFinishedLaunching
         let deadline = ProcessInfo.processInfo.systemUptime + MusicLaunchSupport.replacementLaunchTimeout
         queue.async { waitForLaunch(app, command: command, launching: launching, deadline: deadline) }
     }
 
     private static func waitForLaunch(_ app: NSRunningApplication,
-                                      command: NotchMusicAutomationCapabilities.Event,
+                                      command: MusicPlayCommand,
                                       launching: Bool, deadline: TimeInterval) {
         guard !app.isTerminated, ProcessInfo.processInfo.systemUptime < deadline else { return }
         guard app.isFinishedLaunching else {
@@ -248,7 +249,7 @@ private enum MusicReplacementPlayback {
         }
     }
 
-    private static func send(_ command: NotchMusicAutomationCapabilities.Event,
+    private static func send(_ command: MusicPlayCommand,
                              to app: NSRunningApplication, attemptsLeft: Int) {
         guard !app.isTerminated else { return }
         let target = NSAppleEventDescriptor(processIdentifier: app.processIdentifier)

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AVFoundation
@@ -143,14 +144,13 @@ private final class AsyncResultBox<T>: @unchecked Sendable {
     }
 }
 
-/// A workspace can outlive its visible panel while its requested export runs.
+/// What a media workspace has chosen, kept apart from its view.
 final class MediaWorkspaceSelection: ObservableObject {
     @Published var inputURLs: [URL] = []
     @Published var inputImageSize: CGSize?
     @Published var outputURL: URL?
     @Published var outputWasChosenManually = false
-    @Published var tool: MediaTool?
-    var loadedInitialInputs = false
+    var hasAppeared = false
     var durationLoading = MediaDurationLoading()
 }
 

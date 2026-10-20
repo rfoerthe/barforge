@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -63,7 +64,7 @@ enum ClipboardSensitiveTextPreferenceTests {
         suite.expect(restored != nil && restored?[legacyKey] == nil && restored?[key] == nil
                      && restored?[DefaultsKey.clipboardHistoryIgnoredApps] as? [String] == ignoredApps,
                      "restoring an older backup cannot silently enable text guessing")
-        suite.expect(SettingsBackupSupport.keysToClear(whenImporting: restored ?? [:]).contains(key),
+        suite.expect(SettingsBackupSupport.exportKeys().contains(key),
                      "an older backup replaces an existing opt-in with the new off default")
         for choice in [true, false] {
             let payload = SettingsBackupSupport.payload(appVersion: "test") { candidate in

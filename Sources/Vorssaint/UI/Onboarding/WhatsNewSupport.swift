@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -18,8 +19,7 @@ struct WhatsNewRow: Identifiable, Equatable {
     let id: ID
     let title: String
     let icon: String
-    /// The feature the row stands for, when it stands for a single one. The
-    /// Dynamic Island row stands for the island, not for its extensions.
+    /// The feature the row stands for, when it stands for a single one.
     let feature: AppFeature?
     let destination: FeatureSettingsDestination?
     let changes: [ReleaseChange]
@@ -51,10 +51,8 @@ struct WhatsNewSections: Equatable {
 enum WhatsNewSupport {
     /// Installed features group under the row Settings shows them in, in the
     /// Settings order, with app-wide changes last. Features left out of the
-    /// Mac's install are listed one by one, since each installs on its own;
-    /// a Dynamic Island extension does nothing without the island, so it
-    /// counts as installed only beside it. New features come first and
-    /// appear nowhere else.
+    /// Mac's install are listed one by one, since each installs on its own.
+    /// New features come first and appear nowhere else.
     static func sections(digest: ReleaseDigest,
                          newFeatures: [AppFeature],
                          sidebarItems: [SettingsSidebarItem],
@@ -62,10 +60,6 @@ enum WhatsNewSupport {
                          title: (AppFeature) -> String,
                          generalTitle: String) -> WhatsNewSections {
         let introduced = Set(newFeatures)
-        func isInstalled(_ feature: AppFeature) -> Bool {
-            isAvailable(feature)
-                && (feature.group != .dynamicIsland || feature == .notch || isAvailable(.notch))
-        }
         var installedChanges: [WhatsNewRow.ID: [ReleaseChange]] = [:]
         var missingChanges: [AppFeature: [ReleaseChange]] = [:]
         func add(_ change: ReleaseChange, to list: inout [ReleaseChange]?) {
@@ -76,7 +70,7 @@ enum WhatsNewSupport {
                 add(change, to: &installedChanges[.general])
             }
             for feature in change.features where !introduced.contains(feature) {
-                if isInstalled(feature) {
+                if isAvailable(feature) {
                     add(change, to: &installedChanges[rowID(for: feature, in: sidebarItems)])
                 } else {
                     add(change, to: &missingChanges[feature])
@@ -117,17 +111,15 @@ enum WhatsNewSupport {
         return sections
     }
 
-    /// The Settings sidebar row an installed feature belongs to. Dynamic
-    /// Island extensions, the companion included, live on the island's page;
-    /// a feature Settings files under the General page, or keeps only in the
-    /// Features page, gets a row of its own beside them.
+    /// The Settings sidebar row an installed feature belongs to. A feature
+    /// Settings files under the General page, or keeps only in the Features
+    /// page, gets a row of its own beside them.
     static func rowID(for feature: AppFeature, in items: [SettingsSidebarItem]) -> WhatsNewRow.ID {
         let ids = Set(items.map(\.id))
         if ids.contains(.feature(feature)) { return .settings(.feature(feature)) }
         let page = feature.settingsDestination.page
         if page == .general { return .general }
         if page != .features, ids.contains(.page(page)) { return .settings(.page(page)) }
-        if feature.group == .dynamicIsland, ids.contains(.page(.notch)) { return .settings(.page(.notch)) }
         return .feature(feature)
     }
 
@@ -148,8 +140,7 @@ enum WhatsNewSupport {
     }
 
     /// The one feature a Settings row stands for, if any: a tool row, or a
-    /// page that belongs to a single feature (the Dynamic Island page counts
-    /// as the island's, not its extensions'). The System Monitor page holds
+    /// page that belongs to a single feature. The System Monitor page holds
     /// several and stands for none.
     static func representedFeature(of id: SettingsSidebarItem.ID) -> AppFeature? {
         switch id {
@@ -157,7 +148,6 @@ enum WhatsNewSupport {
         case .page(let page):
             let owners = AppFeature.allCases.filter {
                 $0.settingsDestination == FeatureSettingsDestination(page)
-                    && !AppFeature.dynamicIslandExtensions.contains($0)
             }
             return owners.count == 1 ? owners[0] : nil
         case .setting: return nil

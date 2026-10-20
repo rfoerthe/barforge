@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import CoreGraphics
 import Foundation
@@ -40,11 +41,6 @@ enum ScrollHorizontalModifierTests {
         suite.expect(source.contains("ScrollWheelSupport.isMouseWheel(")
             && source.contains(".intersection([.command, .option, .control, .shift]).isEmpty"),
             "trackpads and modifier combinations keep their own sideways meaning")
-        let panelSource = (try? String(contentsOfFile: "Sources/Vorssaint/Services/Notch/NotchWindowHost.swift",
-                                       encoding: .utf8)) ?? ""
-        suite.expect(source.contains("guard !(event.window is NotchPanel)")
-            && panelSource.contains("handleScroll?(event) == true || HorizontalWheelScrolling.handle(event)"),
-            "the island offers the wheel to its own gestures before moving a strip")
     }
 
     static func run(_ suite: TestSuite) {

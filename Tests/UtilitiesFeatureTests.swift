@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -805,13 +806,8 @@ enum UtilitiesFeatureTests {
                     RadialMenuItem(kind: .submenu, children: [RadialMenuItem(kind: .shortcut, payload: "command:8")]),
                 ]),
                "keyboard and window actions need Accessibility, submenus included")
-        let nowPlayingItem = RadialMenuItem(kind: .media, payload: RadialMenuMediaKey.nowPlaying.rawValue)
-        suite.expect(!RadialMenuSupport.needsAccessibility([nowPlayingItem])
-                && RadialMenuSupport.containsNowPlaying([nowPlayingItem])
-                && RadialMenuSupport.containsNowPlaying([
-                    RadialMenuItem(kind: .submenu, children: [nowPlayingItem]),
-                ]),
-               "Now Playing is found inside wheels without claiming a key-posting permission")
+        suite.expect(RadialMenuSupport.sanitized([RadialMenuItem(kind: .media, payload: "nowPlaying")]).isEmpty,
+               "a Now Playing slice saved by an earlier version leaves the wheel instead of staying dead")
         let radialLayout = RadialMenuItem(kind: .windowLayout,
                                           payload: WindowLayoutAction.leftThird.rawValue)
         suite.expect(RadialMenuSupport.sanitized([radialLayout]) == [radialLayout]
@@ -824,86 +820,8 @@ enum UtilitiesFeatureTests {
                "window-layout slices keep a valid placement and its automatic icon")
         suite.expect(RadialMenuMediaKey.playPause.auxKeyType == 16
                 && RadialMenuMediaKey.previousTrack.auxKeyType == 20
-                && RadialMenuMediaKey.nextTrack.auxKeyType == 19
-                && RadialMenuMediaKey.nowPlaying.auxKeyType == nil,
+                && RadialMenuMediaKey.nextTrack.auxKeyType == 19,
                "media slices post the aux codes of the physical keys")
-        let nowPlayingInfo: [String: Any] = [
-            RadialNowPlayingSupport.titleKey: " Midnight City ",
-            RadialNowPlayingSupport.artistKey: "M83",
-            RadialNowPlayingSupport.albumKey: "Hurry Up, We're Dreaming",
-            RadialNowPlayingSupport.artworkDataKey: Data([1, 2, 3]),
-            RadialNowPlayingSupport.playbackRateKey: 1.0,
-        ]
-        suite.expect(RadialNowPlayingSupport.playbackIsActive(remoteIsPlaying: nil, info: nowPlayingInfo)
-                && RadialNowPlayingSupport.playbackIsActive(remoteIsPlaying: true, info: [:])
-                && !RadialNowPlayingSupport.playbackIsActive(remoteIsPlaying: false, info: nowPlayingInfo),
-               "Now Playing accepts the remote state or a positive playback rate")
-        let nowPlayingSnapshot = RadialNowPlayingSupport.snapshot(
-            info: nowPlayingInfo,
-            isPlaying: true,
-            appBundleIdentifier: " com.apple.Music ",
-            appPID: 42)
-        suite.expect(nowPlayingSnapshot?.title == "Midnight City"
-                && nowPlayingSnapshot?.artist == "M83"
-                && nowPlayingSnapshot?.album == "Hurry Up, We're Dreaming"
-                && nowPlayingSnapshot?.artworkData == Data([1, 2, 3])
-                && nowPlayingSnapshot?.appBundleIdentifier == "com.apple.Music"
-                && nowPlayingSnapshot?.appPID == 42
-                && nowPlayingSnapshot?.radialLabel == "Midnight City\nM83",
-               "Now Playing metadata is sanitized into the radial label and floating card")
-        suite.expect(RadialNowPlayingSupport.snapshot(info: nowPlayingInfo,
-                                                isPlaying: false,
-                                                appBundleIdentifier: "com.apple.Music",
-                                                appPID: 42) == nil
-                && RadialNowPlayingSupport.snapshot(info: [:],
-                                                    isPlaying: true,
-                                                    appBundleIdentifier: nil,
-                                                    appPID: 0) == nil,
-               "paused or ownerless metadata degrades to Nothing Playing")
-        let adapterLine = Data("""
-            {"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","kMRMediaRemoteNowPlayingInfoArtist":"M83",\
-            "kMRMediaRemoteNowPlayingInfoPlaybackRate":1,"artworkBase64":"AQID","pid":42,\
-            "displayID":"com.apple.Music","isPlaying":true}
-            """.utf8)
-        let adapterReply = RadialNowPlayingSupport.adapterReply(from: adapterLine)
-        suite.expect(adapterReply?.info[RadialNowPlayingSupport.titleKey] as? String == "Midnight City"
-                && adapterReply?.info[RadialNowPlayingSupport.artistKey] as? String == "M83"
-                && adapterReply?.info[RadialNowPlayingSupport.artworkDataKey] as? Data == Data([1, 2, 3])
-                && (adapterReply?.info[RadialNowPlayingSupport.playbackRateKey] as? NSNumber)?.doubleValue == 1
-                && adapterReply?.pid == 42
-                && adapterReply?.displayID == "com.apple.Music"
-                && adapterReply?.isPlaying == true,
-               "the Now Playing adapter line is read back into the MediaRemote keys the snapshot builder takes")
-        let adapterPaused = RadialNowPlayingSupport.adapterReply(
-            from: Data(#"{"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","isPlaying":false}"#.utf8))
-        suite.expect(adapterPaused?.pid == 0 && adapterPaused?.displayID == nil && adapterPaused?.isPlaying == false
-                && RadialNowPlayingSupport.snapshot(
-                    info: adapterPaused?.info ?? [:],
-                    isPlaying: RadialNowPlayingSupport.playbackIsActive(remoteIsPlaying: adapterPaused?.isPlaying,
-                                                                       info: adapterPaused?.info ?? [:]),
-                    appBundleIdentifier: adapterPaused?.displayID,
-                    appPID: adapterPaused?.pid ?? 0) == nil,
-               "a paused adapter reply degrades to Nothing Playing through the same path as before")
-        suite.expect(RadialNowPlayingSupport.adapterReply(from: Data(#"{"error":"MRMediaRemoteGetNowPlayingInfo unavailable"}"#.utf8)) == nil
-                && RadialNowPlayingSupport.adapterReply(from: Data("[1,2]".utf8)) == nil
-                && RadialNowPlayingSupport.adapterReply(from: Data("perl: cannot load".utf8)) == nil
-                && RadialNowPlayingSupport.adapterReply(from: Data(#"{"artworkBase64":"***"}"#.utf8))?
-                    .info[RadialNowPlayingSupport.artworkDataKey] == nil,
-               "an adapter error, a non-object, shell noise or bad base64 never become a snapshot")
-        let adapterAfterWarning = RadialNowPlayingSupport.adapterReply(from: Data("""
-            perl: warning: Setting locale failed.
-            perl: warning: Falling back to the standard locale ("C").
-            {"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","pid":42,"isPlaying":true}
-
-            """.utf8))
-        suite.expect(adapterAfterWarning?.info[RadialNowPlayingSupport.titleKey] as? String == "Midnight City"
-                && adapterAfterWarning?.pid == 42 && adapterAfterWarning?.isPlaying == true,
-               "a perl warning on the shared stderr pipe ahead of the adapter's JSON line still parses")
-        let nowPlayingBuildScript = (try? String(contentsOfFile: "build.sh", encoding: .utf8)) ?? ""
-        suite.expect(nowPlayingBuildScript.contains("Sources/NowPlayingAdapter/NowPlayingAdapter.swift")
-                && nowPlayingBuildScript.contains("Resources/now-playing.pl")
-                && nowPlayingBuildScript.contains("Contents/Frameworks/$NOW_PLAYING_ADAPTER"),
-               "build.sh compiles the Now Playing adapter and stages the library and its perl loader")
         let radialQuickToggle = RadialMenuItem(kind: .quickToggle,
                                                payload: RadialMenuQuickToggle.darkMode.rawValue)
         suite.expect(RadialMenuSupport.sanitized([radialQuickToggle]) == [radialQuickToggle]
@@ -968,7 +886,7 @@ enum UtilitiesFeatureTests {
                 && allPresets.allSatisfy { $0.id == $0.rawValue },
                "six distinct radial profile presets")
         suite.expect(RadialMenuProfilePreset.general.makeItems().count == 6
-                && RadialMenuProfilePreset.media.makeItems().count == 4
+                && RadialMenuProfilePreset.media.makeItems().count == 3
                 && RadialMenuProfilePreset.tools.makeItems().count == 6
                 && RadialMenuProfilePreset.windowLayout.makeItems().count == 5
                 && RadialMenuProfilePreset.quickToggles.makeItems().count == 5
@@ -997,7 +915,7 @@ enum UtilitiesFeatureTests {
                 && decodedProfiles[0].color == .purple
                 && decodedProfiles[0].shortcut == "control+command:49"
                 && decodedProfiles[0].mouseButton == RadialMenuMouseTrigger.back.rawValue
-                && decodedProfiles[0].items.count == 4,
+                && decodedProfiles[0].items.count == 3,
                "profile encodes and decodes accurately with trimmed name")
 
         let renamedPresetProfile = RadialMenuProfilePreset.media.createProfile(name: "Renamed")

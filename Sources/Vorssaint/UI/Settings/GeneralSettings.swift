@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 import ServiceManagement
@@ -107,16 +108,11 @@ struct GeneralSettings: View {
             if #available(macOS 26.0, *) {
                 Divider()
                 SettingsRow(symbol: "sparkles", title: appearanceStrings.liquidGlass,
-                            caption: text.liquidGlassCaption) { EmptyView() }
-                VStack(alignment: .leading, spacing: 8) {
-                    Toggle(text.liquidGlassOtherWindows, isOn: $appearance.liquidGlassEnabled)
-                        .accessibilityLabel("\(appearanceStrings.liquidGlass), \(text.liquidGlassOtherWindows)")
-                    Toggle(FeatureStrings.notch(l10n.language).title,
-                           isOn: $appearance.notchLiquidGlassEnabled)
-                        .accessibilityLabel("\(appearanceStrings.liquidGlass), \(FeatureStrings.notch(l10n.language).title)")
+                            caption: text.liquidGlassCaption) {
+                    Toggle(appearanceStrings.liquidGlass, isOn: $appearance.liquidGlassEnabled)
+                        .labelsHidden()
+                        .toggleStyle(.switch)
                 }
-                .toggleStyle(TrailingSwitchToggleStyle())
-                .padding(.leading, settingsRowTextInset)
             }
 #endif
         }

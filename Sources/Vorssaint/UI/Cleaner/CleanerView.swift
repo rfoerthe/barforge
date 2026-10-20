@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 import UserNotifications
@@ -781,7 +782,7 @@ struct CleanerView: View {
                 .frame(maxWidth: .infinity)
             } else {
                 if compact {
-                    // The island, menu panel and launcher already scroll.
+                    // The menu panel and launcher already scroll.
                     // Keep the rows and Clean button in that same scroll area.
                     VStack(alignment: .leading, spacing: 16) {
                         resultsGroups

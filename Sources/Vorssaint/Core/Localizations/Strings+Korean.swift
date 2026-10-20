@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -550,7 +551,6 @@ extension Strings {
         shelfDockPlacement: "위치",
         shelfDockMenuBar: "메뉴 막대 아이콘 아래",
         shelfDockTopCenter: "화면 상단 가운데",
-        shelfDockIslandNote: "Dynamic Island가 켜져 있는 동안에는 상단 가운데를 사용합니다.",
         shelfCollapse: "접기",
         shelfBehaviorTitle: "사용 후",
         shelfCloseAfterDrop: "다른 앱에 놓은 후 닫기",
@@ -684,7 +684,6 @@ extension Strings {
         aboutDescription: "Mac을 위한 유틸리티 허브입니다.\n메뉴 막대에서 에너지 관리, 시스템 모니터, 스크롤 및 윈도우 전환을 제공합니다.",
         versionPrefix: "버전",
         reviewIntro: "시작하기 다시 보기",
-        reviewHighlights: "업데이트 둘러보기 다시 보기",
         viewOnGitHub: "GitHub에서 보기",
 
         obContinue: "계속",
@@ -1019,7 +1018,6 @@ extension Strings {
         qrResultTitle: "QR 코드",
         qrResultCopy: "복사",
         qrResultOpen: "링크 열기",
-        highlightsTitle: "이 업데이트의 새로운 기능",
         highlightsTitleClipboardRedesign: "새로워진 클립보드",
         highlightsTitleWindowLayout: "윈도우 레이아웃",
         highlightsTitleQuitProtection: "⌘Q 및 ⌘W 보호",

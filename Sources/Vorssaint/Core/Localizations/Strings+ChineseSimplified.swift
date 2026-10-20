@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "位置",
         shelfDockMenuBar: "菜单栏图标下方",
         shelfDockTopCenter: "屏幕顶部居中",
-        shelfDockIslandNote: "Dynamic Island打开时会占用屏幕顶部中间。",
         shelfCollapse: "收起",
         shelfBehaviorTitle: "使用后",
         shelfCloseAfterDrop: "拖放到其他 App 后关闭",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "你的 Mac 实用工具中心。\n能源、系统监视器、滚动和窗口切换器，尽在菜单栏中。",
         versionPrefix: "版本",
         reviewIntro: "重看介绍",
-        reviewHighlights: "重看新功能导览",
         viewOnGitHub: "在 GitHub 上查看",
 
         obContinue: "继续",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "二维码",
         qrResultCopy: "拷贝",
         qrResultOpen: "打开链接",
-        highlightsTitle: "本次更新亮点",
         highlightsTitleClipboardRedesign: "剪贴板全新设计",
         highlightsTitleWindowLayout: "窗口布局",
         highlightsTitleQuitProtection: "⌘Q 与 ⌘W 保护",
