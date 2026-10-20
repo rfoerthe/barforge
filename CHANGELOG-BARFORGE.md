@@ -12,20 +12,11 @@ line of its own, `Based on Vorssaint X.Y.Z.`, matching `BarforgeUpstreamVersion`
 in `Resources/Info.plist`. The app's release notes and What's New show a
 release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
-CHANGELOG.md. `3.4.1+mx.1` was the last build before the fork became Barforge.
+CHANGELOG.md.
 
 ## [Unreleased]
 
 Based on Vorssaint 3.4.1.
-
-### Changed
-- Barforge needs macOS 26 Tahoe or later.
-- Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both. Release notes and What's New list Barforge's changes first, then those of the Vorssaint releases a version brings.
-- The fork is now called Barforge, with its own anvil icon and the bundle identifier `de.foerther.barforge`, as Vorssaint's trademark policy asks of forks. It installs as Barforge.app and shares no settings or permissions with an earlier build of the fork: export your settings in the old build under Settings → Advanced → Backup, remove it with its fan helper (Settings → Advanced → Uninstall completely), then install Barforge, import the settings and grant its permissions again.
-- Settings → About names Vorssaint as the original project, says Barforge is an unofficial version it does not endorse, and links the GPL.
-- Settings no longer offers donations, Discord or X for the original project, and no support note follows an update.
-
-## [3.4.1+mx.1] - 2026-10-19
 
 ### Added
 - Logitech MX Master 3, 3S and 4 mice can give every button, the gesture or thumb button and the thumb wheel an action, with gesture sets for windows, media, zoom and panning, over a Bolt or Unifying receiver or Bluetooth. Settings → Mouse & Trackpad → Logitech MX mice.
@@ -33,10 +24,14 @@ Based on Vorssaint 3.4.1.
 - The System card lists each fan and its current speed, read-only, without the Fan Control extension. Settings → Monitor → System → Fan speed.
 
 ### Changed
-- This build comes from the rfoerthe/vorssaint-utils fork and is versioned 3.4.1+mx.1. GitHub links lead to the fork, and automatic updates are off so no official release replaces it. Settings → About.
+- Barforge needs macOS 26 Tahoe or later.
+- The fork is called Barforge, with its own anvil icon and the bundle identifier `de.foerther.barforge`, as Vorssaint's trademark policy asks of forks. It installs as Barforge.app and shares no settings or permissions with Vorssaint or an earlier build of the fork: export your settings there under Settings → Advanced → Backup, remove an earlier fork build with its fan helper (Settings → Advanced → Uninstall completely), then install Barforge, import the settings and grant its permissions again.
+- Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both. Release notes and What's New list Barforge's changes first, then those of the Vorssaint releases a version brings.
+- Settings → About names Vorssaint as the original project, says Barforge is an unofficial version it does not endorse, and links the GPL. GitHub links lead to rfoerthe/vorssaint-utils.
+- Barforge does not update itself, so no Vorssaint release replaces it: new versions come from its releases page, and the menu bar icon's right-click menu offers no Check for updates….
+- Settings no longer offers donations, Discord or X for the original project, and no support note follows an update.
 - The speed test in the Network card measures latency, download and upload one after the other, each as a bar with its value in ms or Mbps, updated four times a second while it runs; download and upload take about ten seconds each, and their result is the mean of the readings after the first 2.5 seconds of ramp-up. Results on fast fibre lines now match breitbandmessung.de: about 6 ms, 1000 to 1060 and 545 Mbps on a 1000/500 line, where the test showed 65 ms, 394 and 198 Mbps before. It measures against Apple's networkQuality servers and falls back to Cloudflare when they do not answer, and a running test can be stopped.
 - The Network card's apps using network list starts folded behind an arrow, like the CPU apps list. Per-app traffic is measured only while the list is open.
 
 ### Fixed
-- Fan Control works in a build signed with a Developer ID other than the official one, such as a signed build of this fork. The app and its helper now trust the team that signed them instead of a fixed one.
-- The menu bar icon's right-click menu no longer offers Check for updates…, since a fork build does not update itself.
+- Fan Control works in a build signed with a Developer ID other than Vorssaint's, such as Barforge's. The app and its helper trust the team that signed them instead of a fixed one.
