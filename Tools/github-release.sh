@@ -131,10 +131,24 @@ SPCTL="$(spctl -a -t open --context context:primary-signature -vv "$DMG" 2>&1 ||
 SIGNER="$(sed -n 's/^origin=//p' <<< "$SPCTL")"
 
 MOUNT="$(mktemp -d)"
+MOUNT="${MOUNT:A}"
 if diskutil image -h >/dev/null 2>&1; then
-    diskutil image attach --nobrowse --readOnly --mountPoint "$MOUNT" "$DMG" >/dev/null
+    diskutil image attach --plist --nobrowse --readOnly --mountPoint "$MOUNT" "$DMG" > "$WORK/attach.plist"
 else
-    hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG" >/dev/null
+    hdiutil attach -plist -nobrowse -readonly -mountpoint "$MOUNT" "$DMG" 2>/dev/null > "$WORK/attach.plist"
+fi
+# A DMG that is attached already (opened in the Finder, say) is not attached
+# again: both tools hand back the volume where it is and ignore the mount point.
+VOLUME=""
+for (( i = 0; ; i++ )); do
+    plutil -extract "system-entities.$i" xml1 -o /dev/null "$WORK/attach.plist" 2>/dev/null || break
+    VOLUME="$(plutil -extract "system-entities.$i.mount-point" raw -o - "$WORK/attach.plist" 2>/dev/null)" && break
+done
+if [[ "${VOLUME:A}" != "$MOUNT" ]]; then
+    rmdir "$MOUNT"
+    MOUNT=""
+    [[ -n "$VOLUME" ]] || die "$DMG_NAME has no volume that can be mounted."
+    die "$DMG_NAME is already mounted at $VOLUME; eject it and run again."
 fi
 APP="$MOUNT/$APP_NAME.app"
 [[ -d "$APP" ]] || die "$DMG_NAME does not contain $APP_NAME.app."
