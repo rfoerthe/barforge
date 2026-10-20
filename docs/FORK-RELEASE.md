@@ -64,7 +64,7 @@ profile goes in `NOTARY_PROFILE`.
 ## Publishing on GitHub
 
 Before you publish, give the version a dated entry in
-[CHANGELOG-BARFORGE.md](../CHANGELOG-BARFORGE.md), `## [1.0.0] - 2026-10-21`, and
+[CHANGELOG-BARFORGE.md](../CHANGELOG-BARFORGE.md), `## [1.0.0] - 2026-10-21` with its `Based on Vorssaint 3.4.1.` line, and
 push that commit. Then:
 
 ```bash
@@ -77,7 +77,10 @@ the DMG and the app inside as notarized, and reads the version from the app.
 Unless the tag `v<version>` exists already, it tags HEAD, which must be clean,
 pushed and carry the same version in `Resources/Info.plist`. After you confirm,
 it pushes the tag, creates a draft release with the DMG and its `.sha256`
-attached and the changelog entry as notes, checks that GitHub reports the same
+attached and the changelog entry as notes, followed by a "From Vorssaint"
+section that links the Vorssaint release it is based on and what changed since
+the previous release's base. It refuses an entry whose base differs from
+`BarforgeUpstreamVersion`, checks that GitHub reports the same
 SHA-256 for both files, and publishes it. Versions with `-alpha.`, `-beta.` or
 `-rc.` become pre-releases; all others are marked as the latest release.
 

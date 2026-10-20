@@ -10,6 +10,11 @@ struct ReleaseNotes {
     let sections: [ReleaseNoteSection]
 
     static var current: ReleaseNotes {
+        // Barforge's own notes first, then the Vorssaint releases they bring.
+        if let fork = ForkChangelog.bundled() {
+            return ForkChangelog.releaseNotes(for: AppInfo.version, fork: fork, upstream: bundledChangelog() ?? "",
+                                              fallbackBase: AppInfo.upstreamVersion)
+        }
         let direct = notes(for: AppInfo.version)
         if !direct.sections.isEmpty { return direct }
         let unreleased = notes(for: "Unreleased")
@@ -64,8 +69,6 @@ struct ReleaseNotes {
     }
 
     static func bundledChangelog() -> String? {
-        // A fork has its own version line, so its own changelog is the one to read.
-        if let fork = ForkChangelog.bundled() { return fork }
         guard let url = Bundle.main.url(forResource: "CHANGELOG", withExtension: "md") else { return nil }
         return try? String(contentsOf: url, encoding: .utf8)
     }

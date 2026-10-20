@@ -2234,9 +2234,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             return true
         }
         let defaults = UserDefaults.standard
-        let digest = ReleaseDigest.make(from: previous, to: AppInfo.version,
-                                        changelog: ReleaseNotes.bundledChangelog() ?? "",
-                                        includeUnreleased: includeUnreleased)
+        let digest = ForkChangelog.bundled().map {
+            ForkChangelog.digest(from: previous, to: AppInfo.version, fork: $0,
+                                 upstream: ReleaseNotes.bundledChangelog() ?? "",
+                                 fallbackBase: AppInfo.upstreamVersion, includeUnreleased: includeUnreleased)
+        } ?? ReleaseDigest.make(from: previous, to: AppInfo.version,
+                                changelog: ReleaseNotes.bundledChangelog() ?? "",
+                                includeUnreleased: includeUnreleased)
         let strings = L10n.shared.s
         let language = L10n.shared.language
         let hub = FeatureStrings.hub(language)

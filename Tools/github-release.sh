@@ -191,7 +191,29 @@ grep -Fq "## [$VERSION] - " "$WORK/changelog.md" \
 NOTES_FILE="$WORK/notes.md"
 awk -v hdr="## [$VERSION]" 'index($0,hdr)==1{g=1;next} /^## \[/&&g{exit} g{print}' "$WORK/changelog.md" > "$NOTES_FILE"
 [[ -n "$(tr -d '[:space:]' < "$NOTES_FILE")" ]] || die "The $CHANGELOG entry for $VERSION is empty."
+
+# The entry names the Vorssaint release it is made from ("Based on Vorssaint
+# 3.4.1."), which must be the bundle's; the next older entry's base marks where
+# the Vorssaint releases this one brings begin.
+BASE_RE='^Based on Vorssaint ([0-9][^ ]*)\.$'
+UPSTREAM_BASE="$(sed -nE "s/$BASE_RE/\\1/p" "$NOTES_FILE" | head -1)"
+[[ -n "$UPSTREAM_BASE" ]] || die "The $CHANGELOG entry for $VERSION has no \"Based on Vorssaint X.Y.Z.\" line."
+PLIST_BASE="$(git show "$TAG_COMMIT:Resources/Info.plist" | plutil -extract BarforgeUpstreamVersion raw -o - - 2>/dev/null || true)"
+[[ "$PLIST_BASE" == "$UPSTREAM_BASE" ]] \
+    || die "$CHANGELOG says $VERSION is based on Vorssaint $UPSTREAM_BASE, Info.plist says ${PLIST_BASE:-nothing}."
+PREVIOUS_BASE="$(awk -v hdr="## [$VERSION]" 'index($0,hdr)==1{g=1;next} g&&/^## \[/{h=1} h' "$WORK/changelog.md" \
+    | sed -nE "s/$BASE_RE/\\1/p" | head -1)"
+sed -i '' -E "/$BASE_RE/d" "$NOTES_FILE"
+UPSTREAM_URL="https://github.com/vorssaint/vorssaint-utils"
+UPSTREAM_NOTE="Based on [Vorssaint $UPSTREAM_BASE]($UPSTREAM_URL/releases/tag/v$UPSTREAM_BASE)."
+if [[ -n "$PREVIOUS_BASE" && "$PREVIOUS_BASE" != "$UPSTREAM_BASE" ]]; then
+    UPSTREAM_NOTE+=" Brings the Vorssaint releases after $PREVIOUS_BASE: [what changed]($UPSTREAM_URL/compare/v$PREVIOUS_BASE...v$UPSTREAM_BASE) and [their release notes]($UPSTREAM_URL/releases)."
+fi
 cat >> "$NOTES_FILE" <<EOF
+
+### From Vorssaint
+
+$UPSTREAM_NOTE
 
 Signed with an Apple Developer ID and notarized by Apple. Requires macOS 14 or later. Open the .dmg below and drag $APP_NAME to Applications. $APP_NAME is an unofficial fork of Vorssaint, built from $REPO. It is not an official Vorssaint release and is not endorsed by the Vorssaint project.
 EOF

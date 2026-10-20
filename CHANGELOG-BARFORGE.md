@@ -7,14 +7,19 @@ recorded in [CHANGELOG.md](CHANGELOG.md), which stays identical to upstream.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Barforge numbers its own releases with [semantic versioning](https://semver.org),
-starting at 1.0.0, and each release names the Vorssaint version it is based on.
-This file is what the app shows in What's New. `3.4.1+mx.1` was the last build
-before the fork became Barforge.
+starting at 1.0.0. Each release names the Vorssaint release it is made from on a
+line of its own, `Based on Vorssaint X.Y.Z.`, matching `BarforgeUpstreamVersion`
+in `Resources/Info.plist`. The app's release notes and What's New show a
+release's entries from this file first, then the notes of the Vorssaint releases
+it brings: those after the previous release's base up to its own, read from
+CHANGELOG.md. `3.4.1+mx.1` was the last build before the fork became Barforge.
 
 ## [Unreleased]
 
+Based on Vorssaint 3.4.1.
+
 ### Changed
-- Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both, and What's New lists Barforge's own releases.
+- Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both. Release notes and What's New list Barforge's changes first, then those of the Vorssaint releases a version brings.
 - The fork is now called Barforge, with its own anvil icon and the bundle identifier `de.foerther.barforge`, as Vorssaint's trademark policy asks of forks. It installs as Barforge.app and shares no settings or permissions with an earlier build of the fork: export your settings in the old build under Settings → Advanced → Backup, remove it with its fan helper (Settings → Advanced → Uninstall completely), then install Barforge, import the settings and grant its permissions again.
 - Settings → About names Vorssaint as the original project, says Barforge is an unofficial version it does not endorse, and links the GPL.
 - Settings no longer offers donations, Discord or X for the original project, and no support note follows an update.

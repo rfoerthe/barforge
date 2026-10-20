@@ -36,6 +36,7 @@ KEEP_FILES = {
     # Names upstream as the copyright holder and the original project.
     "Sources/Vorssaint/Core/AppInfo.swift",
     "Sources/Vorssaint/Core/ForkBuildStrings.swift",
+    "Sources/Vorssaint/Core/ForkChangelog.swift",
     "Tests/ForkBuildTests.swift",
 }
 

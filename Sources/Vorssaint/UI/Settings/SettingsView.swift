@@ -942,7 +942,8 @@ struct ReleaseNotesSettings: View {
     }
 
     private func iconName(for title: String) -> String {
-        switch title.lowercased() {
+        // "Vorssaint 3.4.1 · Added" in a Barforge build reads like "Added".
+        switch title.lowercased().components(separatedBy: " · ").last ?? "" {
         case "added": return "plus.circle.fill"
         case "changed": return "slider.horizontal.3"
         case "fixed": return "checkmark.circle.fill"

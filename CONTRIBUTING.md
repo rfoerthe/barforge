@@ -136,3 +136,7 @@ Barforge is a fork of Vorssaint and may not use its name or icon
   onwards). `BarforgeUpstreamVersion` in `Resources/Info.plist` names the
   Vorssaint release it is made from: update it with every upstream merge, and
   keep Barforge's version when the merge brings upstream's.
+- Every entry in CHANGELOG-BARFORGE.md, `[Unreleased]` included, carries a
+  `Based on Vorssaint X.Y.Z.` line equal to `BarforgeUpstreamVersion`. Do not
+  copy Vorssaint's notes: the app and `Tools/github-release.sh` add the
+  Vorssaint releases a version brings on their own.
