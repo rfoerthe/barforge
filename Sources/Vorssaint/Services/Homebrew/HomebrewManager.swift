@@ -484,7 +484,7 @@ final class HomebrewManager: ObservableObject {
         let paths = HomebrewCommandBuilder.shellProfilePathsToCheck()
         shellConfigProfilePath = primaryPath
         isShellConfigured = paths.contains { path in
-            guard let contents = try? String(contentsOfFile: path) else { return false }
+            guard let contents = try? String(contentsOfFile: path, encoding: .utf8) else { return false }
             return contents.contains(expectedLine)
         }
         if isShellConfigured {
