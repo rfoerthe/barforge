@@ -19,6 +19,7 @@ CHANGELOG.md. `3.4.1+mx.1` was the last build before the fork became Barforge.
 Based on Vorssaint 3.4.1.
 
 ### Changed
+- Barforge needs macOS 26 Tahoe or later.
 - Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both. Release notes and What's New list Barforge's changes first, then those of the Vorssaint releases a version brings.
 - The fork is now called Barforge, with its own anvil icon and the bundle identifier `de.foerther.barforge`, as Vorssaint's trademark policy asks of forks. It installs as Barforge.app and shares no settings or permissions with an earlier build of the fork: export your settings in the old build under Settings → Advanced → Backup, remove it with its fan helper (Settings → Advanced → Uninstall completely), then install Barforge, import the settings and grant its permissions again.
 - Settings → About names Vorssaint as the original project, says Barforge is an unofficial version it does not endorse, and links the GPL.

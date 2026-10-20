@@ -22,7 +22,7 @@
 
 <p align="center">
   <a href="https://github.com/rfoerthe/vorssaint-utils/releases"><img src="https://img.shields.io/github/v/release/rfoerthe/vorssaint-utils?label=release&color=4c8dff" alt="Latest release"></a>
-  <a href="#what-you-need"><img src="https://img.shields.io/badge/macOS-14%2B%20Apple%20Silicon-black" alt="macOS 14 and newer, Apple Silicon"></a>
+  <a href="#what-you-need"><img src="https://img.shields.io/badge/macOS-26%2B%20Apple%20Silicon-black" alt="macOS 26 and newer, Apple Silicon"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-blue" alt="License GPL 3.0 or later"></a>
 </p>
 
@@ -181,7 +181,7 @@ See the [permissions guide](docs/PERMISSIONS.md) for which features need access 
 ## What you need
 
 - A Mac with Apple Silicon
-- macOS 14 Sonoma or newer
+- macOS 26 Tahoe or newer
 
 ### Build it yourself
 
@@ -192,7 +192,7 @@ cd vorssaint-utils
 ./build.sh --dev --install  # install and launch it
 ```
 
-Xcode Command Line Tools are the only requirement. The [contributing guide](CONTRIBUTING.md) covers the layout and conventions. The GPL covers the source, while the Vorssaint name, icon and look belong to the Vorssaint project ([TRADEMARKS.md](TRADEMARKS.md)), which is why this fork carries its own name and icon. After merging from upstream, run `python3 Tools/fork-rebrand.py` so new text shows Barforge too.
+Xcode 26 or its Command Line Tools, with Swift 6.2 or newer, are the only requirement. The [contributing guide](CONTRIBUTING.md) covers the layout and conventions. The GPL covers the source, while the Vorssaint name, icon and look belong to the Vorssaint project ([TRADEMARKS.md](TRADEMARKS.md)), which is why this fork carries its own name and icon. After merging from upstream, run `python3 Tools/fork-rebrand.py` so new text shows Barforge too.
 
 ## When something misbehaves
 

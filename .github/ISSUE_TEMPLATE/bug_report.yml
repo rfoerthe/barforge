@@ -88,8 +88,6 @@ body:
       options:
         - macOS 27 (Golden Gate)
         - macOS 26 (Tahoe)
-        - macOS 15 (Sequoia)
-        - macOS 14 (Sonoma)
     validations:
       required: true
 

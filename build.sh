@@ -63,7 +63,7 @@ FAN_HELPER_ID="$APP_BUNDLE_ID.fan-control"
 # Sources/NowPlayingAdapter. Staged under Contents/Frameworks, signed on its own.
 NOW_PLAYING_ADAPTER_ID="$APP_BUNDLE_ID.now-playing"
 NOW_PLAYING_ADAPTER="libVorssaintNowPlaying.dylib"
-TARGET="arm64-apple-macosx14.0"
+TARGET="arm64-apple-macosx26.0"
 ENTITLEMENTS="Resources/Vorssaint.entitlements"
 LEGACY_IDENTITY="Vorssaint Utils Signing"
 
@@ -658,7 +658,7 @@ else
             --app-icon AppIcon \
             --platform macosx \
             --target-device mac \
-            --minimum-deployment-target 14.0 \
+            --minimum-deployment-target 26.0 \
             --enable-on-demand-resources NO \
             --output-partial-info-plist "$ICON_TMP/partial-info.plist" \
             >"$ICON_TMP/actool.log" 2>&1 && [[ -s "$ICON_TMP/catalog/Assets.car" ]]; then

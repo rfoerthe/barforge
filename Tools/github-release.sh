@@ -215,7 +215,7 @@ cat >> "$NOTES_FILE" <<EOF
 
 $UPSTREAM_NOTE
 
-Signed with an Apple Developer ID and notarized by Apple. Requires macOS 14 or later. Open the .dmg below and drag $APP_NAME to Applications. $APP_NAME is an unofficial fork of Vorssaint, built from $REPO. It is not an official Vorssaint release and is not endorsed by the Vorssaint project.
+Signed with an Apple Developer ID and notarized by Apple. Requires macOS 26 or later. Open the .dmg below and drag $APP_NAME to Applications. $APP_NAME is an unofficial fork of Vorssaint, built from $REPO. It is not an official Vorssaint release and is not endorsed by the Vorssaint project.
 EOF
 
 # ── Release ──────────────────────────────────────────────────────────────────
