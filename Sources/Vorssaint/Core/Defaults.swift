@@ -423,21 +423,6 @@ enum DefaultsKey {
     static let monitorShowDisk = "monitorShowDisk"
     static let monitorShowPower = "monitorShowPower"
     static let monitorShowMixer = "monitorShowMixer"
-    static let panelShowFanControl = "panelShowFanControl"
-    static let fanControlMode = "fanControlMode"
-    static let fanControlCoolingLevel = "fanControlCoolingLevel"
-    static let fanControlCurves = "fanControlCurves"
-    // Re-apply the last manual speed or curve when the app opens and after wake.
-    static let fanControlResume = "fanControlResume"
-    // Machine-only: the control the user left running while resume is on,
-    // cleared when they return to System so it never outlives that choice.
-    static let fanControlResumeConfiguration = "fanControlResumeConfiguration"
-    // Previous panel visibility key, read once by the migration below.
-    static let monitorShowFanControlBeta = "monitorShowFanControlBeta"
-    // Machine-only recovery state. A true value means the helper must confirm
-    // automatic fan control before this marker can be cleared.
-    static let fanControlRecoveryNeeded = "fanControlRecoveryNeeded"
-    static let fanControlHelperVersion = "fanControlHelperVersion"
     // System monitor — per-metric history graphs (each independently toggleable).
     static let monitorGraphCPU = "monitorGraphCPU"
     static let monitorGraphGPU = "monitorGraphGPU"
@@ -1659,14 +1644,6 @@ enum Defaults {
         DefaultsKey.monitorShowDisk: true,
         DefaultsKey.monitorShowPower: true,
         DefaultsKey.monitorShowMixer: true,
-        DefaultsKey.panelShowFanControl: true,
-        DefaultsKey.fanControlMode: FanControlMode.system.rawValue,
-        DefaultsKey.fanControlCoolingLevel: FanControlPolicy.defaultCoolingLevel,
-        DefaultsKey.fanControlCurves: FanControlConfiguration.defaultCurvesStorage,
-        DefaultsKey.fanControlResume: false,
-        DefaultsKey.fanControlResumeConfiguration: "",
-        DefaultsKey.fanControlRecoveryNeeded: false,
-        DefaultsKey.fanControlHelperVersion: "",
         DefaultsKey.panelNavigationEnabled: true,
         DefaultsKey.monitorGraphCPU: true,
         DefaultsKey.monitorGraphGPU: true,
@@ -1973,7 +1950,7 @@ enum Defaults {
         migrateNotchAgentsOptIn(in: defaults)
         migrateExistingNotchDefaults(in: defaults)
         migrateLiquidGlassIsland(in: defaults)
-        migrateFanControlVisibility(in: defaults)
+        removeFanControlSettings(in: defaults)
         migrateScrollInverterAxes(in: defaults)
         migrateLinearScrollAvailability(in: defaults)
         migrateWhatsAppDownloadsEnabled(in: defaults)
@@ -2249,17 +2226,15 @@ enum Defaults {
         defaults.set(true, forKey: AppFeature.linearScroll.availabilityKey)
     }
 
-    static func migrateFanControlVisibility(in defaults: UserDefaults) {
-        if let oldValue = defaults.object(forKey: DefaultsKey.monitorShowFanControlBeta) as? Bool {
-            if defaults.object(forKey: DefaultsKey.panelShowFanControl) == nil {
-                defaults.set(oldValue, forKey: DefaultsKey.panelShowFanControl)
-            }
-            if oldValue,
-               defaults.object(forKey: AppFeature.fanControl.availabilityKey) == nil {
-                defaults.set(true, forKey: AppFeature.fanControl.availabilityKey)
-            }
+    /// Manual fan control is gone; only the read-only fan speeds remain.
+    /// Its settings, its hub switch and the helper's bookkeeping go with it.
+    static func removeFanControlSettings(in defaults: UserDefaults) {
+        for key in ["panelShowFanControl", "fanControlMode", "fanControlCoolingLevel", "fanControlCurves",
+                    "fanControlResume", "fanControlResumeConfiguration", "monitorShowFanControlBeta",
+                    "fanControlRecoveryNeeded", "fanControlHelperVersion",
+                    DefaultsKey.featureAvailable("fanControl")] {
+            defaults.removeObject(forKey: key)
         }
-        defaults.removeObject(forKey: DefaultsKey.monitorShowFanControlBeta)
     }
 
     /// The "show the desktop app without windows" toggle became one choice of

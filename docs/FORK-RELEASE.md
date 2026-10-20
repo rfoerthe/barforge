@@ -92,9 +92,6 @@ workflow.
 
 ## Team ID
 
-Nothing in the source names your Team ID. Fan Control's app and helper each
-read the team that signed them and trust only that team, so a build signed
-with any Developer ID works. Builds without a team (ad-hoc or the local
-self-signed identity) cannot use Fan Control, as before. The in-app updater
-still trusts only the official team, which does not matter here: a fork build
-never updates itself.
+Nothing in the source names your Team ID, so a build signed with any
+Developer ID works. The in-app updater still trusts only the official team,
+which does not matter here: a fork build never updates itself.

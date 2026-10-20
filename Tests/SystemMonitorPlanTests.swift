@@ -32,7 +32,7 @@ enum SystemMonitorPlanTests {
         defaults.removePersistentDomain(forName: domain)
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(true, forKey: AppFeature.connectedDevices.availabilityKey)
-        defaults.set(true, forKey: AppFeature.fanControl.availabilityKey)
+        defaults.set(true, forKey: AppFeature.monitorCPU.availabilityKey)
         let monitor = Monitor()
 
         suite.expect(!monitor.currentPlan(defaults: defaults).needConnectedDevices,
@@ -135,11 +135,11 @@ enum SystemMonitorPlanTests {
         panel.selectedMetric = nil
         panel.activeSection = .system
         monitor.menuPanelNeeds = panel.monitorNeeds
-        defaults.set(false, forKey: AppFeature.fanControl.availabilityKey)
+        defaults.set(false, forKey: AppFeature.monitorCPU.availabilityKey)
         defaults.set(false, forKey: DefaultsKey.menuBarFanSpeed)
         defaults.set(true, forKey: DefaultsKey.monitorSysFans)
         suite.expect(monitor.currentPlan(defaults: defaults).needFanSpeed,
-                     "the System card reads fan speeds without Fan Control installed")
+                     "the System card reads fan speeds without the CPU monitor installed")
         defaults.set(false, forKey: DefaultsKey.monitorSysFans)
         suite.expect(!monitor.currentPlan(defaults: defaults).needFanSpeed,
                      "hiding the System card's fan row stops the fan reads")
@@ -153,10 +153,10 @@ enum SystemMonitorPlanTests {
                      "a closed panel does not read fan speeds")
         defaults.set(true, forKey: DefaultsKey.menuBarFanSpeed)
         suite.expect(!monitor.currentPlan(defaults: defaults).needFanSpeed,
-                     "the menu bar fan speed still needs Fan Control installed")
-        defaults.set(true, forKey: AppFeature.fanControl.availabilityKey)
+                     "the menu bar fan speed rides with the CPU monitor")
+        defaults.set(true, forKey: AppFeature.monitorCPU.availabilityKey)
         suite.expect(monitor.currentPlan(defaults: defaults).needFanSpeed,
-                     "the menu bar fan speed reads with Fan Control installed")
+                     "the menu bar fan speed reads with the CPU monitor installed")
         defaults.set(false, forKey: DefaultsKey.menuBarFanSpeed)
     }
 }

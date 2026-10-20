@@ -398,15 +398,6 @@ final class FeatureRuntime: ObservableObject {
         .monitorNetwork: { FeatureRuntime.syncMonitor() },
         .monitorDisk: { FeatureRuntime.syncMonitor() },
         .monitorPower: { FeatureRuntime.syncMonitor() },
-        .fanControl: {
-            SystemMonitor.shared.planDidChange()
-            let defaults = UserDefaults.standard
-            let needsRecovery = defaults.bool(forKey: DefaultsKey.fanControlRecoveryNeeded)
-            let hasRegisteredHelper = !(defaults.string(forKey: DefaultsKey.fanControlHelperVersion) ?? "").isEmpty
-            if needsRecovery || (!AppFeature.fanControl.isAvailable && hasRegisteredHelper) {
-                FanControlService.shared.syncWithPreferences()
-            }
-        },
     ]
 
     private static func syncMonitor() {
@@ -422,12 +413,10 @@ final class FeatureRuntime: ObservableObject {
 /// comes from a service, and the catalog stays a pure description.
 extension AppFeature {
     /// Why this Mac cannot run the feature, ready to show. `nil` when it can,
-    /// or when the feature depends on no hardware at all.
+    /// or when the feature depends on no hardware at all. No feature does
+    /// today; one that needs hardware this Mac may lack adds its case here.
     var hardwareUnsupportedReason: String? {
         switch self {
-        case .fanControl:
-            return FanControlHardware.hasControllableFan
-                ? nil : FeatureStrings.fanControl(L10n.shared.language).noFans
         default:
             return nil
         }
