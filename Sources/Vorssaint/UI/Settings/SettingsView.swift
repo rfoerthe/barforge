@@ -621,14 +621,15 @@ struct UpdatesView: View {
     @AppStorage(DefaultsKey.releaseNotesOnUpdate) private var showWhatsNewAfter = true
 
     var body: some View {
-        if let fork = AppInfo.forkRepository {
+        if AppInfo.receivesUpdates || AppInfo.isDeveloperBuild {
+            updatesSection
+        } else {
             Section(l10n.s.updatesSection) {
-                Label(String(format: FeatureStrings.forkBuild(l10n.language).updatesOffFormat, fork),
-                      systemImage: "arrow.triangle.branch")
+                Label(String(format: FeatureStrings.forkBuild(l10n.language).updatesUnsignedFormat,
+                             AppInfo.updateRepository),
+                      systemImage: "signature")
                     .fixedSize(horizontal: false, vertical: true)
             }
-        } else {
-            updatesSection
         }
     }
 

@@ -93,5 +93,15 @@ workflow.
 ## Team ID
 
 Nothing in the source names your Team ID, so a build signed with any
-Developer ID works. The in-app updater still trusts only the official team,
-which does not matter here: a fork build never updates itself.
+Developer ID works. The in-app updater reads the bundle identifier and Team ID
+from the running app's own signature and installs an update only when the
+release DMG and the app inside carry the same ones and Gatekeeper accepts the
+app as notarized. A build signed with your Developer ID therefore updates from
+your releases and never from Vorssaint's, whose Team ID differs. An ad-hoc or
+self-signed build has no Team ID and does not update itself; Settings → About
+says so.
+
+The updater asks the repository named by `VorssaintForkRepository` in
+`Resources/Info.plist` for its releases and takes the first `.dmg` asset, so
+every release needs the DMG from `Tools/release-local.sh` attached, as
+`Tools/github-release.sh` does.

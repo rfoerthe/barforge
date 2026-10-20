@@ -937,7 +937,22 @@ enum UpdateFeatureTests {
         suite.expect(!UpdateInstallerSupport.runsFromImmutableLocation(appPath: "/Volumes/ExternalSSD/Vorssaint.app",
                                                                  volumeIsReadOnly: { _ in false }),
                "apps on a writable external volume stay updatable in place")
-        let installerScript = UpdateInstallerSupport.installerScript()
+        let signer = UpdateSigner(bundleID: "de.foerther.barforge", teamID: "3MR4T2CX3T")!
+        let installerScript = UpdateInstallerSupport.installerScript(signer: signer)
+        suite.expect(installerScript.contains(
+                "DMG_VERIFY_REQ='anchor apple generic and certificate leaf[subject.OU] = \"3MR4T2CX3T\"'")
+               && installerScript.contains(
+                "VERIFY_REQ='identifier \"de.foerther.barforge\" and anchor apple generic and certificate leaf[subject.OU] = \"3MR4T2CX3T\"'"),
+               "installer holds the DMG and the app inside to the running app's signer")
+        suite.expect(UpdateSigner(bundleID: "com.vorssaint.utils", teamID: "3D485NHW29") != nil,
+               "the official app's signer is accepted")
+        for (bundleID, teamID) in [(nil, "3MR4T2CX3T"), ("de.foerther.barforge", nil),
+                                   ("de.foerther.barforge", "3mr4t2cx3t"), ("de.foerther.barforge", "3MR4T2CX3"),
+                                   ("x\" or anchor apple", "3MR4T2CX3T"), ("x'y", "3MR4T2CX3T"),
+                                   ("", "3MR4T2CX3T"), ("de.foerther.barforge", "3MR4T2CX3T'")] as [(String?, String?)] {
+            suite.expect(UpdateSigner(bundleID: bundleID, teamID: teamID) == nil,
+                   "an unsigned build or one whose identity could break the requirement has no update signer")
+        }
         for step in ["fail-dmg-verify", "fail-tempdir", "fail-mount", "fail-no-app-in-dmg",
                      "fail-copy", "fail-version", "fail-verify", "fail-swap", "note ok"] {
             suite.expect(installerScript.contains(step),
@@ -976,7 +991,8 @@ enum UpdateFeatureTests {
             pid: 123,
             resultPath: "/tmp/result",
             uid: 501,
-            expectedVersion: "3.3.3")
+            expectedVersion: "3.3.3",
+            signer: signer)
         suite.expect(elevated.contains("POSIX::setsid()") && elevated.hasSuffix("&"),
                "elevated installer leaves this app's session so it outlives the app it replaces")
         suite.expect(elevated.contains("nohup"),

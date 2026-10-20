@@ -44,7 +44,7 @@ enum ForkBuildTests {
 
         for language in AppLanguage.allCases {
             let text = FeatureStrings.forkBuild(language)
-            for format in [text.aboutFormat, text.updatesOffFormat, text.basedOnFormat] {
+            for format in [text.aboutFormat, text.updatesUnsignedFormat, text.basedOnFormat] {
                 suite.expect(format.components(separatedBy: "%@").count == 2 && !format.contains("\u{2014}"),
                              "fork notices take their value once (\(language.rawValue))")
             }

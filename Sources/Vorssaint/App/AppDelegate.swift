@@ -1534,7 +1534,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(shelfItem)
         }
 
-        // A fork build has nothing to update from; see AppInfo.receivesUpdates.
+        // Only a build that can install an update offers to look for one; see AppInfo.receivesUpdates.
         if AppInfo.receivesUpdates {
             let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
             updatesItem.target = self

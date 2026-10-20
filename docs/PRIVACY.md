@@ -29,7 +29,7 @@ The camera mirror starts only after an explicit action. Its frames go to the loc
 
 Barforge opens only a few kinds of connection, and each one belongs to a visible feature.
 
-1. **No update check.** Barforge does not check for updates and never asks GitHub's releases API on its own. New versions come from the fork's [releases page](https://github.com/rfoerthe/barforge/releases).
+1. **The update check, automatic and easy to switch off.** So it can tell you when a newer version exists, Barforge asks GitHub's public releases API at `api.github.com` for the latest release of the fork, [rfoerthe/barforge](https://github.com/rfoerthe/barforge/releases), never of the original project. The request carries only a standard user agent with the app name and its version, and no account, identifier or usage data go along with it. It runs a short while after launch and now and then while the app is open. You can turn it off in Settings under About, and once it is off no update requests are made. If you choose to install an offered update, the disk image comes from GitHub.
 
 2. **The internet speed test, only when you ask.** The optional speed test in the Network section measures latency and your download and upload throughput against Apple's servers at `mensura.cdn-apple.com`, the ones macOS's own `networkQuality` tool uses. If they cannot be reached, it falls back to Cloudflare's public speed endpoints at `speed.cloudflare.com`. This happens only when you start a test yourself, and never on its own. Download and upload run for about ten seconds each, so on a fast line a test moves a gigabyte or more; keep that in mind on a metered connection. The upload is zeros, never your data.
 
