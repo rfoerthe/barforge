@@ -14,6 +14,11 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Changed
+- The menu bar icon and the in-app mark show the anvil with a window through its waist, so the one-color mark no longer reads as a solid blot. The app icon stays as it is.
+
 ## [1.0.0] - 2026-10-20
 
 Based on Vorssaint 3.4.1.
