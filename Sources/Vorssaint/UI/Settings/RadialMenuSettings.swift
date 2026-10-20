@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -1075,7 +1076,6 @@ private struct RadialItemEditor: View {
                 Text(text.mediaPlayPause).tag(RadialMenuMediaKey.playPause.rawValue)
                 Text(text.mediaPrevious).tag(RadialMenuMediaKey.previousTrack.rawValue)
                 Text(text.mediaNext).tag(RadialMenuMediaKey.nextTrack.rawValue)
-                Text(text.mediaNowPlaying).tag(RadialMenuMediaKey.nowPlaying.rawValue)
             }
         case .submenu:
             EmptyView()

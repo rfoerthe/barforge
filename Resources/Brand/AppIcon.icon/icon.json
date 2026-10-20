@@ -14,6 +14,18 @@
       "hidden" : false,
       "layers" : [
         {
+          "hidden" : false,
+          "image-name" : "barforge-faces.svg",
+          "name" : "Faces",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
           "fill-specializations" : [
             {
               "appearance" : "dark",
@@ -28,10 +40,10 @@
           "image-name" : "barforge-brandmark.svg",
           "name" : "BrandMark",
           "position" : {
-            "scale" : 1.25,
+            "scale" : 1,
             "translation-in-points" : [
-              2.2516667286254233e-05,
-              3.9609225268577575e-06
+              0,
+              0
             ]
           }
         }

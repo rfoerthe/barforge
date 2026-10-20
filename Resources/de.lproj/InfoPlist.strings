@@ -2,7 +2,7 @@
 "NSAppleEventsUsageDescription" = "Barforge verwendet Automation, um Dateien zu verschieben, Objekte in den Papierkorb zu legen, angeforderte Befehle zu öffnen und die Wiedergabe in deinen Medienapps zu steuern.";
 
 /* macOS Screen & System Audio Recording permission prompt. */
-"NSAudioCaptureUsageDescription" = "Barforge nutzt den Ton jeder App, um ihre Lautstärke im Mixer zu regeln, die Musikbalken von Dynamic Island zu bewegen und den Ton des Mac in die Bildschirmaufnahmen aufzunehmen, die du startest. Nichts verlässt deinen Mac.";
+"NSAudioCaptureUsageDescription" = "Barforge nutzt den Ton jeder App, um ihre Lautstärke im Mixer zu regeln und den Ton des Mac in die Bildschirmaufnahmen aufzunehmen, die du startest. Nichts verlässt deinen Mac.";
 
 /* macOS Bluetooth permission prompt. */
 "NSBluetoothAlwaysUsageDescription" = "Barforge verwendet Bluetooth nur, um den Akkustand verbundener Peripheriegeräte zu lesen. Nichts verlässt deinen Mac.";
@@ -21,4 +21,3 @@
 "NSDocumentsFolderUsageDescription" = "Barforge organisiert bestätigte WhatsApp-Downloads in einem Zielordner, den du ausdrücklich auswählst. Aufräumen sucht außerdem nach vergessenen Bildschirmfotos, wenn du sie hier speicherst.";
 "NSNetworkVolumesUsageDescription" = "Barforge organisiert bestätigte WhatsApp-Downloads in einem Zielordner, den du ausdrücklich auswählst. Aufräumen sucht außerdem nach vergessenen Bildschirmfotos, wenn du sie hier speicherst.";
 "NSRemovableVolumesUsageDescription" = "Barforge organisiert bestätigte WhatsApp-Downloads in einem Zielordner, den du ausdrücklich auswählst. Aufräumen sucht außerdem nach vergessenen Bildschirmfotos, wenn du sie hier speicherst.";
-"NSCalendarsFullAccessUsageDescription" = "Zeige deine anstehenden Termine im oberen Bildschirmbereich. Kalenderereignisse bleiben auf diesem Mac.";

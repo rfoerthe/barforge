@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import AVFoundation
@@ -174,8 +175,8 @@ final class AirPlayRouteManager: NSObject, ObservableObject {
     private var pickerGeneration = 0
 
     /// Opens the system's speaker list at the pointer, where the choice that
-    /// asked for it was made: an app's output menu in the panel, Settings or
-    /// the island. A transparent window anchors it there.
+    /// asked for it was made: an app's output menu in the panel or Settings.
+    /// A transparent window anchors it there.
     func presentPicker() {
         // Nothing to pick with, and no reason to create the anchor window.
         guard isAvailable else { return }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Combine
@@ -28,12 +29,9 @@ final class StatusItemController {
     /// Last combination applied by updateIconAppearance, so refresh ticks
     /// don't re-render an unchanged icon every 2 seconds.
     private var lastIconStateKey = ""
-    /// Mirrors only the island's fullscreen presentation state. A notification
-    /// avoids loading NotchService when its feature was never installed.
-    private(set) var islandHiddenInFullscreen = false
     /// True while the app itself keeps the main item out of the bar, for
-    /// Dynamic Island or for separate metrics, as opposed to macOS dropping
-    /// it. Recovery leaves such an item alone.
+    /// separate metrics, as opposed to macOS dropping it. Recovery leaves
+    /// such an item alone.
     private(set) var mainItemHiddenByChoice = false
     private var heldMicBadgeActive: Bool?
     private var heldKeepAwakeSignal: Bool?
@@ -103,10 +101,9 @@ final class StatusItemController {
     }
 
     /// Creates the status item and configures its button. The menu bar item is the
-    /// app's entry point unless the person lets Dynamic Island stand in for it, so
-    /// an empty behavior set keeps it from being dragged off the bar (reordering
-    /// still works), and forcing isVisible undoes any hidden state macOS may have
-    /// persisted. If it ever goes missing, re-opening the app recovers access (see
+    /// app's entry point, so an empty behavior set keeps it from being dragged off
+    /// the bar (reordering still works), and forcing isVisible undoes any hidden
+    /// state macOS may have persisted. If it ever goes missing, re-opening the app recovers access (see
     /// applicationShouldHandleReopen) and the "Show menu bar icon" button in
     /// Settings rebuilds it.
     private func installStatusItem() {
@@ -199,16 +196,6 @@ final class StatusItemController {
             .sink { [weak self] _ in
                 guard MenuBarMetric.anyEnabled(in: .standard) else { return }
                 self?.refresh()
-            }
-            .store(in: &cancellables)
-
-        NotificationCenter.default.publisher(for: NotchService.fullscreenVisibilityDidChange)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let self, let hidden = notification.userInfo?["hidden"] as? Bool,
-                      hidden != self.islandHiddenInFullscreen else { return }
-                self.islandHiddenInFullscreen = hidden
-                self.refresh()
             }
             .store(in: &cancellables)
 
@@ -364,9 +351,7 @@ final class StatusItemController {
         let optionEnabled = defaults.bool(forKey: DefaultsKey.menuBarHideIconWithMetrics)
         let separateMetrics = defaults.bool(forKey: DefaultsKey.menuBarSeparateMetrics)
         let signal = updateAvailable || micBadgeActive
-        let islandHides = MenuBarSpacingSupport.islandHidesStatusIcon(
-            in: defaults, hiddenInFullscreen: islandHiddenInFullscreen) && !signal
-        let hidden = islandHides || MenuBarSpacingSupport.shouldHideStatusIcon(
+        let hidden = MenuBarSpacingSupport.shouldHideStatusIcon(
             optionEnabled: optionEnabled,
             separateMetrics: separateMetrics,
             metricsEnabled: MenuBarMetric.anyEnabled(in: defaults),
@@ -374,15 +359,13 @@ final class StatusItemController {
             mustShowForSignal: signal || keepAwakeSignal)
         // In the separate-items mode the metrics are their own clickable
         // items, so hiding means the whole main item steps aside instead of
-        // just its image (which is all that item has). With Dynamic Island
-        // standing in, the item goes whenever it has no text of its own.
-        let mainItemHidden = (islandHides && button.attributedTitle.length == 0)
-            || MenuBarSpacingSupport.shouldHideMainStatusItem(
-                optionEnabled: optionEnabled,
-                separateMetrics: separateMetrics,
-                metricItemsShown: renderedMetricItemCount,
-                renderedTitleLength: button.attributedTitle.length,
-                mustShowForSignal: signal || keepAwakeSignal)
+        // just its image (which is all that item has).
+        let mainItemHidden = MenuBarSpacingSupport.shouldHideMainStatusItem(
+            optionEnabled: optionEnabled,
+            separateMetrics: separateMetrics,
+            metricItemsShown: renderedMetricItemCount,
+            renderedTitleLength: button.attributedTitle.length,
+            mustShowForSignal: signal || keepAwakeSignal)
         mainItemHiddenByChoice = mainItemHidden
         let keepAwakeActive = KeepAwakeManager.shared.isActive
 
@@ -516,8 +499,8 @@ final class StatusItemController {
             }
         } else {
             // The leading space separates the glyph from the text; with the
-            // glyph hidden by the metrics-only option or by Dynamic Island it
-            // would be pure dead padding on the item's left edge. Same
+            // glyph hidden by the metrics-only option it would be pure dead
+            // padding on the item's left edge. Same
             // decision inputs as updateIconAppearance, with a sentinel length:
             // the title is known non-empty on this branch.
             let updateAvailable: Bool
@@ -527,14 +510,12 @@ final class StatusItemController {
                 updateAvailable = false
             }
             let signal = updateAvailable || renderedMicBadgeActive
-            let glyphHidden = (MenuBarSpacingSupport.islandHidesStatusIcon(
-                in: defaults, hiddenInFullscreen: islandHiddenInFullscreen) && !signal)
-                || MenuBarSpacingSupport.shouldHideStatusIcon(
-                    optionEnabled: defaults.bool(forKey: DefaultsKey.menuBarHideIconWithMetrics),
-                    separateMetrics: separateMetrics,
-                    metricsEnabled: !metrics.isEmpty,
-                    renderedTitleLength: 1,
-                    mustShowForSignal: signal || keepAwakeSignal)
+            let glyphHidden = MenuBarSpacingSupport.shouldHideStatusIcon(
+                optionEnabled: defaults.bool(forKey: DefaultsKey.menuBarHideIconWithMetrics),
+                separateMetrics: separateMetrics,
+                metricsEnabled: !metrics.isEmpty,
+                renderedTitleLength: 1,
+                mustShowForSignal: signal || keepAwakeSignal)
             let full = NSMutableAttributedString(string: glyphHidden ? "" : " ")
             full.append(title)
             let stacked = full.string.contains("\n")

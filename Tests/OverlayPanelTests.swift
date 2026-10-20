@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 
@@ -40,7 +41,6 @@ enum OverlayPanelTests {
             "Sources/Vorssaint/Services/CommandBar/CommandBarService.swift",
             "Sources/Vorssaint/Services/Switcher/AppSwitcher.swift",
             "Sources/Vorssaint/Services/RadialMenu/RadialMenuService.swift",
-            "Sources/Vorssaint/Services/RadialMenu/RadialNowPlayingService.swift",
             "Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift",
             "Sources/Vorssaint/Services/WindowLayout/WindowLayoutService.swift",
             "Sources/Vorssaint/Services/DiskImageInstaller/DiskImageInstallerService.swift",

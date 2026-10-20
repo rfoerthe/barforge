@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 import Carbon.HIToolbox
@@ -8,7 +9,6 @@ import Carbon.HIToolbox
 /// methods. Only their environment is replaced: no windows, taps or capture.
 enum QuickLauncherContract {
     static var events: [String] = []
-    static var cameraInNotch = false
     enum ReviewDefaults { static var current: UserDefaults! }
     enum QuickLauncherService { static let columns = 3 }
     struct NSEvent {
@@ -60,11 +60,6 @@ enum QuickLauncherContract {
         func capture() { events.append(name + ".capture") }
         func pick() { events.append(name + ".pick") }
         func show() { events.append(name + ".show") }
-        func showInNotchIfEnabled() -> Bool {
-            guard name == "camera", cameraInNotch else { return false }
-            events.append("camera.notch")
-            return true
-        }
         func showHistoryWindow() { events.append(name + ".showHistoryWindow") }
         func activate() { events.append(name + ".activate") }
     }
@@ -89,7 +84,6 @@ enum QuickLauncherContract {
             defaults.removePersistentDomain(forName: domain)
         }
         for feature in AppFeature.allCases { defaults.set(true, forKey: feature.availabilityKey) }
-        cameraInNotch = false
         let cases: [(QuickLauncherItem, AppFeature, String?, Double?)] = [
             (.keepAwake, .keepAwake, "keepAwake.toggle", nil),
             (.micMute, .micMute, "micMute.toggle", nil),
@@ -142,13 +136,6 @@ enum QuickLauncherContract {
             suite.expect(events.isEmpty && launcher.activeUtility == nil,
                          "editing \(item) never activates it")
         }
-        events.removeAll()
-        DispatchQueue.main.jobs.removeAll()
-        cameraInNotch = true
-        Launcher().run(.cameraPreview)
-        suite.expect(events == ["camera.notch", "hide"] && DispatchQueue.main.jobs.isEmpty,
-                     "an embedded camera switches the notch before hiding the launcher, without a close-and-reopen delay")
-        cameraInNotch = false
         var tile = Tile()
         suite.expect(tile.display(.screenRecorder) == ("record.circle", false),
                      "an idle recording tile offers recording")
@@ -159,7 +146,7 @@ enum QuickLauncherContract {
                      "every tile has an icon")
         presentationContracts(suite)
         compositionContracts(suite)
-        railContracts(suite)
+        gridContracts(suite)
     }
 
     private static func presentationContracts(_ suite: TestSuite) {
@@ -233,19 +220,16 @@ enum QuickLauncherContract {
         }
     }
 
-    /// Hover and the arrows both select, but only the arrows move the
-    /// island's rail: scrolling to a hovered tile slid the next one under the
-    /// pointer, and the rail kept going.
-    private static func railContracts(_ suite: TestSuite) {
+    /// Hover and the arrows both select; an arrow moves on from the hovered
+    /// tile through the row-major grid.
+    private static func gridContracts(_ suite: TestSuite) {
         let launcher = Launcher()
         launcher.prepareForPresentation()
-        suite.expect(launcher.keyboardIndex == 0, "a new presentation starts the rail at its first tile")
+        suite.expect(launcher.selectedIndex == 0, "a new presentation selects the first tile")
         launcher.select(launcher.visibleItems[3])
-        suite.expect(launcher.selectedIndex == 3 && launcher.keyboardIndex == nil,
-                     "hovering a tile selects it without scrolling the rail")
+        suite.expect(launcher.selectedIndex == 3, "hovering a tile selects it")
         let right = NSEvent(keyCode: UInt16(kVK_RightArrow))
-        suite.expect(launcher.handlePanelKey(right, flow: .columns(rows: 2)) == nil
-                     && launcher.selectedIndex == 5 && launcher.keyboardIndex == 5,
-                     "an arrow moves on from the hovered tile and scrolls the rail to the new one")
+        suite.expect(launcher.handlePanelKey(right) == nil && launcher.selectedIndex == 4,
+                     "an arrow moves on from the hovered tile")
     }
 }

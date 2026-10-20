@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 // Generates all icon assets:
-// - the app iconset and .icns from the exported Default rendition of the
-//   adaptive source (Resources/Brand/AppIcon-Default.png)
-// - the menu bar template glyph and BrandMark from the wordmark master
+// - the app iconset and .icns from the rendered icon artwork
+//   (Resources/Brand/AppIcon-Default.png)
+// - the menu bar template glyph and BrandMark from the anvil silhouette
 //   (Resources/Brand/logo.png)
-// AppIcon-Default.png is a hand-exported twin of Resources/Brand/AppIcon.icon;
-// re-export it whenever the Icon Composer project changes. The build cannot read
+// The silhouette in logo.png and in Resources/Brand/AppIcon.icon is traced
+// from the artwork's outline, and the .icon's Faces layer from its lit top and
+// bevels; change them together. The build cannot read
 // .icon bundles directly: actool exists only inside full Xcode 26, and the
 // supported local floor is Command Line Tools alone.
 import AppKit

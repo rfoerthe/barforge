@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "Position",
         shelfDockMenuBar: "Unter dem Menüleistensymbol",
         shelfDockTopCenter: "Oben in der Bildschirmmitte",
-        shelfDockIslandNote: "Solange die Dynamic Island aktiv ist, gehört ihr die Mitte oben.",
         shelfCollapse: "Einklappen",
         shelfBehaviorTitle: "Nach der Verwendung",
         shelfCloseAfterDrop: "Nach dem Ablegen in einer anderen App schließen",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "Eine Werkzeugzentrale für deinen Mac.\nEnergie, Systemüberwachung, Scrollen und ein Fensterumschalter, direkt in der Menüleiste.",
         versionPrefix: "Version",
         reviewIntro: "Einführung erneut ansehen",
-        reviewHighlights: "Neuerungen ansehen",
         viewOnGitHub: "Auf GitHub ansehen",
 
         obContinue: "Fortfahren",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "QR-Code",
         qrResultCopy: "Kopieren",
         qrResultOpen: "Link öffnen",
-        highlightsTitle: "Neu in diesem Update",
         highlightsTitleClipboardRedesign: "Überarbeitete Zwischenablage",
         highlightsTitleWindowLayout: "Fenster-Layout",
         highlightsTitleQuitProtection: "Schutz für ⌘Q und ⌘W",

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -10,7 +11,6 @@ struct GeneralSettingsStrings {
     let appearanceCaption: String
     let launchAtLoginCaption: String
     let liquidGlassCaption: String
-    let liquidGlassOtherWindows: String
     let panelIntro: String
     let panelReorderHint: String
     let menuBarIconTitle: String
@@ -61,7 +61,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Стосується лише вікон і панелей Barforge, а не всього Mac.",
         launchAtLoginCaption: "Автоматично відкривається щоразу після запуску Mac.",
         liquidGlassCaption: "Прозорі панелі з ефектом скла.",
-        liquidGlassOtherWindows: "Інші вікна й панелі",
         panelIntro: "Натисніть значок Barforge на смузі меню, щоб відкрити панель. Вкладки розташовані в такому порядку.",
         panelReorderHint: "Перетягуйте, щоб змінити порядок. Вимкніть те, що вам не потрібно.",
         menuBarIconTitle: "Значок на смузі меню",
@@ -89,7 +88,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Applies to Barforge’s own windows and panels, not to the whole Mac.",
         launchAtLoginCaption: "Opens by itself every time you turn on your Mac.",
         liquidGlassCaption: "See-through, glass-like panels.",
-        liquidGlassOtherWindows: "Other windows and panels",
         panelIntro: "Click Barforge’s icon in the menu bar to open the panel. Its tabs appear in this order.",
         panelReorderHint: "Drag to reorder. Switch off anything you don’t need.",
         menuBarIconTitle: "Menu bar icon",
@@ -117,7 +115,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Vale para as janelas e painéis do Barforge, não para o Mac inteiro.",
         launchAtLoginCaption: "Abre sozinho toda vez que você liga o Mac.",
         liquidGlassCaption: "Painéis translúcidos, com aparência de vidro.",
-        liquidGlassOtherWindows: "Outras janelas e painéis",
         panelIntro: "Clique no ícone do Barforge na barra de menus para abrir o painel. As abas aparecem nesta ordem.",
         panelReorderHint: "Arraste para reordenar. Desligue o que você não precisa.",
         menuBarIconTitle: "Ícone da barra de menus",
@@ -145,7 +142,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Yalnızca Barforge’un kendi pencereleri ve panelleri için geçerlidir, tüm Mac için değil.",
         launchAtLoginCaption: "Mac’i her açtığınızda kendiliğinden açılır.",
         liquidGlassCaption: "Cam görünümlü, yarı saydam paneller.",
-        liquidGlassOtherWindows: "Diğer pencereler ve paneller",
         panelIntro: "Paneli açmak için menü çubuğundaki Barforge simgesine tıklayın. Sekmeler bu sırayla görünür.",
         panelReorderHint: "Sıralamak için sürükleyin. İhtiyaç duymadıklarınızı kapatın.",
         menuBarIconTitle: "Menü çubuğu simgesi",
@@ -173,7 +169,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Действует только на окна и панели Barforge, а не на весь Mac.",
         launchAtLoginCaption: "Открывается сам при каждом включении Mac.",
         liquidGlassCaption: "Полупрозрачные панели, похожие на стекло.",
-        liquidGlassOtherWindows: "Другие окна и панели",
         panelIntro: "Нажмите значок Barforge в строке меню, чтобы открыть панель. Вкладки идут в этом порядке.",
         panelReorderHint: "Перетаскивайте, чтобы изменить порядок. Выключите то, что вам не нужно.",
         menuBarIconTitle: "Значок в строке меню",
@@ -201,7 +196,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Solo afecta a las ventanas y paneles de Barforge, no a todo el Mac.",
         launchAtLoginCaption: "Se abre solo cada vez que enciendes el Mac.",
         liquidGlassCaption: "Paneles translúcidos, con aspecto de cristal.",
-        liquidGlassOtherWindows: "Otras ventanas y paneles",
         panelIntro: "Haz clic en el icono de Barforge en la barra de menús para abrir el panel. Sus pestañas aparecen en este orden.",
         panelReorderHint: "Arrastra para reordenar. Desactiva lo que no necesites.",
         menuBarIconTitle: "Icono de la barra de menús",
@@ -229,7 +223,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Platí len pre vlastné okná a panely Barforge, nie pre celý Mac.",
         launchAtLoginCaption: "Otvorí sa sám vždy, keď zapnete Mac.",
         liquidGlassCaption: "Priehľadné panely v štýle skla.",
-        liquidGlassOtherWindows: "Ostatné okná a panely",
         panelIntro: "Kliknutím na ikonu Barforge v lište otvoríte panel. Jeho karty sa zobrazujú v tomto poradí.",
         panelReorderHint: "Presunutím zmeníte poradie. Vypnite čokoľvek, čo nepotrebujete.",
         menuBarIconTitle: "Ikona v lište s ponukami",
@@ -257,7 +250,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Gilt nur für die Fenster und Panels von Barforge, nicht für den ganzen Mac.",
         launchAtLoginCaption: "Öffnet sich von selbst, sobald du den Mac einschaltest.",
         liquidGlassCaption: "Durchscheinende Panels wie aus Glas.",
-        liquidGlassOtherWindows: "Andere Fenster und Panels",
         panelIntro: "Klicke auf das Barforge-Symbol in der Menüleiste, um das Panel zu öffnen. Die Tabs erscheinen in dieser Reihenfolge.",
         panelReorderHint: "Zum Umsortieren ziehen. Was du nicht brauchst, einfach ausschalten.",
         menuBarIconTitle: "Menüleistensymbol",
@@ -285,7 +277,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Ne concerne que les fenêtres et panneaux de Barforge, pas tout le Mac.",
         launchAtLoginCaption: "S’ouvre tout seul à chaque démarrage du Mac.",
         liquidGlassCaption: "Panneaux translucides, à l’aspect de verre.",
-        liquidGlassOtherWindows: "Autres fenêtres et panneaux",
         panelIntro: "Cliquez sur l’icône de Barforge dans la barre des menus pour ouvrir le panneau. Ses onglets apparaissent dans cet ordre.",
         panelReorderHint: "Glissez pour réordonner. Désactivez ce dont vous n’avez pas besoin.",
         menuBarIconTitle: "Icône de la barre des menus",
@@ -313,7 +304,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Vale solo per le finestre e i pannelli di Barforge, non per tutto il Mac.",
         launchAtLoginCaption: "Si apre da solo ogni volta che accendi il Mac.",
         liquidGlassCaption: "Pannelli traslucidi, con l’aspetto del vetro.",
-        liquidGlassOtherWindows: "Altre finestre e pannelli",
         panelIntro: "Fai clic sull’icona di Barforge nella barra dei menu per aprire il pannello. Le sue schede compaiono in questo ordine.",
         panelReorderHint: "Trascina per riordinare. Disattiva ciò che non ti serve.",
         menuBarIconTitle: "Icona della barra dei menu",
@@ -341,7 +331,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Barforge のウインドウとパネルにだけ適用され、Mac 全体には影響しません。",
         launchAtLoginCaption: "Mac の電源を入れるたびに自動で開きます。",
         liquidGlassCaption: "ガラスのように透ける半透明のパネル。",
-        liquidGlassOtherWindows: "ほかのウインドウとパネル",
         panelIntro: "メニューバーの Barforge アイコンをクリックするとパネルが開きます。タブはこの順番で表示されます。",
         panelReorderHint: "ドラッグして並べ替え。不要なものはオフにします。",
         menuBarIconTitle: "メニューバーのアイコン",
@@ -369,7 +358,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "Barforge의 윈도우와 패널에만 적용되며 Mac 전체에는 영향을 주지 않습니다.",
         launchAtLoginCaption: "Mac을 켤 때마다 자동으로 열립니다.",
         liquidGlassCaption: "유리처럼 비치는 반투명 패널.",
-        liquidGlassOtherWindows: "다른 윈도우와 패널",
         panelIntro: "메뉴 막대의 Barforge 아이콘을 클릭하면 패널이 열립니다. 탭은 이 순서로 표시됩니다.",
         panelReorderHint: "드래그하여 순서를 바꾸고, 필요 없는 것은 끄세요.",
         menuBarIconTitle: "메뉴 막대 아이콘",
@@ -397,7 +385,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "仅影响 Barforge 自己的窗口和面板，不影响整台 Mac。",
         launchAtLoginCaption: "每次开机时自动打开。",
         liquidGlassCaption: "像玻璃一样通透的半透明面板。",
-        liquidGlassOtherWindows: "其他窗口和面板",
         panelIntro: "点按菜单栏中的 Barforge 图标即可打开面板。标签页按此顺序显示。",
         panelReorderHint: "拖动可重新排序。不需要的关掉即可。",
         menuBarIconTitle: "菜单栏图标",
@@ -425,7 +412,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "僅影響 Barforge 自己的視窗和面板，不影響整台 Mac。",
         launchAtLoginCaption: "每次開機時自動開啟。",
         liquidGlassCaption: "像玻璃一樣通透的半透明面板。",
-        liquidGlassOtherWindows: "其他視窗和面板",
         panelIntro: "按一下選單列中的 Barforge 圖示即可開啟面板。標籤頁會依此順序顯示。",
         panelReorderHint: "拖曳可重新排序。不需要的關掉即可。",
         menuBarIconTitle: "選單列圖示",
@@ -453,7 +439,6 @@ extension GeneralSettingsStrings {
         appearanceCaption: "只影響 Barforge 自己的視窗和面板，不影響整部 Mac。",
         launchAtLoginCaption: "每次開機時自動開啟。",
         liquidGlassCaption: "像玻璃一樣通透的半透明面板。",
-        liquidGlassOtherWindows: "其他視窗和面板",
         panelIntro: "按一下選單列中的 Barforge 圖示即可開啟面板。分頁會按此次序顯示。",
         panelReorderHint: "拖曳可重新排序。不需要的關掉即可。",
         menuBarIconTitle: "選單列圖示",

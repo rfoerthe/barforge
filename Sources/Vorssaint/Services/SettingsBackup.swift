@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import UniformTypeIdentifiers
@@ -92,7 +93,7 @@ enum SettingsBackup {
             }
         let windowLayoutPaths = SettingsBackupSupport.pathIdentities(
             in: defaults.stringArray(forKey: DefaultsKey.windowLayoutIgnoredApps) ?? [])
-        for key in SettingsBackupSupport.keysToClear(whenImporting: settings) {
+        for key in SettingsBackupSupport.exportKeys() {
             defaults.removeObject(forKey: key)
         }
         for (key, value) in settings {

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import ImageIO
@@ -66,7 +67,6 @@ final class ScreenshotService: ObservableObject {
     /// the previous capture's toast.
     private var workflowWindowIDs: Set<CGWindowID> {
         var ids = session?.protectedWindowIDs ?? []
-        if NotchSupport.isEnabled() { ids.formUnion(NotchService.shared.protectedWindowIDs) }
         ids.formUnion(preview?.protectedWindowIDs ?? [])
         ids.formUnion(ScreenCaptureService.shared.protectedWindowIDs)
         if let number = QuickToolHUD.currentWindowNumber, number > 0 {
@@ -445,8 +445,6 @@ final class ScreenshotService: ObservableObject {
     /// exists to reach for.
     private func route(_ capture: ScreenshotSelectionController.Capture) {
         beginLatestCapture(capture)
-        // The island's companion blinks hard, as a flash, if it is there to see.
-        NotchService.shared.reactMascot(.flash, patience: 1)
         preview?.close()
         RecentCaptureService.shared.recordScreenshot(capture)
         let defaults = UserDefaults.standard
@@ -749,7 +747,7 @@ final class ScreenshotService: ObservableObject {
                     NSSound.beep()
                     return
                 }
-                NotchService.shared.perform {
+                DispatchQueue.main.async {
                     ScreenshotService.shared.openEditor(with: capture)
                 }
             }

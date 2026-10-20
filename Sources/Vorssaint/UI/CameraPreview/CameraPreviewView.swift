@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AVFoundation
 import SwiftUI
@@ -9,9 +10,6 @@ import SwiftUI
 /// anywhere else or switching to the meeting app closes it.
 struct CameraPreviewView: View {
     var size = CGSize(width: 320, height: 240)
-    /// The picker over the image on hover. The island turns it off: its top
-    /// row holds the picker and the stop button, clear of the image.
-    var showsCameraMenu = true
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var service = CameraPreviewService.shared
     @State private var hovering = false
@@ -58,8 +56,8 @@ struct CameraPreviewView: View {
                 .controlSize(.small)
             }
         case .unavailable:
-            statusMessage(icon: "video.slash", text: FeatureStrings.notchActivities(l10n.language).cameraUnavailable) {
-                Button(FeatureStrings.notchActivities(l10n.language).startCamera, action: service.retryCapture)
+            statusMessage(icon: "video.slash", text: strings.cameraUnavailable) {
+                Button(strings.startCamera, action: service.retryCapture)
                     .controlSize(.small)
             }
         case .noCamera:
@@ -68,7 +66,7 @@ struct CameraPreviewView: View {
     }
 
     private var showsMenu: Bool {
-        showsCameraMenu && hovering && service.state == .running && service.session != nil
+        hovering && service.state == .running && service.session != nil
             && service.devices.count > 1
     }
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "位置",
         shelfDockMenuBar: "メニューバーアイコンの下",
         shelfDockTopCenter: "画面上部の中央",
-        shelfDockIslandNote: "Dynamic Islandがオンの間は画面上部の中央を使います。",
         shelfCollapse: "折りたたむ",
         shelfBehaviorTitle: "使用後",
         shelfCloseAfterDrop: "別のアプリにドロップしたら閉じる",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "あなたの Mac のためのユーティリティハブ。\n省エネルギー、システムモニタ、スクロール、ウインドウスイッチャーを、メニューバーから。",
         versionPrefix: "バージョン",
         reviewIntro: "はじめにを見直す",
-        reviewHighlights: "新機能ツアーを見直す",
         viewOnGitHub: "GitHub で見る",
 
         obContinue: "続ける",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "QRコード",
         qrResultCopy: "コピー",
         qrResultOpen: "リンクを開く",
-        highlightsTitle: "このアップデートの新機能",
         highlightsTitleClipboardRedesign: "クリップボードの再設計",
         highlightsTitleWindowLayout: "ウィンドウの配置",
         highlightsTitleQuitProtection: "⌘Qと⌘Wの保護",

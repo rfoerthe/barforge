@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -342,11 +343,8 @@ private struct PurposeStep: View {
             selectedPreset = nil
             if selected {
                 selectedFeatures.remove(feature)
-                if feature == .notch {
-                    selectedFeatures.subtract(AppFeature.dynamicIslandExtensions)
-                }
             } else {
-                selectedFeatures.formUnion(feature.initialInstallGroup)
+                selectedFeatures.insert(feature)
             }
         } label: {
             HStack(spacing: 10) {
@@ -405,7 +403,6 @@ private struct PurposeStep: View {
         case .sound: return hub.groupSound
         case .energyDisplay: return hub.groupEnergyDisplay
         case .tools: return hub.groupTools
-        case .dynamicIsland: return FeatureStrings.notch(l10n.language).title
         case .monitor: return hub.groupMonitor
         }
     }

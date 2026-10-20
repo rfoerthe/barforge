@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -550,7 +551,6 @@ extension Strings {
         shelfDockPlacement: "Расположение",
         shelfDockMenuBar: "Под значком в строке меню",
         shelfDockTopCenter: "Вверху по центру экрана",
-        shelfDockIslandNote: "Пока Dynamic Island включён, верх по центру занят им.",
         shelfCollapse: "Свернуть",
         shelfBehaviorTitle: "После использования",
         shelfCloseAfterDrop: "Закрывать после переноса в другое приложение",
@@ -684,7 +684,6 @@ extension Strings {
         aboutDescription: "Набор полезных инструментов для вашего Mac.\nПитание, системный монитор, прокрутка и переключатель окон прямо в строке меню.",
         versionPrefix: "Версия",
         reviewIntro: "Повторно показать вступление",
-        reviewHighlights: "Повторно показать обзор новинок",
         viewOnGitHub: "Открыть на GitHub",
 
         obContinue: "Далее",
@@ -1019,7 +1018,6 @@ extension Strings {
         qrResultTitle: "QR-код",
         qrResultCopy: "Копировать",
         qrResultOpen: "Открыть ссылку",
-        highlightsTitle: "Новое в этом обновлении",
         highlightsTitleClipboardRedesign: "Обновлённый буфер обмена",
         highlightsTitleWindowLayout: "Размещение окон",
         highlightsTitleQuitProtection: "Защита от ⌘Q и ⌘W",

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "Poloha",
         shelfDockMenuBar: "Pod ikonou v lište",
         shelfDockTopCenter: "Hore v strede obrazovky",
-        shelfDockIslandNote: "Kým je Dynamic Island zapnutý, hore v strede je jeho miesto.",
         shelfCollapse: "Zbaliť",
         shelfBehaviorTitle: "Po použití",
         shelfCloseAfterDrop: "Zavrieť po pustení do inej aplikácie",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "Centrum nástrojov pre váš Mac.\nEnergia, monitor systému, rolovanie a prepínač okien priamo v lište s ponukami.",
         versionPrefix: "Verzia",
         reviewIntro: "Znova zobraziť úvod",
-        reviewHighlights: "Znova zobraziť novinky",
         viewOnGitHub: "Zobraziť na GitHube",
 
         obContinue: "Pokračovať",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "QR kód",
         qrResultCopy: "Kopírovať",
         qrResultOpen: "Otvoriť odkaz",
-        highlightsTitle: "Novinky v tejto aktualizácii",
         highlightsTitleClipboardRedesign: "Prepracovaná schránka",
         highlightsTitleWindowLayout: "Rozloženie okien",
         highlightsTitleQuitProtection: "Ochrana pred ukončením a zatvorením",

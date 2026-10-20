@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 
@@ -205,7 +206,6 @@ enum CommandBarCatalog {
         case .sound: return hub.groupSound
         case .energyDisplay: return hub.groupEnergyDisplay
         case .tools: return hub.groupTools
-        case .dynamicIsland: return FeatureStrings.notch(L10n.shared.language).title
         case .monitor: return hub.groupMonitor
         }
     }
@@ -545,9 +545,6 @@ enum CommandBarCatalog {
                     NSSound.beep()
                     return
                 }
-                // Dynamic Island shows the level itself, and a floating copy
-                // would sit right below it.
-                if NotchSupport.routes(.volume), NotchService.shared.showVolume(level) { return }
                 QuickToolHUD.show(icon: "speaker.wave.2",
                                   message: "\(FeatureStrings.commandBar(L10n.shared.language).volumeTitle) \(value)%")
             }))

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -171,15 +172,14 @@ struct RadialMenuView: View {
         let count = items.count
         return ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
             RadialChipView(item: item,
-                           name: item.displayName(text, nowPlayingState: service.nowPlayingState),
-                           nowPlayingState: service.nowPlayingState,
+                           name: item.displayName(text),
                            highlighted: service.highlightedIndex == index,
                            animates: animates,
                            profileColor: profileColor,
                            direction: RadialMenuGeometry.unitPosition(index: index, itemCount: count),
                            openDelay: Self.openDelay(index: index, count: count),
                            open: service.visible)
-                .accessibilityLabel(item.displayName(text, nowPlayingState: service.nowPlayingState))
+                .accessibilityLabel(item.displayName(text))
         }
     }
 
@@ -221,7 +221,7 @@ struct RadialMenuView: View {
     @ViewBuilder
     private var hubFace: some View {
         if let index = service.highlightedIndex, items.indices.contains(index) {
-            Text(items[index].displayName(text, nowPlayingState: service.nowPlayingState))
+            Text(items[index].displayName(text))
                 .font(.system(size: 11, weight: .semibold))
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
@@ -251,7 +251,6 @@ struct RadialMenuView: View {
 private struct RadialChipView: View {
     let item: RadialMenuItem
     let name: String
-    let nowPlayingState: RadialNowPlayingState
     let highlighted: Bool
     let animates: Bool
     let profileColor: Color
@@ -331,19 +330,7 @@ private struct RadialChipView: View {
 
     @ViewBuilder
     private var icon: some View {
-        if item.mediaKey == .nowPlaying {
-            if case let .playing(snapshot) = nowPlayingState,
-               let icon = RadialNowPlayingApplication.icon(for: snapshot) {
-                Image(nsImage: icon)
-                    .resizable()
-                    .interpolation(.high)
-                    .frame(width: 34, height: 34)
-            } else {
-                Image(systemName: "music.note")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(highlighted ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
-            }
-        } else if item.symbolName.isEmpty, let customImage = RadialMenuIconStore.customIcon(for: item) {
+        if item.symbolName.isEmpty, let customImage = RadialMenuIconStore.customIcon(for: item) {
             Image(nsImage: customImage)
                 .resizable()
                 .interpolation(.high)
@@ -443,8 +430,7 @@ enum RadialMenuIconStore {
 /// Name resolution shared by the wheel and the Settings editor: a custom name
 /// wins, everything else derives from the target in the user's language.
 extension RadialMenuItem {
-    func displayName(_ text: RadialMenuFeatureStrings,
-                     nowPlayingState: RadialNowPlayingState? = nil) -> String {
+    func displayName(_ text: RadialMenuFeatureStrings) -> String {
         if !name.isEmpty { return name }
         switch kind {
         case .app, .file:
@@ -469,12 +455,6 @@ extension RadialMenuItem {
             case .playPause: return text.mediaPlayPause
             case .previousTrack: return text.mediaPrevious
             case .nextTrack: return text.mediaNext
-            case .nowPlaying:
-                switch nowPlayingState {
-                case let .some(.playing(snapshot)): return snapshot.radialLabel ?? text.mediaNowPlaying
-                case .some(.nothingPlaying): return text.mediaNothingPlaying
-                case .some(.loading), .none: return text.mediaNowPlaying
-                }
             case nil: return text.kindMedia
             }
         case .submenu:

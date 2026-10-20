@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import UniformTypeIdentifiers
@@ -27,13 +28,6 @@ enum QuickToolsSupport {
         case up, down, left, right
     }
 
-    /// Which way a grid fills: row by row with a fixed column count, or
-    /// column by column with a fixed row count, as a rail in the island does.
-    enum GridFlow: Equatable {
-        case rows(columns: Int)
-        case columns(rows: Int)
-    }
-
     /// Keyboard navigation over a row-major grid: arrows move by one cell,
     /// clamped to the existing items (no wrapping, so the selection never
     /// jumps surprisingly from one edge to the other).
@@ -54,23 +48,6 @@ enum QuickToolsSupport {
         if direction == .left, current % columns == 0 { return current }
         if direction == .right, current % columns == columns - 1 { return current }
         return candidate
-    }
-
-    /// A column-major rail is the row-major walk with the axes swapped.
-    static func gridIndex(after index: Int, count: Int, flow: GridFlow, direction: GridDirection) -> Int {
-        switch flow {
-        case .rows(let columns):
-            return gridIndex(after: index, count: count, columns: columns, direction: direction)
-        case .columns(let rows):
-            let transposed: GridDirection
-            switch direction {
-            case .up: transposed = .left
-            case .down: transposed = .right
-            case .left: transposed = .up
-            case .right: transposed = .down
-            }
-            return gridIndex(after: index, count: count, columns: max(1, rows), direction: transposed)
-        }
     }
 
     /// The launcher's hidden-item set travels as a comma-joined string.

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 
-/// Lets a mouse wheel move the strips that only scroll sideways: the island's
-/// mixer and rails, the switcher, wallpaper and chip rows. Without it their
+/// Lets a mouse wheel move the strips that only scroll sideways: the
+/// switcher, wallpaper and chip rows. Without it their
 /// hidden items could only be reached with a trackpad or Shift.
 enum HorizontalWheelScrolling {
     private static var monitor: Any?
@@ -13,9 +14,7 @@ enum HorizontalWheelScrolling {
     static func install() {
         guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
-            // The island first offers the wheel to its own gestures.
-            guard !(event.window is NotchPanel) else { return event }
-            return handle(event) ? nil : event
+            handle(event) ? nil : event
         }
     }
 

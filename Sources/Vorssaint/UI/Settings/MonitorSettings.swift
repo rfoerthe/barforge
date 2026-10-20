@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -96,7 +97,7 @@ struct MonitorSettings: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             MenuBarMetricTiles()
-            Text(FeatureStrings.notchEditor(l10n.language).reorderHint)
+            Text(FeatureStrings.settingsPages(l10n.language).menuBarReorderHint)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -549,7 +550,6 @@ extension Strings {
         shelfDockPlacement: "Konum",
         shelfDockMenuBar: "Menü çubuğu simgesinin altında",
         shelfDockTopCenter: "Ekranın üst ortasında",
-        shelfDockIslandNote: "Dynamic Island açıkken üst orta onundur.",
         shelfCollapse: "Daralt",
         shelfBehaviorTitle: "Kullanımdan sonra",
         shelfCloseAfterDrop: "Başka bir uygulamaya bırakınca kapat",
@@ -683,7 +683,6 @@ extension Strings {
         aboutDescription: "Mac’in için bir yardımcı merkez.\nEnerji, sistem monitörü, kaydırma ve pencere değiştirici, doğrudan menü çubuğunda.",
         versionPrefix: "Sürüm",
         reviewIntro: "Tanıtımı incele",
-        reviewHighlights: "Yenilikler turunu incele",
         viewOnGitHub: "GitHub’da görüntüle",
 
         obContinue: "Devam",
@@ -1018,7 +1017,6 @@ extension Strings {
         qrResultTitle: "QR kodu",
         qrResultCopy: "Kopyala",
         qrResultOpen: "Bağlantıyı aç",
-        highlightsTitle: "Bu güncellemedeki yenilikler",
         highlightsTitleClipboardRedesign: "Yenilenen Pano",
         highlightsTitleWindowLayout: "Pencere Yerleşimi",
         highlightsTitleQuitProtection: "⌘Q ve ⌘W Koruması",

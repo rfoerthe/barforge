@@ -24,26 +24,6 @@ enum SettingsBackupSupport {
         return keys
     }
 
-    /// Backups written before Dynamic Island existed have no island keys.
-    /// Importing one must not erase the receiving Mac's island preferences.
-    static func omitsDynamicIslandSettings(_ settings: [String: Any]) -> Bool {
-        dynamicIslandKeys(in: exportKeys()).isDisjoint(with: settings.keys)
-    }
-
-    static func keysToClear(whenImporting settings: [String: Any]) -> Set<String> {
-        let keys = exportKeys()
-        guard omitsDynamicIslandSettings(settings) else { return keys }
-        return keys.subtracting(dynamicIslandKeys(in: keys))
-    }
-
-    private static func dynamicIslandKeys(in keys: Set<String>) -> Set<String> {
-        let availability = Set(AppFeature.features(in: .dynamicIsland).map(\.availabilityKey))
-        return keys.filter {
-            $0.hasPrefix("notch") || $0 == DefaultsKey.panelControlNotch
-                || availability.contains($0)
-        }
-    }
-
     /// Preferences stored without a registered default (absence means "use
     /// the built-in behavior"), still part of how the user set the app up.
     static let unregisteredPreferenceKeys: Set<String> = [
@@ -79,10 +59,6 @@ enum SettingsBackupSupport {
         DefaultsKey.panelPowerOrder,
         DefaultsKey.panelCollapsedSections,
         DefaultsKey.quickLauncherItemOrder,
-        // Legacy island layouts stay restorable; absence selects the new layout.
-        DefaultsKey.notchQuickAccessSide,
-        DefaultsKey.notchQuickAccessSecond,
-        DefaultsKey.notchQuickAccessThird,
         DefaultsKey.systemShortcutTakeOverKeys,
         // Experience flags: a restored Mac must not replay onboarding or the
         // feature intros the user has already been through.
@@ -91,9 +67,7 @@ enum SettingsBackupSupport {
         DefaultsKey.featuresOnboardingVersion,
         DefaultsKey.lastUpdateIntroVersion,
         DefaultsKey.supportUpdateIntroVersion,
-        DefaultsKey.updateHighlightsSeenVersion,
         DefaultsKey.featureHubKeptFeatures,
-        DefaultsKey.brightnessUpdatePromptState,
         DefaultsKey.panelCollapsedResetVersion,
     ]
 
@@ -104,9 +78,6 @@ enum SettingsBackupSupport {
     static let machineStateKeys: Set<String> = [
         DefaultsKey.displaysSwitchedOff,
         DefaultsKey.displaysSwitchedOffFingerprints,
-        // Codex homes are folders on this Mac whose sign-in the cards use,
-        // never settings to bring to another one.
-        DefaultsKey.notchAgentsCodexProfiles,
         DefaultsKey.dockPreviewRestoreAutohide,
         // The Space arrangement setting to put back, and a Dock restart still
         // owed, belong to this Mac's Dock.
@@ -151,7 +122,6 @@ enum SettingsBackupSupport {
         // Restoring it elsewhere could search a different volume or trigger a
         // protected-folder prompt without a fresh choice.
         DefaultsKey.commandBarFileScopes,
-        DefaultsKey.notchDownloadsFolderBookmark,
         DefaultsKey.wallpaperOwnBookmarks,
         DefaultsKey.wallpaperExcludedOwnPaths,
         DefaultsKey.recorderSaveFolder,
@@ -165,7 +135,6 @@ enum SettingsBackupSupport {
         DefaultsKey.unifiedScreenCaptureShortcutMigrated,
         DefaultsKey.restoredScreenCaptureShortcutsMigrated,
         DefaultsKey.orphanedCaptureShortcutMigrated,
-        DefaultsKey.notchAgentsOptInMigrated,
         DefaultsKey.settingsWindowWidth,
         DefaultsKey.settingsWindowHeight,
         DefaultsKey.clipboardHistoryWindowWidth,
@@ -186,9 +155,6 @@ enum SettingsBackupSupport {
         DefaultsKey.brightnessDDCWriteOnlyPathsRechecked,
         DefaultsKey.brightnessForcedSoftwarePaths,
         DefaultsKey.brightnessExtendedDimmingPaths,
-        // A fit measured against one Mac's camera housing would misfit another's.
-        DefaultsKey.notchCameraFitWidth,
-        DefaultsKey.notchCameraFitHeight,
     ]
 
     /// The file's content: an envelope with the format version, the app
@@ -201,7 +167,6 @@ enum SettingsBackupSupport {
                 settings[key] = value
             }
         }
-        settings = portableNotchDisplay(settings)
         settings = portableMediaSettings(settings)
         settings = portableMouseExceptions(settings)
         settings = portableWindowLayoutIgnoredApps(settings)
@@ -223,18 +188,8 @@ enum SettingsBackupSupport {
         else { return nil }
         let allowed = exportKeys()
         let filtered = settings.filter { allowed.contains($0.key) && valueLooksRight($0.key, $0.value) }
-        return portableNotchDisplay(portableThumbnailPauseLists(portableWindowLayoutIgnoredApps(
-            portableMouseExceptions(portableMediaSettings(filtered)))))
-    }
-
-    /// A display mode this version does not offer, such as one kept by an
-    /// earlier development build, restores as the automatic choice.
-    private static func portableNotchDisplay(_ settings: [String: Any]) -> [String: Any] {
-        var result = settings
-        if let mode = result[DefaultsKey.notchDisplay] as? String, NotchDisplay(rawValue: mode) == nil {
-            result[DefaultsKey.notchDisplay] = NotchDisplay.automatic.rawValue
-        }
-        return result
+        return portableThumbnailPauseLists(portableWindowLayoutIgnoredApps(
+            portableMouseExceptions(portableMediaSettings(filtered))))
     }
 
     static func formatVersion(from payload: [String: Any]) -> Int? {
@@ -437,11 +392,6 @@ enum SettingsBackupSupport {
     /// switch belongs, or text where a number belongs, would otherwise reach
     /// code that trusts its own settings.
     static func valueLooksRight(_ key: String, _ value: Any) -> Bool {
-        switch key {
-        case DefaultsKey.notchQuickAccessSide, DefaultsKey.notchQuickAccessSecond, DefaultsKey.notchQuickAccessThird:
-            return value is String
-        default: break
-        }
         guard let expected = Defaults.registeredDefaults[key] else {
             // Not a registered setting, so there is nothing to compare
             // against; the allowed list is the only gate for these.

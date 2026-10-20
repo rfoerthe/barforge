@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -194,16 +195,11 @@ enum ScratchpadStoreContractTests {
 /// No system dialog opens, and writes stay inside a disposable directory.
 enum ScratchpadExportContract {
     final class Window {
-        struct Level { let rawValue: Int }
-        var level = Level(rawValue: 26)
         var isVisible = true
         var focusCount = 0
         func makeKey() { focusCount += 1 }
     }
     final class Application {
-        var keyWindow: Window?
-        var currentEvent: Event?
-        struct Event { let window: Window? }
         func activate(ignoringOtherApps: Bool) {}
     }
     final class Panel {
@@ -213,41 +209,16 @@ enum ScratchpadExportContract {
         var isExtensionHidden = true
         var nameFieldStringValue = ""
         var url: URL?
-        var parent: Window?
-        var level = Window.Level(rawValue: 0)
-        var hidesOnDeactivate = true
-        var standalone = false
-        var focused = false
         var modalCalls = 0
         var response: NSApplication.ModalResponse = .cancel
-        var completion: ((NSApplication.ModalResponse) -> Void)?
         init() { Self.latest = self }
         func runModal() -> NSApplication.ModalResponse { modalCalls += 1; return response }
-        func beginSheetModal(for parent: Window,
-                             completionHandler: @escaping (NSApplication.ModalResponse) -> Void) {
-            self.parent = parent
-            completion = completionHandler
-        }
-        func begin(completionHandler: @escaping (NSApplication.ModalResponse) -> Void) {
-            standalone = true
-            completion = completionHandler
-        }
-        func makeKeyAndOrderFront(_ sender: Any?) { focused = true }
-        func finish(_ response: NSApplication.ModalResponse) {
-            let callback = completion
-            completion = nil
-            callback?(response)
-        }
     }
     enum Queue {
         static var main: Queue.Type { Self.self }
         static var jobs: [() -> Void] = []
         static func async(execute action: @escaping () -> Void) { jobs.append(action) }
         static func drain() { while !jobs.isEmpty { jobs.removeFirst()() } }
-    }
-    final class Island {
-        static let shared = Island()
-        var presentationWindow: Window?
     }
     enum HUD {
         static var errors = 0
@@ -257,7 +228,6 @@ enum ScratchpadExportContract {
         typealias NSSavePanel = Panel
         typealias NSWindow = Window
         typealias DispatchQueue = Queue
-        typealias NotchService = Island
         typealias QuickToolHUD = HUD
         static let padID = UUID()
         var NSApp = Application()
@@ -279,106 +249,76 @@ enum ScratchpadExportContract {
         defer {
             Queue.jobs = []
             Panel.latest = nil
-            Island.shared.presentationWindow = nil
             try? FileManager.default.removeItem(at: root)
         }
         do {
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-            for host in ["island key", "island event", "island menu", "floating", "floating while island key"] {
-                for response in [NSApplication.ModalResponse.cancel, .OK] {
-                    let service = Service()
-                    let island = Window()
-                    let floating = Window()
-                    Island.shared.presentationWindow = island
-                    service.panel = floating
-                    service.NSApp.keyWindow = host == "island key" || host == "floating while island key" ? island : floating
-                    if host == "island event" {
-                        service.NSApp.currentEvent = Application.Event(window: island)
-                    } else if host == "island menu" {
-                        service.NSApp.currentEvent = Application.Event(window: Window())
-                    }
-                    let fromIsland = host.hasPrefix("island")
-                    let destination = root.appendingPathComponent("notes.txt")
-                    try "Previous file".write(to: destination, atomically: true, encoding: .utf8)
-                    service.exportText(suggestedName: "Notes.txt", from: fromIsland ? island : nil)
-                    guard let panel = Panel.latest else {
-                        suite.expect(false, "export prepares its save panel")
-                        continue
-                    }
-                    suite.expect(service.modalInteractionActive && service.flushes == 1,
-                                 "export protects its document while a dialog is pending")
-                    service.exportText(suggestedName: "Duplicate.txt")
-                    suite.expect(Panel.latest === panel, "a pending export cannot open a second dialog")
-                    panel.url = destination
-                    panel.response = response
-                    service.text = "A later edit"
-                    if !fromIsland {
-                        suite.expect(panel.parent == nil, "the floating pad retains its independent dialog")
-                        Queue.drain()
-                        suite.expect(panel.modalCalls == 1 && floating.focusCount == 1 && island.focusCount == 0,
-                                     "floating-pad export returns focus only to its own host")
-                    } else {
-                        suite.expect(panel.parent == nil && panel.standalone && panel.focused && panel.modalCalls == 0
-                                     && panel.level.rawValue > island.level.rawValue && !panel.hidesOnDeactivate,
-                                     "island export opens its own dialog above its host instead of attaching or opening behind it")
-                        panel.finish(response)
-                        suite.expect(island.focusCount == 0, "completion defers focus until dismissal finishes")
-                        Queue.drain()
-                        suite.expect(island.focusCount == 1 && floating.focusCount == 0,
-                                     "island export returns focus to the island even when its menu supplied the event")
-                    }
-                    suite.expect(!service.modalInteractionActive, "completion releases the export guard")
-                    let saved = try String(contentsOf: destination, encoding: .utf8)
-                    suite.expect(saved == (response == .OK ? "A later edit" : "Previous file"),
-                                 "export writes the pad as it is when the save is confirmed and cancellation never writes")
+            for response in [NSApplication.ModalResponse.cancel, .OK] {
+                let service = Service()
+                let floating = Window()
+                service.panel = floating
+                let destination = root.appendingPathComponent("notes.txt")
+                try "Previous file".write(to: destination, atomically: true, encoding: .utf8)
+                service.exportText(suggestedName: "Notes.txt")
+                guard let panel = Panel.latest else {
+                    suite.expect(false, "export prepares its save panel")
+                    continue
                 }
+                suite.expect(service.modalInteractionActive && service.flushes == 1,
+                             "export protects its document while a dialog is pending")
+                service.exportText(suggestedName: "Duplicate.txt")
+                suite.expect(Panel.latest === panel, "a pending export cannot open a second dialog")
+                panel.url = destination
+                panel.response = response
+                service.text = "A later edit"
+                Queue.drain()
+                suite.expect(panel.modalCalls == 1 && floating.focusCount == 1,
+                             "export returns focus to the pad")
+                suite.expect(!service.modalInteractionActive, "completion releases the export guard")
+                let saved = try String(contentsOf: destination, encoding: .utf8)
+                suite.expect(saved == (response == .OK ? "A later edit" : "Previous file"),
+                             "export writes the pad as it is when the save is confirmed and cancellation never writes")
             }
             try editsWhileOpen(suite, root: root)
             let service = Service()
-            let island = Window()
-            Island.shared.presentationWindow = island
-            service.NSApp.keyWindow = island
-            service.exportText(suggestedName: "Notes.txt", from: island)
-            island.isVisible = false
-            Panel.latest?.finish(.cancel)
-            Queue.drain()
-            suite.expect(island.focusCount == 0 && !service.modalInteractionActive,
-                         "closing the island during export does not resurrect its window")
+            let hidden = Window()
+            hidden.isVisible = false
+            service.panel = hidden
             Panel.latest = nil
-            service.exportText(suggestedName: "Hidden.txt", from: island)
+            service.exportText(suggestedName: "Hidden.txt")
             suite.expect(Panel.latest == nil && !service.modalInteractionActive,
-                         "an action delivered after its host disappeared cannot open a dialog")
+                         "an export without a visible pad cannot open a dialog")
         } catch {
             suite.expect(false, "export fixture completes: \(error)")
         }
     }
 
-    /// The island's dialog does not block its pad. Choosing another tab
-    /// meanwhile still saves the pad that asked; closing that pad reports the
-    /// failed export and writes nothing.
+    /// The pad that asked is the one saved, whichever tab is chosen before
+    /// the dialog answers; closing that pad reports the failed export and
+    /// writes nothing.
     private static func editsWhileOpen(_ suite: TestSuite, root: URL) throws {
-        let island = Window()
-        Island.shared.presentationWindow = island
         let switching = Service()
+        switching.panel = Window()
         let chosen = root.appendingPathComponent("chosen.txt")
-        switching.exportText(suggestedName: "Notes.txt", from: island)
+        switching.exportText(suggestedName: "Notes.txt")
         switching.document = switching.document?.addingPad(defaultName: "Notes")
         switching.text = "Another pad"
         Panel.latest?.url = chosen
-        Panel.latest?.finish(.OK)
+        Panel.latest?.response = .OK
         Queue.drain()
         let exported = try String(contentsOf: chosen, encoding: .utf8)
         suite.expect(exported == "Notes to export", "choosing another tab during export still saves the pad that asked")
 
         let closing = Service()
+        closing.panel = Window()
         let kept = root.appendingPathComponent("kept.txt")
         try "Previous file".write(to: kept, atomically: true, encoding: .utf8)
-        closing.exportText(suggestedName: "Notes.txt", from: island)
+        closing.exportText(suggestedName: "Notes.txt")
         let added = closing.document?.addingPad(defaultName: "Notes")
         closing.document = added?.removing(Fixture.padID)
         let failures = HUD.errors
         Panel.latest?.url = kept
-        Panel.latest?.finish(.OK)
+        Panel.latest?.response = .OK
         Queue.drain()
         let untouched = try String(contentsOf: kept, encoding: .utf8)
         suite.expect(untouched == "Previous file" && HUD.errors == failures + 1,
@@ -426,7 +366,7 @@ enum ScratchpadSaveContract {
         suite.expect(service.applied == 0 && service.document?.pads.count == 1,
                      "a tab action whose write failed leaves the notes as they were")
         service.commitEdits()
-        suite.expect(HUD.messages == [message], "a failed write as the pad or the island closes shows the HUD")
+        suite.expect(HUD.messages == [message], "a failed write as the pad closes shows the HUD")
         service.store.succeeds = true
         service.createPad(defaultName: "Notes")
         suite.expect(!service.saveFailed && service.applied == 1, "a successful write clears the warning")

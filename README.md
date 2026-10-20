@@ -60,7 +60,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 ### Know what your Mac is doing
 
 - **System monitor.** CPU, GPU, memory, temperatures, battery health and power use, with history graphs and a view of energy-hungry apps.
-- **Fan speeds.** See live fan RPM in the panel, the menu bar or the Dynamic Island.
+- **Fan speeds.** See live fan RPM in the panel or the menu bar.
 - **Menu bar readouts.** Put your chosen readings, usage bars, battery time or fan speed directly in the menu bar.
 - **Network.** See live traffic, session totals and your local IP address, or run a speed test.
 - **Alerts.** Get notified about sustained CPU load, high temperatures, memory pressure, low disk space or low battery.
@@ -115,13 +115,11 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 
 ### Everyday tools
 
-- **Dynamic Island.** Keep music, notifications, calendars, timers, downloads and everyday controls around the camera cutout, or a simulated one on other Macs. Customize sections and shortcuts, with optional lyrics, a live equalizer, camera preview and file tools.
-- **AI agents.** Follow Claude, Codex, OpenCode and GitHub Copilot in the Dynamic Island: plan limits and when they reset where available, tokens, API value, models, projects and live work, with a notice when a long task finishes. Codex's banked resets can be used from there too, and each extra Codex account (`CODEX_HOME`) can have a limits card of its own. Copilot uses local CLI/app session logs; its token totals update when shutdown metrics arrive, and aggregate API-value estimates use base rates.
 - **Command Bar.** Search apps, windows, files, clipboard history, snippets and app menu commands from one field. Calculate, convert units, find emoji or run saved scripts.
 - **Quick panel.** Open a floating palette of favorite tools with ⌃⌘V.
 - **Quick toggles.** Switch appearance, hide desktop icons, eject disks, empty the Trash, lock the screen and more.
 - **Radial menu.** Open a customizable wheel of apps, files, shortcuts and tools around the pointer, with profiles and submenus.
-- **Scratchpad.** Keep autosaved notes in tabs, with Markdown preview and export, in a floating window or Dynamic Island.
+- **Scratchpad.** Keep autosaved notes in tabs, with Markdown preview and export, in a floating window.
 - **Cleaning Mode.** Lock keyboard input while cleaning, with a black screen or a small visible indicator.
 
 ### Capture and create
@@ -129,7 +127,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 - **Screen capture.** Switch between screenshots, recording, text recognition and color picking in one selector with a pixel magnifier.
 - **Screenshot.** Capture an area, window, screen or scrolling page. Annotate, crop, redact, add backgrounds and watermarks, pin captures, send them through the Share menu or share an expiring link.
 - **Screen recording.** Record with separate system-audio and microphone tracks. Trim, cut, add automatic zooms, blur private details and export video or GIFs, or share an expiring link.
-- **Camera preview.** Check your camera in a floating mirror or Dynamic Island before a call.
+- **Camera preview.** Check your camera in a floating mirror before a call.
 - **Copy text from screen.** Recognize text offline from any screen area, or read a QR code.
 - **Color picker.** Copy a screen color as HEX, RGB, HSL or SwiftUI code.
 - **Media tools.** Compress and edit videos, batch-convert images, add watermarks, make GIFs and extract text, all locally.

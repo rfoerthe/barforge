@@ -100,21 +100,15 @@ final class FeatureRuntime: ObservableObject {
     /// Flipping availability runs each feature's binding immediately, in the
     /// order given: off tears every resource down on the spot, while a first
     /// install turns on the feature's main control. Saved choices survive a
-    /// reinstall. One row, the "all" buttons and the Dynamic Island leaving
-    /// with its extensions all pass through here, with one revision bump.
+    /// reinstall. One row and the "all" buttons pass through here, with one
+    /// revision bump.
     /// Install all leaves enable keys alone: it would otherwise switch on
     /// intrusive features nobody picked, such as focus follows mouse.
     func setAvailable(_ features: [AppFeature], _ available: Bool,
                       enablingFirstInstalls: Bool = true) {
         var changed = false
-        let firstIslandInstall = available && features.contains(.notch)
-            && mayFlip(.notch, to: true)
-            && !UserDefaults.standard.bool(forKey: DefaultsKey.notchInitialExtensionsInstalled)
-        let requested = firstIslandInstall
-            ? features + AppFeature.dynamicIslandInitialExtensions.filter { !features.contains($0) }
-            : features
         let savedValues = savedPreferences()
-        for feature in requested where mayFlip(feature, to: available) {
+        for feature in features where mayFlip(feature, to: available) {
             if available && enablingFirstInstalls {
                 feature.enableOnFirstInstall(in: .standard, savedValues: savedValues)
             }
@@ -125,9 +119,6 @@ final class FeatureRuntime: ObservableObject {
             }
             Self.bindings[feature]?()
             changed = true
-        }
-        if firstIslandInstall && AppFeature.notch.isAvailable {
-            UserDefaults.standard.set(true, forKey: DefaultsKey.notchInitialExtensionsInstalled)
         }
         if changed { finishAvailabilityChange() }
     }
@@ -168,9 +159,6 @@ final class FeatureRuntime: ObservableObject {
         // unavailable one and its service never comes to life.
         for feature in selected where feature.isAvailable {
             Self.bindings[feature]?()
-        }
-        if selected.contains(.notch) && AppFeature.notch.isAvailable {
-            UserDefaults.standard.set(true, forKey: DefaultsKey.notchInitialExtensionsInstalled)
         }
         finishAvailabilityChange()
     }
@@ -231,7 +219,6 @@ final class FeatureRuntime: ObservableObject {
     private func finishAvailabilityChange() {
         revision += 1
         CommandBarService.shared.noteHubChange()
-        if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
     }
 
     /// What each feature must re-evaluate when its availability (or a
@@ -278,7 +265,6 @@ final class FeatureRuntime: ObservableObject {
             ClipboardAutoClearService.shared.syncWithPreferences()
         },
         .mediaTools: {
-            NotchFileToolsService.shared.syncWithPreferences()
             guard !AppFeature.mediaTools.isAvailable else { return }
             MediaService.shared.cancel()
             ScreenRecorderService.shared.closeEditors(ownedBy: .mediaTools)
@@ -286,10 +272,7 @@ final class FeatureRuntime: ObservableObject {
         .pastePlain: { PastePlainService.shared.syncWithPreferences() },
         .finderCutPaste: { FinderCutPaste.shared.syncWithPreferences() },
         .finderRename: { FinderRenameService.shared.syncWithPreferences() },
-        .shelf: {
-            ShelfService.shared.syncWithPreferences()
-            NotchFileToolsService.shared.syncWithPreferences()
-        },
+        .shelf: { ShelfService.shared.syncWithPreferences() },
         .urlCleaner: { URLCleanerService.shared.syncWithPreferences() },
         .diskImageInstaller: { DiskImageInstallerService.shared.syncWithPreferences() },
         .mixer: {
@@ -339,47 +322,6 @@ final class FeatureRuntime: ObservableObject {
         .cameraPreview: { CameraPreviewService.shared.syncWithPreferences() },
         .wallpaper: { WallpaperService.shared.syncWithPreferences() },
         .radialMenu: { RadialMenuService.shared.syncWithPreferences() },
-        .notch: { NotchService.shared.syncWithPreferences() },
-        .notchGestures: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-        },
-        .notchTimer: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchTimerService.shared.stop() }
-        },
-        .notchAccessories: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchAccessoryService.shared.stop() }
-        },
-        .notchLyrics: {
-            if !NotchLyricsSupport.isEnabled() { NotchLyricsService.shared.stop() }
-        },
-        .notchQueue: { NotchMusicService.shared.syncQueuePreference() },
-        .notchLiveEqualizer: { NotchAudioLevelService.shared.syncWithPreferences() },
-        .notchNotifications: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchNotificationService.shared.stop() }
-        },
-        .notchDownloads: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchDownloadService.shared.stop() }
-        },
-        .notchCalendar: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchCalendarService.shared.stop() }
-        },
-        .notchAgents: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { AgentUsageService.shared.stop() }
-        },
-        .notchWatch: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-            else { NotchWatchService.shared.stop() }
-        },
-        // Leaving folds the wings it rests in, and coming back greets.
-        .notchMascot: {
-            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
-        },
         .scratchpad: { ScratchpadService.shared.syncWithPreferences() },
         .commandBar: { CommandBarService.shared.syncWithPreferences() },
         .cleaner: {

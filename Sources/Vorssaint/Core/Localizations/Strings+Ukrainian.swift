@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -533,7 +534,6 @@ extension Strings {
         shelfDockPlacement: "Позиція",
         shelfDockMenuBar: "Під значком на смузі меню",
         shelfDockTopCenter: "Угорі посередині екрана",
-        shelfDockIslandNote: "Поки Dynamic Island увімкнений, місце вгорі посередині екрана займає він.",
         shelfCollapse: "Згорнути",
         shelfBehaviorTitle: "Після використання",
         shelfCloseAfterDrop: "Закривати після перенесення в іншу програму",
@@ -662,7 +662,6 @@ extension Strings {
         aboutDescription: "Набір корисних інструментів для вашого Mac.\nЖивлення, системний монітор, прокрутка та перемикач вікон прямо на смузі меню.",
         versionPrefix: "Версія",
         reviewIntro: "Показати вступ знову",
-        reviewHighlights: "Показати огляд новинок знову",
         viewOnGitHub: "Відкрити на GitHub",
         obContinue: "Далі",
         obBack: "Назад",
@@ -988,7 +987,6 @@ extension Strings {
         qrResultTitle: "QR-код",
         qrResultCopy: "Скопіювати",
         qrResultOpen: "Відкрити посилання",
-        highlightsTitle: "Нове в цьому оновленні",
         highlightsTitleClipboardRedesign: "Оновлений буфер обміну",
         highlightsTitleWindowLayout: "Розкладка вікон",
         highlightsTitleQuitProtection: "Захист від виходу та закриття",

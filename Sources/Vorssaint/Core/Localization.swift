@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Combine
 import Foundation
@@ -722,7 +723,6 @@ struct Strings {
     let shelfDockPlacement: String
     let shelfDockMenuBar: String
     let shelfDockTopCenter: String
-    let shelfDockIslandNote: String
     let shelfCollapse: String
     let shelfBehaviorTitle: String
     let shelfCloseAfterDrop: String
@@ -870,7 +870,6 @@ struct Strings {
     let aboutDescription: String
     let versionPrefix: String
     let reviewIntro: String
-    let reviewHighlights: String
     let viewOnGitHub: String
 
     // MARK: Onboarding
@@ -1222,7 +1221,6 @@ struct Strings {
     let qrResultTitle: String
     let qrResultCopy: String
     let qrResultOpen: String
-    let highlightsTitle: String
     let highlightsTitleClipboardRedesign: String
     let highlightsTitleWindowLayout: String
     let highlightsTitleQuitProtection: String
@@ -1860,7 +1858,6 @@ extension Strings {
         shelfDockPlacement: "Posição",
         shelfDockMenuBar: "Embaixo do ícone da barra de menus",
         shelfDockTopCenter: "No topo, no centro da tela",
-        shelfDockIslandNote: "Enquanto a Dynamic Island está ligada, o centro do topo é dela.",
         shelfCollapse: "Encolher",
         shelfBehaviorTitle: "Depois de usar",
         shelfCloseAfterDrop: "Fechar depois de soltar em outro app",
@@ -1994,7 +1991,6 @@ extension Strings {
         aboutDescription: "Central de utilidades para o seu Mac.\nEnergia, monitor do sistema, rolagem e alternador de janelas, direto na barra de menus.",
         versionPrefix: "Versão",
         reviewIntro: "Rever introdução",
-        reviewHighlights: "Rever novidades",
         viewOnGitHub: "Ver no GitHub",
 
         obContinue: "Continuar",
@@ -2329,7 +2325,6 @@ extension Strings {
         qrResultTitle: "QR code",
         qrResultCopy: "Copiar",
         qrResultOpen: "Abrir link",
-        highlightsTitle: "Novidades desta versão",
         highlightsTitleClipboardRedesign: "Novo visual da área de transferência",
         highlightsTitleWindowLayout: "Organização de janelas",
         highlightsTitleQuitProtection: "Proteção de ⌘Q e ⌘W",
@@ -2968,7 +2963,6 @@ extension Strings {
         shelfDockPlacement: "Position",
         shelfDockMenuBar: "Below the menu bar icon",
         shelfDockTopCenter: "Top center of the screen",
-        shelfDockIslandNote: "The Dynamic Island keeps the top center while it is on.",
         shelfCollapse: "Collapse",
         shelfBehaviorTitle: "After use",
         shelfCloseAfterDrop: "Close after dropping into another app",
@@ -3102,7 +3096,6 @@ extension Strings {
         aboutDescription: "A utility hub for your Mac.\nEnergy, system monitor, scrolling and a window switcher, right in the menu bar.",
         versionPrefix: "Version",
         reviewIntro: "Review introduction",
-        reviewHighlights: "Review highlights",
         viewOnGitHub: "View on GitHub",
 
         obContinue: "Continue",
@@ -3437,7 +3430,6 @@ extension Strings {
         qrResultTitle: "QR code",
         qrResultCopy: "Copy",
         qrResultOpen: "Open link",
-        highlightsTitle: "New in this update",
         highlightsTitleClipboardRedesign: "Redesigned clipboard",
         highlightsTitleWindowLayout: "Window Layout",
         highlightsTitleQuitProtection: "Quit and close protection",

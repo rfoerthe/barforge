@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
-/// Read-only fan speed readings from the SMC, shown in the System card, the
-/// menu bar and the notch. Nothing here ever writes to the fans.
+/// Read-only fan speed readings from the SMC, shown in the System card and
+/// the menu bar. Nothing here ever writes to the fans.
 enum FanTelemetry {
     static let maximumFanCount = 8
     static let maximumSaneRPM = 20_000.0

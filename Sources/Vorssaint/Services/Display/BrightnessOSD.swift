@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -17,9 +18,6 @@ enum BrightnessOSD {
             DispatchQueue.main.async {
                 show(displayID: displayID, brightness: brightness)
             }
-            return
-        }
-        if NotchSupport.routes(.brightness), NotchService.shared.showBrightness(brightness) {
             return
         }
         guard let screen = NSScreen.screens.first(where: {

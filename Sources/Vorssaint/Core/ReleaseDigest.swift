@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -141,7 +142,8 @@ struct ReleaseDigest {
                 if name.hasPrefix("everything from") { break }
                 if highlightsRepeat && (name.hasSuffix("highlights") || name == "highlight") { continue }
                 guard let kind = ReleaseChangeKind(section: section.title) else { continue }
-                for text in section.bulletItems where seenTexts.insert(text).inserted {
+                for text in section.bulletItems where seenTexts.insert(text).inserted
+                    && !ReleaseChangeAliases.isAboutRemovedFeature(text, section: section.title) {
                     changes.append(ReleaseChange(
                         text: text, kind: kind, version: release.version,
                         features: ReleaseChangeAliases.features(inBullet: text, section: section.title),
@@ -207,9 +209,6 @@ enum WhatsNewInfo {
         "quickLauncher", "quickToggles", "colorPicker", "screenOCR", "cleaningMode", "mediaTools",
         "cleaner", "uninstaller", "homebrew", "appUpdates", "screenshot", "cameraPreview", "radialMenu",
         "scratchpad", "commandBar", "screenRecorder", "wallpaper", "killProcess", "portManager",
-        "notch", "notchCalendar", "notchNotifications", "notchGestures", "notchTimer", "notchAccessories",
-        "notchLyrics", "notchQueue", "notchLiveEqualizer", "notchDownloads", "notchAgents", "notchWatch",
-        "notchMascot",
         "monitorCPU", "monitorGPU", "monitorMemory", "monitorNetwork", "monitorDisk", "monitorPower",
         "connectedDevices",
     ]

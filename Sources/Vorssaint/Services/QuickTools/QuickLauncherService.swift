@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -62,10 +63,6 @@ final class QuickLauncherService: ObservableObject {
     /// menu bar popover is never involved.
     @Published private(set) var activeUtility: QuickLauncherItem?
     @Published private(set) var selectedIndex: Int?
-    /// Where the keyboard moved the selection, which the island's rail
-    /// scrolls to. Hover clears it: centering a hovered tile slid the next
-    /// one under the pointer, and the rail kept scrolling by itself.
-    @Published private(set) var keyboardIndex: Int?
     @Published private(set) var presentationID = UUID()
     @Published private(set) var hiddenItemsRaw: String = UserDefaults.standard.string(
         forKey: DefaultsKey.quickLauncherHiddenItems) ?? ""
@@ -143,7 +140,6 @@ final class QuickLauncherService: ObservableObject {
     // MARK: - Presentation
 
     func toggle() {
-        if NotchService.shared.openQuickPanel(toggle: true) { return }
         if isVisible {
             hide()
         } else {
@@ -152,7 +148,6 @@ final class QuickLauncherService: ObservableObject {
     }
 
     func show() {
-        if NotchService.shared.openQuickPanel() { return }
         let panel = ensurePanel()
         prepareForPresentation()
         position(panel)
@@ -166,15 +161,13 @@ final class QuickLauncherService: ObservableObject {
         }
     }
 
-    /// Both destinations start with usable keyboard navigation. A utility that
-    /// is still installed keeps its working state when the island is reopened.
+    /// The launcher starts with usable keyboard navigation.
     func prepareForPresentation() {
         refreshAvailability()
         presentationID = UUID()
         isEditing = false
         editingOptionsItem = nil
         selectedIndex = visibleItems.isEmpty ? nil : 0
-        keyboardIndex = selectedIndex
     }
 
     func refreshAvailability() {
@@ -184,7 +177,6 @@ final class QuickLauncherService: ObservableObject {
     }
 
     func hide() {
-        if NotchService.shared.expanded, NotchService.shared.selected == .tools { NotchService.shared.collapse() }
         removeMonitors()
         isEditing = false
         editingOptionsItem = nil
@@ -200,9 +192,6 @@ final class QuickLauncherService: ObservableObject {
     /// (choosing a file in Media, for example), so Esc and the keyboard
     /// shortcuts keep working without an extra click.
     func refocusAfterModal() {
-        if NotchService.shared.expanded, NotchService.shared.selected == .tools {
-            NotchService.shared.presentationWindow?.makeKey(); return
-        }
         guard let panel, panel.isVisible else { return }
         panel.makeKey()
     }
@@ -250,22 +239,18 @@ final class QuickLauncherService: ObservableObject {
         run(visibleItems[index])
     }
 
-    func moveSelection(_ direction: QuickToolsSupport.GridDirection,
-                       flow: QuickToolsSupport.GridFlow = .rows(columns: QuickLauncherService.columns)) {
+    func moveSelection(_ direction: QuickToolsSupport.GridDirection) {
         let count = visibleItems.count
         guard count > 0 else { return }
         selectedIndex = QuickToolsSupport.gridIndex(after: selectedIndex ?? 0,
                                                     count: count,
-                                                    flow: flow,
+                                                    columns: QuickLauncherService.columns,
                                                     direction: direction)
-        keyboardIndex = selectedIndex
     }
 
-    /// The pointer's selection. The hovered tile is already in view, so the
-    /// rail stays where it is.
+    /// The pointer's selection.
     func select(_ item: QuickLauncherItem) {
         selectedIndex = visibleItems.firstIndex(of: item)
-        keyboardIndex = nil
     }
 
     func run(_ item: QuickLauncherItem) {
@@ -296,12 +281,9 @@ final class QuickLauncherService: ObservableObject {
                 ColorSamplerService.shared.pick()
             }
         case .cameraPreview:
-            let embedded = CameraPreviewService.shared.showInNotchIfEnabled()
             hide()
-            if !embedded {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    CameraPreviewService.shared.show()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                CameraPreviewService.shared.show()
             }
         case .scratchpad:
             hide()
@@ -382,8 +364,7 @@ final class QuickLauncherService: ObservableObject {
 
     // MARK: - Monitors
 
-    func handlePanelKey(_ event: NSEvent,
-                        flow: QuickToolsSupport.GridFlow = .rows(columns: QuickLauncherService.columns)) -> NSEvent? {
+    func handlePanelKey(_ event: NSEvent) -> NSEvent? {
         if event.keyCode == UInt16(kVK_Escape) {
             // While an input method is composing in a utility's field, Esc
             // belongs to it and drops the candidate; the launcher takes the
@@ -409,16 +390,16 @@ final class QuickLauncherService: ObservableObject {
             activateSelection()
             return nil
         case kVK_LeftArrow:
-            moveSelection(.left, flow: flow)
+            moveSelection(.left)
             return nil
         case kVK_RightArrow:
-            moveSelection(.right, flow: flow)
+            moveSelection(.right)
             return nil
         case kVK_UpArrow:
-            moveSelection(.up, flow: flow)
+            moveSelection(.up)
             return nil
         case kVK_DownArrow:
-            moveSelection(.down, flow: flow)
+            moveSelection(.down)
             return nil
         default:
             if let index = Self.digitIndex(for: event.keyCode) {

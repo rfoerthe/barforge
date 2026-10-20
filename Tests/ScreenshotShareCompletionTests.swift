@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
 /// Runs the production completion handler with controlled upload and clipboard results.
 /// No network request or native preview is created.
 enum ScreenshotShareCompletionTests {
-    typealias DispatchQueue = NotchScreenRefreshContract.DispatchQueue
+    typealias DispatchQueue = ManualScheduler.DispatchQueue
     final class Model {
         var deletingShare = false
         var sharing = false
@@ -515,7 +516,7 @@ enum ScreenshotShareCompletionTests {
         suite.expect(standaloneRetry.uploads == 1 && service.copies == [record.url, record.url],
                      "standalone shortcut retries copying its existing link without uploading again")
         for duration in [3.0, 12.0] {
-            DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+            DispatchQueue.main = ManualScheduler.Scheduler()
             let history = Uploader()
             let historyPreview = history.showPreview(capture: 2)
             historyPreview.autoDismissDuration = duration
@@ -528,7 +529,7 @@ enum ScreenshotShareCompletionTests {
             history.completion?(record)
             suite.expect(historyPreview.closed, "history upload copies and closes its own preview")
         }
-        DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
+        DispatchQueue.main = ManualScheduler.Scheduler()
         let deleting = Uploader()
         let deletingPreview = deleting.showPreview()
         deletingPreview.model.sharedRecord = record

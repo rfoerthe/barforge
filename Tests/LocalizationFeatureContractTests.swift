@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -258,7 +259,7 @@ enum LocalizationFeatureContractTests {
                                    strings.cleaningOverlayMouseHint, strings.cleaningPanelCaption]
             suite.expect(cleaningStrings.allSatisfy { !$0.isEmpty && !$0.contains("—") },
                    "\(prefix) cleaning mode strings are present without em dash")
-            let highlightsStrings = [strings.highlightsTitle, strings.highlightsTitleClipboardRedesign,
+            let highlightsStrings = [strings.highlightsTitleClipboardRedesign,
                                      strings.highlightsCaptionDockPreview,
                                      strings.highlightsCaptionScreenshot,
                                      strings.highlightsCaptionSnippetLibrary,
@@ -266,7 +267,7 @@ enum LocalizationFeatureContractTests {
                                      strings.highlightsCaptionClipboardRedesign,
                                      strings.highlightsConfigure,
                                      strings.highlightsTry, strings.highlightsSeeAll,
-                                     strings.reviewIntro, strings.reviewHighlights]
+                                     strings.reviewIntro]
             suite.expect(highlightsStrings.allSatisfy { !$0.isEmpty && !$0.contains("—") },
                    "\(prefix) update highlights strings are present without em dash")
             let officialHomebrewIntroStrings = [
@@ -419,7 +420,6 @@ enum LocalizationFeatureContractTests {
             ("finderRenameDefault", GlobalShortcut.finderRenameDefault),
             ("keepAwakeDefault", GlobalShortcut.keepAwakeDefault),
             ("micMuteDefault", GlobalShortcut.micMuteDefault),
-            ("notchDefault", GlobalShortcut.notchDefault),
             ("pastePlainDefault", GlobalShortcut.pastePlainDefault),
             ("pointerNextDisplayDefault", GlobalShortcut.pointerNextDisplayDefault),
             ("quickLauncherDefault", GlobalShortcut.quickLauncherDefault),
@@ -455,7 +455,7 @@ enum LocalizationFeatureContractTests {
             ("windowLayoutTopLeftDefault", GlobalShortcut.windowLayoutTopLeftDefault),
             ("windowLayoutTopRightDefault", GlobalShortcut.windowLayoutTopRightDefault),
         ]
-        suite.expect(defaultShortcuts.count == 42, "every default shortcut is in the round trip")
+        suite.expect(defaultShortcuts.count == 41, "every default shortcut is in the round trip")
         var brokenShortcuts: [String] = []
         for (name, shortcut) in defaultShortcuts {
             guard let restored = GlobalShortcut(storageValue: shortcut.storageValue),

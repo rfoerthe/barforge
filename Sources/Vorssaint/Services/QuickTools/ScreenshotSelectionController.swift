@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -81,14 +82,10 @@ final class ScreenshotSelectionController {
     fileprivate var spaceIsDown = false
     fileprivate private(set) var selectionInProgress = false
     fileprivate func setSelectionInProgress(_ active: Bool) {
-        let previous = selectionInProgress
         selectionInProgress = active
         panels.forEach {
             $0.overlayView.refreshGuideVisibility()
             $0.overlayView.refreshFullScreenControlVisibility()
-        }
-        if active != previous {
-            screenCaptureOptions?.onSelectionProgressChange?(active)
         }
     }
     fileprivate var scrollingCaptureEnabled = false {
@@ -280,12 +277,9 @@ final class ScreenshotSelectionController {
         panels.forEach { $0.overlayView.refreshCaptureGuide() }
         screenCaptureOptions?.offersRepeatLastRegion = offersRepeatLastRegion
         installKeyMonitor()
-        // Give key ownership to only one destination. Opening and immediately
-        // resigning a full-screen key panel can flash the surrounding chrome.
-        screenCaptureOptions?.onPresentationReady?()
         guard !finished else { return }
         panels.forEach { $0.orderFrontRegardless() }
-        if screenCaptureOptions?.controlsInNotch != true { keyPanelUnderMouse()?.makeKey() }
+        keyPanelUnderMouse()?.makeKey()
         if isPickingColor
             || UserDefaults.standard.bool(forKey: DefaultsKey.screenshotLoupeStartsOn) {
             // Opt-in: the session opens with the magnifier already up,
@@ -367,13 +361,6 @@ final class ScreenshotSelectionController {
         }
     }
 
-    func placeFullScreenControlBelowNotch(screenFrame: CGRect, surfaceHeight: CGFloat) {
-        for panel in panels {
-            panel.overlayView.setNotchCaptureControlsHeight(
-                panel.screenFrame == screenFrame ? surfaceHeight : nil)
-        }
-    }
-
     private static func pickableWindows(_ entries: [(id: CGWindowID, bounds: CGRect)],
                                         on screenFrame: CGRect,
                                         mainScreenHeight: CGFloat)
@@ -411,17 +398,7 @@ final class ScreenshotSelectionController {
     private func installKeyMonitor() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { [weak self] event in
             guard let self else { return event }
-            let inNotch = self.screenCaptureOptions?.controlsInNotch == true
-                && event.window === NotchService.shared.presentationWindow
-            guard event.window is ScreenshotOverlayPanel || inNotch else { return event }
-            if inNotch {
-                guard event.window?.attachedSheet == nil, !(event.window?.firstResponder is NSText),
-                      !ShortcutCapture.isCapturing else { return event }
-                let movesSelection = event.keyCode == UInt16(kVK_Space)
-                    && (self.spaceIsDown || self.panelUnderMouse()?.overlayView.isDragging == true)
-                if self.screenCaptureOptions?.hasFocusedControl == true,
-                   event.keyCode != UInt16(kVK_Escape), !movesSelection { return event }
-            }
+            guard event.window is ScreenshotOverlayPanel else { return event }
             if event.type == .keyUp {
                 guard event.keyCode == UInt16(kVK_Space), self.spaceIsDown else { return event }
                 self.spaceIsDown = false
@@ -873,7 +850,7 @@ private final class ScreenshotOverlayPanel: OverlayPanel {
     let screenFrame: CGRect
     let displayID: CGDirectDisplayID
     /// Height reserved by macOS chrome at the top of this display. The
-    /// full-screen action stays below it even when there is no notch surface.
+    /// full-screen action stays below it.
     let topChromeHeight: CGFloat
     private(set) var frozenImage: CGImage?
     let pixelScale: CGFloat
@@ -916,11 +893,9 @@ private final class ScreenshotOverlayPanel: OverlayPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         hidesOnDeactivate = false
         acceptsMouseMovedEvents = true
-        // Live, the panel is clear, and with the controls in Dynamic Island it
-        // draws nothing over the desktop until a drag starts. Left at its
-        // default, a window hands a press on a fully transparent pixel to
-        // whatever is under it, so the desktop took the drag instead of the
-        // selection (#3005). Set explicitly, the panel takes every press.
+        // Left at its default, a window hands a press on a fully transparent
+        // pixel to whatever is under it, so the desktop took the drag instead
+        // of the selection (#3005). Set explicitly, the panel takes every press.
         ignoresMouseEvents = false
 
         // The frozen still sits in its own view UNDER the chrome: a backing
@@ -967,7 +942,6 @@ private final class ScreenshotOverlayPanel: OverlayPanel {
 /// and the magnifier; owns all mouse interaction. Flipped so
 /// geometry matches image pixels (top-left origin) with no sign juggling.
 private final class ScreenshotOverlayView: NSView {
-    private var pointerHasMoved = false
     private var frozenImage: CGImage?
     fileprivate var loupeImage: CGImage?
     private var windows: [ScreenshotSupport.PickableWindow]
@@ -981,10 +955,6 @@ private final class ScreenshotOverlayView: NSView {
     private let screenCaptureOptions: ScreenCaptureSelectionOptions?
     private let guideHost: PassThroughHostingView<CaptureGuideView>
     private let fullScreenHost: PassThroughHostingView<FullScreenCaptureButton>
-    private var notchCaptureControlsHeight: CGFloat?
-    private var fullScreenControlHovered = false
-    private var deferredNotchCaptureControlsHeight: CGFloat?
-    private var hasDeferredNotchCaptureControlsHeight = false
 
     private var dragOrigin: CGPoint?
     private var lastDragPoint: CGPoint = .zero
@@ -1026,10 +996,9 @@ private final class ScreenshotOverlayView: NSView {
 
     override var isFlipped: Bool { true }
     override var acceptsFirstResponder: Bool { true }
-    /// With the controls in Dynamic Island, the island's panel holds key
-    /// focus for its shortcuts and this surface never becomes key on its own.
-    /// AppKit would then spend the first click making the window key and
-    /// swallow it, so the first drag drew nothing. Claim it instead.
+    /// Only the display under the pointer holds key focus. AppKit would spend
+    /// the first click on another display making its window key and swallow
+    /// it, so the first drag drew nothing. Claim it instead.
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     init(frame: CGRect,
@@ -1069,7 +1038,9 @@ private final class ScreenshotOverlayView: NSView {
             hoverChanged: { hoverRelay.update($0) }))
         fullScreenHost = fullScreen
         super.init(frame: frame)
-        hoverRelay.changed = { [weak self] in self?.fullScreenControlHoverChanged($0) }
+        // SwiftUI owns the pill's hover tracking, while AppKit owns the
+        // window highlight. Re-evaluate the latter on the same transition.
+        hoverRelay.changed = { [weak self] _ in self?.refreshPointerState() }
         let tracking = NSTrackingArea(rect: .zero,
                                       options: [.activeAlways, .mouseMoved, .mouseEnteredAndExited,
                                                 .inVisibleRect],
@@ -1104,8 +1075,7 @@ private final class ScreenshotOverlayView: NSView {
         let fullScreenWidth = min(max(fitting.width, 1), availableWidth)
         let fullScreenHeight = max(fitting.height, 32)
         let topInset = ScreenshotSupport.fullScreenCaptureControlTopInset(
-            screenChromeHeight: panel?.topChromeHeight ?? 0,
-            notchControlsHeight: notchCaptureControlsHeight)
+            screenChromeHeight: panel?.topChromeHeight ?? 0)
         fullScreenHost.frame = CGRect(x: bounds.midX - fullScreenWidth / 2,
                                       y: topInset,
                                       width: fullScreenWidth,
@@ -1183,7 +1153,6 @@ private final class ScreenshotOverlayView: NSView {
     // MARK: Mouse
 
     override func mouseMoved(with event: NSEvent) {
-        pointerHasMoved = true
         controller?.currentPointerLocation = nil
         updatePointerHover(convert(event.locationInWindow, from: nil))
         refreshFullScreenControlVisibility()
@@ -1307,7 +1276,7 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     func refreshGuideVisibility() {
-        guard screenCaptureOptions?.controlsInNotch != true, let panel else {
+        guard let panel else {
             guideHost.isHidden = true
             return
         }
@@ -1318,33 +1287,17 @@ private final class ScreenshotOverlayView: NSView {
             capturePending: isCapturePending)
     }
 
-    func setNotchCaptureControlsHeight(_ height: CGFloat?) {
-        // The island collapses on its own timer. Do not move the action out
-        // from under a pointer that is already aiming at it; apply the latest
-        // surface geometry as soon as the pointer leaves instead.
-        if fullScreenControlHovered {
-            deferredNotchCaptureControlsHeight = height
-            hasDeferredNotchCaptureControlsHeight = true
-            return
-        }
-        notchCaptureControlsHeight = height
-        needsLayout = true
-    }
-
     func refreshFullScreenControlVisibility() {
         guard let panel else {
             fullScreenHost.isHidden = true
-            resetFullScreenControlHover()
             return
         }
         let global = controller?.currentPointerLocation ?? NSEvent.mouseLocation
-        let hidden = !ScreenshotSupport.fullScreenCaptureControlIsVisible(
+        fullScreenHost.isHidden = !ScreenshotSupport.fullScreenCaptureControlIsVisible(
             isAvailable: controller?.offersFullScreenCapture ?? false,
             pointerOnDisplay: NSMouseInRect(global, panel.screenFrame, false),
             selectionInProgress: controller?.selectionInProgress ?? true,
             capturePending: isCapturePending)
-        fullScreenHost.isHidden = hidden
-        if hidden { resetFullScreenControlHover() }
     }
 
     private func pointerIsOverFullScreenControl(_ point: CGPoint) -> Bool {
@@ -1360,29 +1313,6 @@ private final class ScreenshotOverlayView: NSView {
             : nil
     }
 
-    private func fullScreenControlHoverChanged(_ hovered: Bool) {
-        fullScreenControlHovered = hovered
-        if !hovered { applyDeferredNotchCaptureControlsHeight() }
-        // SwiftUI owns the pill's hover tracking, while AppKit owns the
-        // window highlight. Re-evaluate the latter on the same transition.
-        refreshPointerState()
-    }
-
-    private func resetFullScreenControlHover() {
-        guard fullScreenControlHovered else { return }
-        fullScreenControlHovered = false
-        applyDeferredNotchCaptureControlsHeight()
-    }
-
-    private func applyDeferredNotchCaptureControlsHeight() {
-        if hasDeferredNotchCaptureControlsHeight {
-            notchCaptureControlsHeight = deferredNotchCaptureControlsHeight
-            deferredNotchCaptureControlsHeight = nil
-            hasDeferredNotchCaptureControlsHeight = false
-            needsLayout = true
-        }
-    }
-
     // MARK: Drawing
 
     override func draw(_ dirtyRect: NSRect) {
@@ -1390,11 +1320,7 @@ private final class ScreenshotOverlayView: NSView {
               let controller,
               let panel
         else { return }
-        // Opening controls in the notch should not darken the whole desktop.
-        // Keep selection feedback, without the initial full-screen dim/tint.
-        let notchChooser = screenCaptureOptions?.controlsInNotch == true
-        let dimAlpha = ScreenshotSupport.selectionDimAlpha(notchControls: notchChooser,
-                                                          isFrozen: frozenImage != nil, isDragging: isDragging)
+        let dimAlpha = ScreenshotSupport.selectionDimAlpha(isFrozen: frozenImage != nil)
         context.setFillColor(CGColor(gray: 0, alpha: dimAlpha))
         if selection.width > 0, selection.height > 0 {
             context.beginPath()
@@ -1411,7 +1337,7 @@ private final class ScreenshotOverlayView: NSView {
                 context.addRect(bounds)
                 context.addRect(hovered.frame)
                 context.fillPath(using: .evenOdd)
-                if !notchChooser || pointerHasMoved { drawWindowHighlight(context, rect: hovered.frame) }
+                drawWindowHighlight(context, rect: hovered.frame)
             } else {
                 context.fill(bounds)
             }
@@ -1730,9 +1656,9 @@ private final class FullScreenControlHoverRelay {
 private final class PassThroughHostingView<Content: View>: NSHostingView<Content> {
     var passesThrough = true
     var acceptsFirstClick = false
-    /// Capture actions remain clickable while the Dynamic Island panel owns
-    /// key focus. Keep that policy attached to the interactive host itself so
-    /// a caller cannot accidentally forget one half of the setup.
+    /// Capture actions remain clickable on a display that does not hold key
+    /// focus. Keep that policy attached to the interactive host itself so a
+    /// caller cannot accidentally forget one half of the setup.
     convenience init(interactiveRootView rootView: Content) {
         self.init(rootView: rootView)
         passesThrough = false

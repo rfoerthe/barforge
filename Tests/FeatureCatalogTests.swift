@@ -387,7 +387,7 @@ enum FeatureCatalogTests {
 
         // MARK: Features hub catalog
 
-        suite.expect(AppFeature.allCases.count == 77, "feature catalog has 77 features")
+        suite.expect(AppFeature.allCases.count == 64, "feature catalog has 64 features")
         suite.expect(Set(AppFeature.allCases.map(\.rawValue)).count == AppFeature.allCases.count,
                "feature ids are unique")
         suite.expect(AppFeature.allCases.map(\.rawValue) == [
@@ -400,7 +400,7 @@ enum FeatureCatalogTests {
             "keepAwake", "brightness", "extraBrightness", "bluetoothSleep",
             "quickLauncher", "quickToggles", "colorPicker", "screenOCR", "cleaningMode", "mediaTools",
             "cleaner", "uninstaller", "homebrew", "appUpdates", "screenshot", "cameraPreview",
-            "radialMenu", "scratchpad", "commandBar", "screenRecorder", "wallpaper", "killProcess", "portManager", "notch", "notchCalendar", "notchNotifications", "notchGestures", "notchTimer", "notchAccessories", "notchLyrics", "notchQueue", "notchLiveEqualizer", "notchDownloads", "notchAgents", "notchWatch", "notchMascot",
+            "radialMenu", "scratchpad", "commandBar", "screenRecorder", "wallpaper", "killProcess", "portManager",
             "monitorCPU", "monitorGPU", "monitorMemory", "monitorNetwork", "monitorDisk", "monitorPower",
             "connectedDevices",
         ], "feature ids are stable (they persist inside availability keys)")
@@ -527,17 +527,13 @@ enum FeatureCatalogTests {
                 installDefaults.persistentDomain(forName: installSuiteName) ?? [:]
             }
             for feature in AppFeature.allCases
-            where !feature.enabledKeys.isEmpty && feature != .notchLiveEqualizer {
+            where !feature.enabledKeys.isEmpty {
                 feature.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
                 suite.expect(feature.enabledKeys.contains {
                     savedValues()[$0] as? Bool == true
                 }, "a new \(feature.rawValue) install saves an enabled main control")
                 for key in feature.enabledKeys { installDefaults.removeObject(forKey: key) }
             }
-            AppFeature.notchLiveEqualizer.enableOnFirstInstall(in: installDefaults,
-                                                                savedValues: savedValues())
-            suite.expect(savedValues()[DefaultsKey.notchLiveEqualizer] == nil,
-                   "installing the live equalizer leaves its audio recording switch off")
             AppFeature.windowLayout.enableOnFirstInstall(in: installDefaults,
                                                           savedValues: savedValues())
             suite.expect(installDefaults.bool(forKey: DefaultsKey.windowLayoutShortcutsEnabled),
@@ -573,8 +569,6 @@ enum FeatureCatalogTests {
             "quickLauncher", "quickToggles", "colorPicker", "screenOCR", "cleaningMode", "mediaTools",
             "cleaner", "uninstaller", "homebrew", "appUpdates", "screenshot", "cameraPreview", "radialMenu",
             "scratchpad", "commandBar", "screenRecorder",
-            "notch", "notchCalendar", "notchNotifications", "notchGestures", "notchTimer", "notchAccessories",
-            "notchLyrics", "notchQueue", "notchLiveEqualizer", "notchDownloads", "notchAgents", "notchWatch",
             "monitorCPU", "monitorGPU", "monitorMemory", "monitorNetwork", "monitorDisk", "monitorPower",
             "connectedDevices",
         ]
@@ -587,8 +581,7 @@ enum FeatureCatalogTests {
                 },
                "every feature an update already had stays installed and every other one ships uninstalled")
         suite.expect((AppFeature.availabilityDefaults[AppFeature.linearScroll.availabilityKey] as? Bool) == false
-                && (AppFeature.availabilityDefaults[AppFeature.focusFollowsMouse.availabilityKey] as? Bool) == false
-                && (AppFeature.availabilityDefaults[AppFeature.notchMascot.availabilityKey] as? Bool) == false,
+                && (AppFeature.availabilityDefaults[AppFeature.focusFollowsMouse.availabilityKey] as? Bool) == false,
                "features added after the list was frozen wait on the Features page instead of installing themselves")
         let linearScrollSuiteName = "com.vorssaint.tests.linear-scroll-availability.\(UUID().uuidString)"
         if let linearDefaults = UserDefaults(suiteName: linearScrollSuiteName) {
@@ -608,44 +601,13 @@ enum FeatureCatalogTests {
             suite.expect(false, "linear scrolling availability suite can be created")
         }
 
-        let watchSuiteName = "com.vorssaint.tests.notch-watch-availability.\(UUID().uuidString)"
-        if let watchDefaults = UserDefaults(suiteName: watchSuiteName) {
-            Defaults.migrateNotchWatchAvailability(in: watchDefaults)
-            suite.expect(watchDefaults.object(forKey: AppFeature.notchWatch.availabilityKey) == nil,
-                   "Watch keeps its installed default where the island was never left out")
-            watchDefaults.set(true, forKey: AppFeature.notch.availabilityKey)
-            Defaults.migrateNotchWatchAvailability(in: watchDefaults)
-            suite.expect(watchDefaults.object(forKey: AppFeature.notchWatch.availabilityKey) == nil,
-                   "an installed island keeps Watch among its extensions")
-            // A first-run setup saved every feature it knew, Watch not yet among them.
-            for feature in AppFeature.features(in: .dynamicIsland) where feature != .notchWatch {
-                watchDefaults.set(false, forKey: feature.availabilityKey)
-            }
-            Defaults.migrateNotchWatchAvailability(in: watchDefaults)
-            let isAvailable: (AppFeature) -> Bool = { feature in
-                watchDefaults.object(forKey: feature.availabilityKey) as? Bool
-                    ?? (AppFeature.availabilityDefaults[feature.availabilityKey] as? Bool ?? false)
-            }
-            suite.expect(watchDefaults.object(forKey: AppFeature.notchWatch.availabilityKey) as? Bool == false
-                    && !FeatureVisibilitySupport.isPageVisible(.notch, isAvailable: isAvailable),
-                   "a setup that left the island out keeps Watch and the Dynamic Island page out after updating")
-            watchDefaults.set(true, forKey: AppFeature.notchWatch.availabilityKey)
-            Defaults.migrateNotchWatchAvailability(in: watchDefaults)
-            suite.expect(watchDefaults.object(forKey: AppFeature.notchWatch.availabilityKey) as? Bool == true,
-                   "a Watch install chosen later is never undone by the migration")
-            watchDefaults.removePersistentDomain(forName: watchSuiteName)
-        } else {
-            suite.expect(false, "Watch availability suite can be created")
-        }
-
         // The Features page offers installed switches that were never turned
         // on. Only switches nothing else leans on qualify, and only while
         // they are off and were never saved.
         let offeredWhenUnused = AppFeature.offeredWhenNeverSwitchedOn
-        suite.expect(!offeredWhenUnused.contains(.notch) && !offeredWhenUnused.contains(.shelf)
-                && !offeredWhenUnused.contains(.textSnippets) && !offeredWhenUnused.contains(.switcher)
+        suite.expect(!offeredWhenUnused.contains(.textSnippets) && !offeredWhenUnused.contains(.switcher)
                 && !offeredWhenUnused.contains(.radialMenu)
-                && offeredWhenUnused.allSatisfy { !$0.enabledKeys.isEmpty && $0.group != .dynamicIsland },
+                && offeredWhenUnused.allSatisfy { !$0.enabledKeys.isEmpty },
                "features other features lean on are never offered for uninstalling as unused")
         let everythingInstalled: (AppFeature) -> Bool = { _ in true }
         suite.expect(AppFeature.neverSwitchedOn(isAvailable: everythingInstalled, boolFor: { _ in false },
@@ -686,29 +648,10 @@ enum FeatureCatalogTests {
                "every feature belongs to exactly one group")
         suite.expect(!FeatureGroup.allCases.contains { AppFeature.features(in: $0).isEmpty },
                "no hub group is empty")
-        suite.expect(AppFeature.features(in: .dynamicIsland) == [
-            .notch, .notchCalendar, .notchNotifications, .notchGestures, .notchTimer,
-            .notchAccessories, .notchLyrics, .notchQueue, .notchLiveEqualizer, .notchDownloads, .notchAgents, .notchWatch,
-            .notchMascot,
-        ], "the Dynamic Island heads its own hub section, followed by its extensions")
-        suite.expect(AppFeature.dynamicIslandExtensions
-                == Array(AppFeature.features(in: .dynamicIsland).dropFirst()),
-               "the Dynamic Island's extensions are every other feature of its section")
-        suite.expect(AppFeature.notch.initialInstallGroup
-                        == AppFeature.features(in: .dynamicIsland).filter { $0 != .notchMascot && $0 != .notchAgents }
-                     && AppFeature.mixer.initialInstallGroup == [.mixer],
-                     "choosing the island keeps Agents and the companion as separate installs")
-        suite.expect(AppFeature.dynamicIslandExtensions.contains(.notchMascot)
-                        && !AppFeature.notch.initialInstallGroup.contains(.notchMascot)
-                        && AppFeature.notchMascot.permissions.isEmpty
-                        && AppFeature.notchMascot.enabledKeys == [DefaultsKey.notchMascotEnabled]
-                        && AppFeature.notchMascot.settingsDestination == FeatureSettingsDestination(.notchMascot)
-                        && FeatureVisibilitySupport.features(for: .notchMascot) == [.notchMascot],
-                     "the companion leaves with the island but only comes when picked, with a page of its own")
         suite.expect(AppPermission.allCases.map(\.rawValue) == [
             "accessibility", "screenRecording", "fullDiskAccess", "filesAndFolders", "notifications",
-            "automationFinder", "automationTerminal", "automationPlayback", "audioCapture", "microphone", "camera",
-            "appManagement", "calendar",
+            "automationFinder", "automationTerminal", "audioCapture", "microphone", "camera",
+            "appManagement",
         ], "permission portal contains every supported permission")
         let onboardingViewSource = (try? String(
             contentsOfFile: "Sources/Vorssaint/UI/Onboarding/OnboardingView.swift",
@@ -735,8 +678,7 @@ enum FeatureCatalogTests {
                 == [.screenRecording, .accessibility],
                "the recorder choice explains both permissions it needs")
         suite.expect(AppFeature.cleaner.onboardingPermissions.isEmpty
-                && AppFeature.cameraPreview.onboardingPermissions.isEmpty
-                && AppFeature.notchWatch.onboardingPermissions.isEmpty,
+                && AppFeature.cameraPreview.onboardingPermissions.isEmpty,
                "contextual grants are not requested during first setup")
         suite.expect(AppFeature.killProcess.isBeta && !AppFeature.monitorPower.isBeta,
                "only explicit betas carry the beta badge")
@@ -1020,7 +962,6 @@ enum FeatureCatalogTests {
                }
                && !AppFeature.screenshot.monitorsPermissionChanges
                && !AppFeature.screenRecorder.monitorsPermissionChanges
-               && !AppFeature.notchWatch.monitorsPermissionChanges
                && AppFeature.switcher.monitorsPermissionChanges
                && AppFeature.focusFollowsMouse.monitorsPermissionChanges
                && AppFeature.mouseNavigation.monitorsPermissionChanges,
@@ -1199,8 +1140,8 @@ enum FeatureCatalogTests {
 
         suite.expect(!AppFeature.anyMonitorAlertEnabled(isAvailable: { _ in true }, boolFor: { _ in false }),
                "no alert keys means no monitor alerts")
-        suite.expect(AppFeature.mixer.symbolName == NotchModule.mixer.symbol,
-               "Features and General use the Dynamic Island Mixer’s speaker symbol")
+        suite.expect(AppFeature.mixer.symbolName == "speaker.wave.2",
+               "Features and General use the mixer's speaker symbol")
         suite.expect(AppFeature.anyMonitorAlertEnabled(isAvailable: { _ in true },
                                                  boolFor: { $0 == DefaultsKey.monitorAlertDisk }),
                "one alert on an available metric arms the alert service")
@@ -1424,8 +1365,6 @@ enum FeatureCatalogTests {
                    "shortcut editor strings keep their format and avoid em-dashes (\(language.rawValue))")
             suite.expect(FeatureStrings.feedback(language).charactersFormat.contains("%d"),
                    "feedback character format keeps its placeholder (\(language.rawValue))")
-            suite.expect(FeatureStrings.radialMenu(language).mediaOpenAppFormat.contains("%@"),
-                   "Now Playing keeps the app-name placeholder (\(language.rawValue))")
             suite.expect(FeatureStrings.scratchpad(language).deletePadMessageFormat.contains("%@")
                     && FeatureStrings.scratchpad(language).padLimitFormat.contains("%d"),
                    "scratchpad dialog formats keep their placeholders (\(language.rawValue))")
@@ -1759,14 +1698,6 @@ enum FeatureCatalogTests {
         suite.expect(AppFeature.monitorCPU.settingsDestination == FeatureSettingsDestination(.monitor),
                "monitor features open the shared monitor page")
         let settingsRouter = SettingsRouter.shared
-        let companionRouter = SettingsRouter()
-        companionRouter.request(AppFeature.notchMascot.settingsDestination)
-        suite.expect(companionRouter.page == .notch && companionRouter.notchCompanion
-                     && pageVisible(companionRouter.page, available: [.notchMascot]),
-                     "the companion's settings remain reachable when it alone is installed, including the install-island prompt")
-        suite.expect(pageVisible(companionRouter.page, available: [.notch, .notchMascot])
-                     && !pageVisible(companionRouter.page, available: []),
-                     "the companion shares the installed island's page without exposing it when every extension is uninstalled")
         var settingsRequestCount = 0
         var settingsRequestsPublishedReady = true
         let settingsRequestObservation = settingsRouter.$requestID
@@ -2496,8 +2427,8 @@ enum FeatureCatalogTests {
                                                           displayIsBuiltIn: false,
                                                           overlayReplacesNative: true),
                "with the overlay on, the system target is stepped here so only one OSD draws")
-        // An external keyboard's plain brightness keys must reach the island
-        // or the overlay too, not only the pointer routing (beta feedback).
+        // An external keyboard's plain brightness keys must reach the
+        // overlay too, not only the pointer routing (beta feedback).
         suite.expect(BrightnessSupport.answersPlainBrightnessKeys(followsPointer: false, overlayReplacesNative: true,
                                                                   finerSteps: false)
                 && BrightnessSupport.answersPlainBrightnessKeys(followsPointer: true, overlayReplacesNative: false,
@@ -2591,25 +2522,9 @@ enum FeatureCatalogTests {
                 && BrightnessSupport.wholePercent(1.2) == 100
                 && BrightnessSupport.wholePercent(.infinity) == 0,
                "brightness overlay percentage rounds and clamps safely")
-        // Show brightness when adjusting governs the app's overlay. The island
-        // stands in for the system only while it shows notices.
-        suite.expect(BrightnessSupport.overlayReplacesNative(overlayEnabled: true, islandRoutes: false,
-                                                             islandShowsNotices: false),
-               "the opt-in overlay replaces the system's brightness feedback")
-        suite.expect(BrightnessSupport.overlayReplacesNative(overlayEnabled: false, islandRoutes: true,
-                                                             islandShowsNotices: true),
-               "an island that shows notices stands in for the system's brightness feedback")
-        let hiddenIsland = BrightnessSupport.overlayReplacesNative(overlayEnabled: false, islandRoutes: true,
-                                                                   islandShowsNotices: false)
-        suite.expect(!hiddenIsland && !BrightnessSupport.stepsSystemRoutedDisplay(followsPointer: false,
-                                                                                  displayIsBuiltIn: true,
-                                                                                  overlayReplacesNative: hiddenIsland),
-               "with the overlay off, an island hidden until hover leaves the built-in panel's key to the system")
-        suite.expect(!BrightnessSupport.overlayReplacesNative(overlayEnabled: false, islandRoutes: false,
-                                                              islandShowsNotices: true),
-               "an island without brightness leaves the key to the system")
-        suite.expect(!brightnessWorkQueueCode.contains("NotchSupport.routes(.brightness)"),
-               "the app's overlay appears only with its own option, never in place of an island that shows nothing")
+        suite.expect(!BrightnessSupport.stepsSystemRoutedDisplay(followsPointer: false, displayIsBuiltIn: true,
+                                                                 overlayReplacesNative: false),
+               "with the overlay off, the built-in panel's key stays with the system")
 
     }
 }

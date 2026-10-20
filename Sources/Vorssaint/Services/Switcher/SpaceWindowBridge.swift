@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import ApplicationServices
@@ -97,15 +98,6 @@ enum SpaceWindowBridge {
             let spaces: [UInt64]
             let fullscreenSpaces: Set<UInt64>
             let currentSpace: UInt64?
-        }
-
-        /// With separate Spaces, only the island's display controls visibility.
-        /// A shared Space applies to every display even if its UUID is absent.
-        func isFullscreen(on displayID: CGDirectDisplayID, separateSpaces: Bool) -> Bool {
-            let candidates = separateSpaces ? displays.filter { $0.displayID == displayID } : displays
-            return candidates.contains { display in
-                display.currentSpace.map { display.fullscreenSpaces.contains($0) } == true
-            }
         }
 
         /// Displays in order.

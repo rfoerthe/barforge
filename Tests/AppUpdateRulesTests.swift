@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -162,9 +163,6 @@ enum AppUpdateRulesContract {
     private static func listControls(_ suite: TestSuite) {
         let source = (try? String(contentsOfFile: "Sources/Vorssaint/UI/AppUpdates/AppUpdatesListView.swift",
                                   encoding: .utf8)) ?? ""
-        suite.expect(source.contains("guard !inNotch else {")
-                     && source.contains("guard panel.runAboveIsland() == .OK, let url = panel.url else { return }"),
-                     "inside the island the app picker opens above it instead of below it")
         suite.expect(source.contains(".help(moreOptions)")
                      && source.contains(".accessibilityLabel(\"\\(moreOptions): \\(item.name)\")")
                      && !source.contains(".help(text.excludeApp)"),

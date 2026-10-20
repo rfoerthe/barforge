@@ -17,7 +17,6 @@ struct MetricsTests {
             }),
             ("metrics", {
                 MetricsFeatureTests.run(suite)
-                MenuBarBatteryWarningTests.run(suite)
                 ProcessNameContract.run(suite)
                 SystemMonitorCPUTests.run(suite)
                 SystemMonitorPlanTests.run(suite)
@@ -75,7 +74,6 @@ struct MetricsTests {
                 LaunchAtLoginSettingsTests.run(suite)
                 PostUpdateStatusItemRecoveryTests.run(suite)
                 UpdateAdminInstallContract.run(suite)
-                UpdateHighlightsTests.run(suite)
                 UpdateIntroFlowTests.run(suite)
                 ReleaseDigestTests.run(suite)
             }),
@@ -108,18 +106,8 @@ struct MetricsTests {
                 CommandBarSelectionTests.run(suite)
             }),
             ("transient-paste", { TransientPasteTests.run(suite) }),
-            ("notch-music", { NotchMusicExtrasTests.run(suite) }),
-            ("notch", {
-                NotchTests.run(suite)
-                NotchCompactTests.run(suite)
-                NotchCapsuleTests.run(suite)
-                PlainTextLineMoverTests.run(suite)
-                NotchVolumeKeyTests.run(suite)
-                NotchSettingsTabRowTests.run(suite)
-                NotchPresentationProbeArgumentTests.run(suite)
-            }),
+            ("plain-text", { PlainTextLineMoverTests.run(suite) }),
             ("switcher-model", { SwitcherModelFeatureTests.run(suite) }),
-            ("agents", { NotchAgentTests.run(suite) }),
             ("features", {
                 FeatureCatalogTests.run(suite)
                 MenuPanelSectionGateContract.run(suite)
@@ -133,7 +121,6 @@ struct MetricsTests {
             ("settings", {
                 SettingsFeatureTests.run(suite)
                 SettingsWindowTests.run { suite.expect($0, $1) }
-                NotchSettingsChoiceTests.run(suite)
                 MonitorTokenTests.run(suite)
             }),
             ("feature-hub-layout", { FeatureHubLayoutTests.run(suite) }),
