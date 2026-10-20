@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Combine
@@ -130,7 +131,7 @@ final class UpdateService: ObservableObject {
 
         var request = URLRequest(url: URL(string: endpoint)!)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        request.setValue("Vorssaint/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
+        request.setValue("Barforge/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
         request.cachePolicy = .reloadIgnoringLocalCacheData
 
         URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
@@ -283,7 +284,7 @@ final class UpdateService: ObservableObject {
                     }
                     // Move out of the session's scratch space before handing off.
                     let dmgURL = FileManager.default.temporaryDirectory
-                        .appendingPathComponent("Vorssaint-update.dmg")
+                        .appendingPathComponent("Barforge-update.dmg")
                     try? FileManager.default.removeItem(at: dmgURL)
                     do {
                         try FileManager.default.moveItem(at: tempURL, to: dmgURL)
@@ -511,7 +512,7 @@ final class BoundedUpdateDownloadDelegate: NSObject, URLSessionDataDelegate {
         self.progress = progress
         self.completion = completion
         let temporaryFileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Vorssaint-update-\(UUID().uuidString).download")
+            .appendingPathComponent("Barforge-update-\(UUID().uuidString).download")
         fileURL = temporaryFileURL
         guard FileManager.default.createFile(atPath: temporaryFileURL.path, contents: nil) else {
             throw CocoaError(.fileWriteUnknown)

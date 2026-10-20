@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -9,12 +10,12 @@ struct ReleaseNotes {
     let sections: [ReleaseNoteSection]
 
     static var current: ReleaseNotes {
-        let direct = notes(for: AppInfo.version)
-        // A fork build lists its own entries and then the release it builds on.
-        if let base = ForkChangelog.baseVersion(of: AppInfo.version) {
-            let combined = ForkChangelog.combined(direct, base: notes(for: base))
-            if !combined.sections.isEmpty { return combined }
+        // Barforge's own notes first, then the Vorssaint releases they bring.
+        if let fork = ForkChangelog.bundled() {
+            return ForkChangelog.releaseNotes(for: AppInfo.version, fork: fork, upstream: bundledChangelog() ?? "",
+                                              fallbackBase: AppInfo.upstreamVersion)
         }
+        let direct = notes(for: AppInfo.version)
         if !direct.sections.isEmpty { return direct }
         let unreleased = notes(for: "Unreleased")
         if !unreleased.sections.isEmpty { return unreleased }
@@ -68,9 +69,8 @@ struct ReleaseNotes {
     }
 
     static func bundledChangelog() -> String? {
-        guard let url = Bundle.main.url(forResource: "CHANGELOG", withExtension: "md"),
-              let changelog = try? String(contentsOf: url, encoding: .utf8) else { return nil }
-        return ForkChangelog.merged(changelog, fork: ForkChangelog.bundled())
+        guard let url = Bundle.main.url(forResource: "CHANGELOG", withExtension: "md") else { return nil }
+        return try? String(contentsOf: url, encoding: .utf8)
     }
 
     private static func parse(version: String, changelog: String) -> ReleaseNotes? {
@@ -183,7 +183,7 @@ struct ReleaseNotes {
 
     private static func isDistributionFooter(_ line: String) -> Bool {
         let normalized = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        return normalized == "Signed with an Apple Developer ID and notarized by Apple, so it downloads and opens normally. Requires macOS 14 or later. Open the .dmg below and drag Vorssaint to Applications."
+        return normalized == "Signed with an Apple Developer ID and notarized by Apple, so it downloads and opens normally. Requires macOS 14 or later. Open the .dmg below and drag Barforge to Applications."
     }
 }
 

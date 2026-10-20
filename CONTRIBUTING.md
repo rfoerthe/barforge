@@ -1,27 +1,29 @@
-# Contributing to Vorssaint
+# Contributing to Barforge
 
-Vorssaint aims to stay small, native and readable. Contributions are accepted
+Barforge aims to stay small, native and readable. Contributions are accepted
 under GPL-3.0-or-later unless stated otherwise.
 
 ## Getting started
 
-You need macOS 14 or newer, Apple Silicon and the Xcode Command Line Tools.
+You need macOS 26 or newer, Apple Silicon and Xcode 26 or its Command Line Tools
+(Swift 6.2 or newer; CI also builds with Xcode 26.0.1).
 The project builds with `build.sh`, without an Xcode project or external package
 dependencies. `Package.swift` supports editor indexing; it does not assemble or
 sign the app bundle.
 
 ```sh
-git clone https://github.com/vorssaint/vorssaint-utils.git
+git clone https://github.com/rfoerthe/vorssaint-utils.git
 cd vorssaint-utils
 ./build.sh --dev
-./build/VorssaintDeveloper --selftest
+./build/BarforgeDeveloper --selftest
 ./build.sh --test
 ```
 
 To install and launch the separate Developer app, use `./build.sh --dev --install`.
 It has its own preferences and permissions and does not replace the official app.
 A plain `./build.sh` builds the optimized variant used by CI; its health check is
-`./build/Vorssaint --selftest`.
+`./build/Barforge --selftest`. `./build.sh --clean` removes `build/` and `.build/`
+and does nothing else; signed disk images in `dist/` stay.
 
 ### Stable signing
 
@@ -54,7 +56,7 @@ over a new subsystem. Keep each PR focused on one independently useful change.
   permission prompts where applicable, and coverage tests.
 - New source files retain the project's SPDX license and copyright headers.
 
-Sensor changes should include a dump from `./build/Vorssaint --sensors` and the
+Sensor changes should include a dump from `./build/Barforge --sensors` and the
 Mac model. Selection logic lives in `TemperatureSensorSelector` and `SystemMonitor`.
 
 ## Validation
@@ -97,7 +99,7 @@ a stable release carries the fix, and can close the issue after two weeks withou
 a response. If the PR addresses only part of an issue, say exactly which part.
 
 For agent-assisted work, see [contributing with an agent](docs/AI-CONTRIBUTIONS.md).
-Bug reports and feature requests use the [issue forms](https://github.com/vorssaint/vorssaint-utils/issues/new/choose).
+Bug reports and feature requests use the [issue forms](https://github.com/rfoerthe/vorssaint-utils/issues/new/choose).
 Report vulnerabilities through [private security reporting](SECURITY.md).
 
 ## Releases (maintainers)
@@ -116,3 +118,27 @@ publishes an immutable release. Confirm publication succeeded; a pushed tag alon
 is not a published version. Beta releases remain prereleases and do not replace
 the latest stable release or its Homebrew cask. Do not move published tags or
 replace published artifacts.
+
+## Fork conventions
+
+Barforge is a fork of Vorssaint and may not use its name or icon
+([TRADEMARKS.md](TRADEMARKS.md)).
+
+- After merging from upstream, run `python3 Tools/fork-rebrand.py`. It shows
+  Barforge in every string upstream added; `--check` fails while one still
+  shows Vorssaint. Comments, identifiers and copyright lines stay as upstream
+  wrote them, so later merges stay small.
+- A file the fork adds starts with its own notice:
+  `// Copyright (C) 2026 Roland Foerther`. A file from upstream that the fork
+  changes beyond the rename keeps `Copyright (C) 2026 Vorssaint` and gets the
+  fork's line below it. Never remove or replace upstream's line.
+- Record fork changes in [CHANGELOG-BARFORGE.md](CHANGELOG-BARFORGE.md); CHANGELOG.md
+  stays identical to upstream.
+- Barforge has its own version line (`CFBundleShortVersionString`, 1.0.0
+  onwards). `BarforgeUpstreamVersion` in `Resources/Info.plist` names the
+  Vorssaint release it is made from: update it with every upstream merge, and
+  keep Barforge's version when the merge brings upstream's.
+- Every entry in CHANGELOG-BARFORGE.md, `[Unreleased]` included, carries a
+  `Based on Vorssaint X.Y.Z.` line equal to `BarforgeUpstreamVersion`. Do not
+  copy Vorssaint's notes: the app and `Tools/github-release.sh` add the
+  Vorssaint releases a version brings on their own.

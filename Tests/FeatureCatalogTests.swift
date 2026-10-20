@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -1680,7 +1681,7 @@ enum FeatureCatalogTests {
                "WindowServer is protected")
         suite.expect(KillProcessSupport.isProtected(pid: 9999, name: "loginwindow", path: "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"),
                "loginwindow is protected")
-        suite.expect(KillProcessSupport.isProtected(pid: ProcessInfo.processInfo.processIdentifier, name: "Vorssaint"),
+        suite.expect(KillProcessSupport.isProtected(pid: ProcessInfo.processInfo.processIdentifier, name: "Barforge"),
                "current app PID is protected")
         suite.expect(!KillProcessSupport.isProtected(pid: 12345, name: "Safari", path: "/Applications/Safari.app/Contents/MacOS/Safari"),
                "ordinary user app is not protected")

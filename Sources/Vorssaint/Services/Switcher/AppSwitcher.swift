@@ -354,7 +354,7 @@ final class AppSwitcher: ObservableObject {
             let thread = Thread { [weak self] in
                 self?.runEventTap()
             }
-            thread.name = "Vorssaint Switcher"
+            thread.name = "Barforge Switcher"
             thread.qualityOfService = .userInteractive
             tapThread = thread
             return thread

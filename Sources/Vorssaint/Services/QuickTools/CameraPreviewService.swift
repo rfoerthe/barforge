@@ -309,8 +309,8 @@ final class CameraPreviewService: ObservableObject {
     private func installDeviceObservers() {
         guard deviceObservers.isEmpty else { return }
         let center = NotificationCenter.default
-        for name in [NSNotification.Name.AVCaptureDeviceWasConnected,
-                     NSNotification.Name.AVCaptureDeviceWasDisconnected] {
+        for name in [AVCaptureDevice.wasConnectedNotification,
+                     AVCaptureDevice.wasDisconnectedNotification] {
             deviceObservers.append(center.addObserver(forName: name, object: nil,
                                                       queue: .main) { [weak self] _ in
                 self?.handleDevicesChanged()
@@ -362,7 +362,7 @@ final class CameraPreviewService: ObservableObject {
                                         styleMask: [.borderless, .nonactivatingPanel],
                                         backing: .buffered,
                                         defer: false)
-        panel.title = "Vorssaint"
+        panel.title = "Barforge"
         panel.isReleasedWhenClosed = false
         // A mirror is something the user drags next to the meeting window.
         panel.isMovableByWindowBackground = true

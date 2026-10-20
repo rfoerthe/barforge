@@ -1,11 +1,11 @@
 #!/bin/zsh
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 Vorssaint
+# Copyright (C) 2026 Roland Foerther
 
 # Builds a signed, notarized DMG on this Mac with your own Developer ID, the way
 # the release workflow does for the official app: build, sign, notarize and
 # staple the app, package the DMG, sign, notarize and staple it, then verify
-# that Gatekeeper accepts both. The result is dist/Vorssaint-<version>.dmg.
+# that Gatekeeper accepts both. The result is dist/Barforge-<version>.dmg.
 #
 # One-time setup:
 #   1. A "Developer ID Application" certificate with its private key in the
@@ -40,9 +40,9 @@ for arg in "$@"; do
     esac
 done
 
-APP_NAME="Vorssaint"
+APP_NAME="Barforge"
 APP="build/stage/$APP_NAME.app"
-APP_BUNDLE_ID="com.vorssaint.utils"
+APP_BUNDLE_ID="de.foerther.barforge"
 NOTARY_PROFILE="${NOTARY_PROFILE:-vorssaint-notary}"
 WORK=""
 MOUNT=""
@@ -145,7 +145,7 @@ if [[ "$SIGNATURE" != *"flags="*"runtime"* ]]; then
     echo "✗ $APP is not signed with the hardened runtime." >&2
     exit 1
 fi
-./build/Vorssaint --selftest
+./build/$APP_NAME --selftest
 (( NOTARIZE )) && notarize "$APP"
 
 # ── DMG ──────────────────────────────────────────────────────────────────────

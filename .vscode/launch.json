@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:fork-naming-trademark-0033bb}",
+            "name": "Debug Vorssaint",
+            "target": "Vorssaint",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Vorssaint"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:fork-naming-trademark-0033bb}",
+            "name": "Release Vorssaint",
+            "target": "Vorssaint",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Vorssaint"
+        }
+    ]
+}

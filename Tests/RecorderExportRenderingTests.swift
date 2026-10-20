@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AVFoundation
 import AppKit
@@ -156,11 +157,15 @@ enum RecorderExportRenderingTests {
                                        of: track, at: CMTime(seconds: offset, preferredTimescale: 600))
         }
         let mux = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetPassthrough)!
-        mux.outputURL = audioTake.videoURL
-        mux.outputFileType = .mov
-        await mux.export()
-        suite.expect(mux.status == .completed, "two-track fixture retains delayed microphone and its silent gap")
-        guard mux.status == .completed else { return }
+        let muxed: Bool
+        do {
+            try await mux.export(to: audioTake.videoURL, as: .mov)
+            muxed = true
+        } catch {
+            muxed = false
+        }
+        suite.expect(muxed, "two-track fixture retains delayed microphone and its silent gap")
+        guard muxed else { return }
         for speed in [0.25, 0.5, 1.0, 1.37, 4.0] {
             var doc = RecorderEditDocument(exportSpeed: speed, keepsSystemAudio: false, microphoneGain: 0.5)
             doc.showsPointer = false

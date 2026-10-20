@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -771,6 +772,11 @@ struct AboutSettings: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                if let upstream = AppInfo.upstreamVersion {
+                    Text(String(format: FeatureStrings.forkBuild(l10n.language).basedOnFormat, upstream))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 if AppInfo.isDeveloperBuild, let commit = AppInfo.buildCommit {
                     // Dev-only: which source commit this build came from. Never shipped.
                     Text(commit)
@@ -791,6 +797,15 @@ struct AboutSettings: View {
                     appDelegate()?.showUpdateHighlights(isReview: true)
                 }
                 Link(l10n.s.viewOnGitHub, destination: AppInfo.repositoryURL)
+            }
+            if AppInfo.isForkBuild {
+                Text(FeatureStrings.forkBuild(l10n.language).attribution)
+                    .font(.caption2)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: 420)
+                Link("GPL-3.0-or-later", destination: AppInfo.licenseURL)
+                    .font(.caption2)
             }
             Text(AppInfo.copyright)
                 .font(.caption2)
@@ -927,7 +942,8 @@ struct ReleaseNotesSettings: View {
     }
 
     private func iconName(for title: String) -> String {
-        switch title.lowercased() {
+        // "Vorssaint 3.4.1 · Added" in a Barforge build reads like "Added".
+        switch title.lowercased().components(separatedBy: " · ").last ?? "" {
         case "added": return "plus.circle.fill"
         case "changed": return "slider.horizontal.3"
         case "fixed": return "checkmark.circle.fill"

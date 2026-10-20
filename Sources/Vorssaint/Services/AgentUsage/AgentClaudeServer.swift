@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
@@ -51,10 +52,12 @@ enum AgentClaudeServer {
     /// pnpm keep global tools. The Claude app's own copy is left out: it has
     /// no sign-in of its own to check with.
     static func candidates(home: URL, searchPath: String? = nil) -> [URL] {
-        let folders = [home.appending(path: ".local/bin").path,
-                       home.appending(path: ".claude/local").path, "/opt/homebrew/bin", "/usr/local/bin"]
-            + (searchPath ?? "").split(separator: ":").map(String.init).filter { $0.hasPrefix("/") }
-            + toolFolders(home: home)
+        // Appended one by one: as a single chain of `+` the Swift 6.0 type
+        // checker gives up on the expression.
+        var folders: [String] = [home.appending(path: ".local/bin").path,
+                                 home.appending(path: ".claude/local").path, "/opt/homebrew/bin", "/usr/local/bin"]
+        folders += (searchPath ?? "").split(separator: ":").map(String.init).filter { $0.hasPrefix("/") }
+        folders += toolFolders(home: home)
         return folders.map { URL(fileURLWithPath: $0, isDirectory: true).appending(path: "claude") }
     }
 
@@ -62,14 +65,19 @@ enum AgentClaudeServer {
     /// them, each manager's newest Node first, and Volta's, Bun's and pnpm's
     /// own. A Claude Code that needs Node finds it on this list too.
     static func toolFolders(home: URL) -> [String] {
-        let path = { (relative: String) in home.appending(path: relative).path }
-        let fnm = ["Library/Application Support/fnm", ".local/share/fnm", ".fnm"].map(path)
-        return [path(".volta/bin")] + fnm.map { $0 + "/aliases/default/bin" }
-            + newest(in: path(".nvm/versions/node")).map { $0 + "/bin" }
-            + fnm.flatMap { newest(in: $0 + "/node-versions").map { $0 + "/installation/bin" } }
-            + newest(in: path(".asdf/installs/nodejs")).map { $0 + "/bin" }
-            + newest(in: path(".local/share/mise/installs/node")).map { $0 + "/bin" }
-            + [path(".bun/bin"), path("Library/pnpm"), path(".local/share/pnpm"), path(".npm-global/bin")]
+        let path = { (relative: String) -> String in home.appending(path: relative).path }
+        let fnm: [String] = ["Library/Application Support/fnm", ".local/share/fnm", ".fnm"].map(path)
+        // Appended one by one, as in `candidates`, for the Swift 6.0 type checker.
+        var folders: [String] = [path(".volta/bin")]
+        folders += fnm.map { (root: String) -> String in root + "/aliases/default/bin" }
+        folders += newest(in: path(".nvm/versions/node")).map { (node: String) -> String in node + "/bin" }
+        folders += fnm.flatMap { (root: String) -> [String] in
+            newest(in: root + "/node-versions").map { (node: String) -> String in node + "/installation/bin" }
+        }
+        folders += newest(in: path(".asdf/installs/nodejs")).map { (node: String) -> String in node + "/bin" }
+        folders += newest(in: path(".local/share/mise/installs/node")).map { (node: String) -> String in node + "/bin" }
+        folders += [path(".bun/bin"), path("Library/pnpm"), path(".local/share/pnpm"), path(".npm-global/bin")]
+        return folders
     }
 
     /// The folders in `folder` named for a version, as `v22.11.0` or

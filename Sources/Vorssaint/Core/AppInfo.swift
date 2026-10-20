@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 
 /// Static identity of the app, shared by UI, notifications and tooling.
 enum AppInfo {
-    static let name = "Vorssaint"
-    static let copyright = "© 2026 Vorssaint"
-    static let websiteURL = URL(string: "https://vorssaint.com")!
+    static let name = "Barforge"
+    static let copyright = "© 2026 Vorssaint · © 2026 Roland Foerther"
+    static let licenseURL = URL(string: "https://www.gnu.org/licenses/gpl-3.0.html")!
+    static var websiteURL: URL { isForkBuild ? repositoryURL : URL(string: "https://vorssaint.com")! }
     static let upstreamRepository = "vorssaint/vorssaint-utils"
 
     /// "owner/name" of the fork this build came from, stamped into Info.plist
@@ -17,6 +19,12 @@ enum AppInfo {
     }
 
     static var isForkBuild: Bool { forkRepository != nil }
+
+    /// The upstream release a fork build is made from, stamped into Info.plist
+    /// as `BarforgeUpstreamVersion`, since the fork numbers its own versions.
+    static var upstreamVersion: String? {
+        Bundle.main.object(forInfoDictionaryKey: "BarforgeUpstreamVersion") as? String
+    }
 
     /// A fork build links to its own repository.
     static var repositoryURL: URL {

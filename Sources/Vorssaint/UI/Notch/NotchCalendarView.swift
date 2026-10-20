@@ -408,11 +408,9 @@ private struct NotchCalendarEventRow: View {
                         Text(text.allDay)
                     } else if Calendar.current.isDate(event.start, inSameDayAs: day)
                                 && Calendar.current.isDate(event.end.addingTimeInterval(-1), inSameDayAs: day) {
-                        Text(event.start, format: .dateTime.hour().minute())
-                            + Text(" · ") + Text(event.end, format: .dateTime.hour().minute())
+                        Text("\(event.start, format: .dateTime.hour().minute()) · \(event.end, format: .dateTime.hour().minute())")
                     } else {
-                        Text(event.start, format: .dateTime.day().month(.abbreviated).hour().minute())
-                            + Text(" → ") + Text(event.end, format: .dateTime.day().month(.abbreviated).hour().minute())
+                        Text("\(event.start, format: .dateTime.day().month(.abbreviated).hour().minute()) → \(event.end, format: .dateTime.day().month(.abbreviated).hour().minute())")
                     }
                 }
                 .fixedSize(horizontal: false, vertical: true)

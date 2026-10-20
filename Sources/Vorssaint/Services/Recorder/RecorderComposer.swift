@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AVFoundation
 import AppKit
@@ -337,28 +338,34 @@ final class RecorderComposer {
                                  composer: RecorderComposer?,
                                  sourceSize: CGSize,
                                  outputSize: CGSize,
-                                 playbackSpeed: Double = 1) async -> AVMutableVideoComposition? {
+                                 playbackSpeed: Double = 1) async -> AVVideoComposition? {
         if let composer {
             // The handler may run concurrently; this composer only reads
             // immutable state while rendering each frame.
             nonisolated(unsafe) let threadSafeComposer = composer
             let timing = RecorderExportTiming(speed: playbackSpeed)
-            let composition = try? await AVMutableVideoComposition.videoComposition(
-                with: asset) { request in
-                    // Plans are built on the edited, unscaled clock. Map back
-                    // before looking up zooms, cursor shapes, captions and
-                    // privacy blurs, including frames on either side of a cut.
-                    let rendered = threadSafeComposer.render(
-                        request.sourceImage,
-                        at: timing.sourceTime(forOutputTime: CMTimeGetSeconds(request.compositionTime)))
-                    request.finish(with: rendered, context: nil)
-                }
-            guard let composition else { return nil }
-            composition.frameDuration = CMTime(value: 1,
-                                               timescale: CMTimeScale(max(1, frameRate)))
-            composition.renderSize = composer.canvasSize
-            composition.sourceTrackIDForFrameTiming = kCMPersistentTrackID_Invalid
-            return composition
+            let filtered = try? await AVVideoComposition(applyingFiltersTo: asset) { parameters in
+                // Plans are built on the edited, unscaled clock. Map back
+                // before looking up zooms, cursor shapes, captions and
+                // privacy blurs, including frames on either side of a cut.
+                let rendered = threadSafeComposer.render(
+                    parameters.sourceImage,
+                    at: timing.sourceTime(forOutputTime: CMTimeGetSeconds(parameters.compositionTime)))
+                return AVCIImageFilteringResult(resultImage: rendered)
+            }
+            guard let filtered else { return nil }
+            // The filtering composition is immutable: keep its compositor and
+            // instructions, and set the steady rate and the canvas on a copy.
+            return AVVideoComposition(configuration: AVVideoComposition.Configuration(
+                colorPrimaries: filtered.colorPrimaries,
+                colorTransferFunction: filtered.colorTransferFunction,
+                colorYCbCrMatrix: filtered.colorYCbCrMatrix,
+                customVideoCompositorClass: filtered.customVideoCompositorClass,
+                frameDuration: CMTime(value: 1, timescale: CMTimeScale(max(1, frameRate))),
+                instructions: filtered.instructions,
+                renderScale: filtered.renderScale,
+                renderSize: composer.canvasSize,
+                sourceTrackIDForFrameTiming: kCMPersistentTrackID_Invalid))
         }
         let naturalSize = (try? await track.load(.naturalSize)) ?? sourceSize
         let preferredTransform = (try? await track.load(.preferredTransform)) ?? .identity
@@ -375,15 +382,8 @@ final class RecorderComposer {
                                  preferredTransform: CGAffineTransform,
                                  outputSize: CGSize,
                                  frameRate: Int,
-                                 duration: CMTime) -> AVMutableVideoComposition {
-        let composition = AVMutableVideoComposition()
-        composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(1, frameRate)))
-        composition.renderSize = outputSize
-        composition.sourceTrackIDForFrameTiming = kCMPersistentTrackID_Invalid
-
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
-        let layer = AVMutableVideoCompositionLayerInstruction(assetTrack: track)
+                                 duration: CMTime) -> AVVideoComposition {
+        var layer = AVVideoCompositionLayerInstruction.Configuration(assetTrack: track)
         let geometry = RecorderSupport.videoGeometry(
             naturalSize: naturalSize,
             preferredTransform: preferredTransform)
@@ -392,8 +392,13 @@ final class RecorderComposer {
                                           y: outputSize.height / geometry.size.height)
             layer.setTransform(geometry.transform.concatenating(scale), at: .zero)
         }
-        instruction.layerInstructions = [layer]
-        composition.instructions = [instruction]
-        return composition
+        let instruction = AVVideoCompositionInstruction(configuration: .init(
+            layerInstructions: [AVVideoCompositionLayerInstruction(configuration: layer)],
+            timeRange: CMTimeRange(start: .zero, duration: duration)))
+        return AVVideoComposition(configuration: AVVideoComposition.Configuration(
+            frameDuration: CMTime(value: 1, timescale: CMTimeScale(max(1, frameRate))),
+            instructions: [instruction],
+            renderSize: outputSize,
+            sourceTrackIDForFrameTiming: kCMPersistentTrackID_Invalid))
     }
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import Carbon.HIToolbox
@@ -930,7 +931,7 @@ final class RadialMenuService: ObservableObject {
                                       styleMask: [.borderless, .nonactivatingPanel],
                                       backing: .buffered,
                                       defer: false)
-        panel.title = "Vorssaint"
+        panel.title = "Barforge"
         panel.isReleasedWhenClosed = false
         panel.isMovableByWindowBackground = false
         panel.hidesOnDeactivate = false

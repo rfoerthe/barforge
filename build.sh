@@ -1,8 +1,9 @@
 #!/bin/zsh
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Vorssaint
+# Copyright (C) 2026 Roland Foerther
 
-# Builds Vorssaint, assembles the .app bundle, signs it and (with --install)
+# Builds Barforge, assembles the .app bundle, signs it and (with --install)
 # installs it into /Applications.
 #
 # The bundle is staged in a temporary directory outside ~/Documents: folders synced
@@ -26,11 +27,13 @@ trap cleanup EXIT
 # into the build sweeps like any other ending.
 trap 'exit 1' INT TERM HUP
 
-# Flags: --dev builds the local-only "Vorssaint (Developer)" variant (its own
-# bundle id, so it coexists with the official app); --install puts it in /Applications.
+# Flags: --dev builds the local-only "Barforge (Developer)" variant (its own
+# bundle id, so it coexists with the official app); --install puts it in /Applications;
+# --clean removes the build artifacts and does nothing else.
 DEV=0
 INSTALL=0
 TEST=0
+CLEAN=0
 TEST_ARGS=()
 for arg in "$@"; do
     case "$arg" in
@@ -39,20 +42,39 @@ for arg in "$@"; do
         --test)    TEST=1 ;;
         --test-suite=*) TEST=1; TEST_ARGS+=("--suite=${arg#*=}") ;;
         --list-tests) TEST=1; TEST_ARGS+=(--list) ;;
+        --clean)   CLEAN=1 ;;
     esac
 done
 
+# build/ holds everything this script makes; .build/ is SwiftPM's and the
+# editor's cache from Package.swift. dist/ stays: its disk images are signed and
+# notarized releases. Staged bundles leave LaunchServices first, so no stale
+# app entry points at a deleted path.
+if (( CLEAN )); then
+    if (( $# > 1 )); then
+        echo "--clean does nothing else; run it on its own." >&2
+        exit 2
+    fi
+    for bundle in build/stage/*.app(N) build/stage.noindex/*.app(N); do
+        /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+            -u "$PWD/$bundle" >/dev/null 2>&1 || true
+    done
+    rm -rf build .build
+    echo "✓ Removed build/ and .build/"
+    exit 0
+fi
+
 if (( DEV )); then
-    APP_NAME="Vorssaint (Developer)"
-    EXECUTABLE="VorssaintDeveloper"
-    APP_BUNDLE_ID="com.vorssaint.utils.dev"
+    APP_NAME="Barforge (Developer)"
+    EXECUTABLE="BarforgeDeveloper"
+    APP_BUNDLE_ID="de.foerther.barforge.dev"
     BUILD_VARIANT_FLAGS=(-D VORSSAINT_DEVELOPMENT)
     APP_OPTIMIZATION_FLAGS=(-Onone)
     BUILD_CONFIGURATION="debug"
 else
-    APP_NAME="Vorssaint"
-    EXECUTABLE="Vorssaint"
-    APP_BUNDLE_ID="com.vorssaint.utils"
+    APP_NAME="Barforge"
+    EXECUTABLE="Barforge"
+    APP_BUNDLE_ID="de.foerther.barforge"
     BUILD_VARIANT_FLAGS=()
     APP_OPTIMIZATION_FLAGS=(-O)
     BUILD_CONFIGURATION="release"
@@ -62,7 +84,7 @@ FAN_HELPER_ID="$APP_BUNDLE_ID.fan-control"
 # Sources/NowPlayingAdapter. Staged under Contents/Frameworks, signed on its own.
 NOW_PLAYING_ADAPTER_ID="$APP_BUNDLE_ID.now-playing"
 NOW_PLAYING_ADAPTER="libVorssaintNowPlaying.dylib"
-TARGET="arm64-apple-macosx14.0"
+TARGET="arm64-apple-macosx26.0"
 ENTITLEMENTS="Resources/Vorssaint.entitlements"
 LEGACY_IDENTITY="Vorssaint Utils Signing"
 
@@ -657,7 +679,7 @@ else
             --app-icon AppIcon \
             --platform macosx \
             --target-device mac \
-            --minimum-deployment-target 14.0 \
+            --minimum-deployment-target 26.0 \
             --enable-on-demand-resources NO \
             --output-partial-info-plist "$ICON_TMP/partial-info.plist" \
             >"$ICON_TMP/actool.log" 2>&1 && [[ -s "$ICON_TMP/catalog/Assets.car" ]]; then
@@ -681,12 +703,12 @@ mkdir -p "$STAGE/Contents/Frameworks"
 cp "build/$NOW_PLAYING_ADAPTER" "$STAGE/Contents/Frameworks/$NOW_PLAYING_ADAPTER"
 cp Resources/now-playing.pl "$STAGE/Contents/Resources/now-playing.pl"
 cp Resources/agent-prices.json "$STAGE/Contents/Resources/agent-prices.json"
-cp Resources/com.vorssaint.utils.fan-control.plist \
+cp Resources/de.foerther.barforge.fan-control.plist \
     "$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
 cp Resources/Info.plist "$STAGE/Contents/Info.plist"
 cp CHANGELOG.md "$STAGE/Contents/Resources/CHANGELOG.md"
-if [[ -f CHANGELOG-FORK.md ]]; then
-    cp CHANGELOG-FORK.md "$STAGE/Contents/Resources/CHANGELOG-FORK.md"
+if [[ -f CHANGELOG-BARFORGE.md ]]; then
+    cp CHANGELOG-BARFORGE.md "$STAGE/Contents/Resources/CHANGELOG-BARFORGE.md"
 fi
 for lproj in Resources/*.lproj(N); do
     cp -R "$lproj" "$STAGE/Contents/Resources/"
@@ -701,7 +723,7 @@ if (( DEV )); then
     FAN_PLIST="$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
     /usr/libexec/PlistBuddy -c "Set :Label $FAN_HELPER_ID" "$FAN_PLIST"
     /usr/libexec/PlistBuddy -c "Set :BundleProgram Contents/Library/LaunchServices/$FAN_HELPER_ID" "$FAN_PLIST"
-    /usr/libexec/PlistBuddy -c "Delete :MachServices:com.vorssaint.utils.fan-control" "$FAN_PLIST"
+    /usr/libexec/PlistBuddy -c "Delete :MachServices:de.foerther.barforge.fan-control" "$FAN_PLIST"
     /usr/libexec/PlistBuddy -c "Add :MachServices:$FAN_HELPER_ID bool true" "$FAN_PLIST"
     # Stamp the source commit + build time so the running dev app shows (in About)
     # exactly which code it was compiled from. Lets you verify it matches HEAD before

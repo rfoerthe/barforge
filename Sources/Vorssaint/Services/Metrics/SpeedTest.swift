@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Combine
 import Foundation
@@ -122,7 +123,7 @@ final class SpeedTest: ObservableObject {
 
     init(transports: [SpeedTestTransport] = [HTTPSpeedTestTransport.apple(), HTTPSpeedTestTransport.cloudflare()],
          configuration: Configuration = Configuration(),
-         queue: DispatchQueue = DispatchQueue(label: "Vorssaint.SpeedTest", qos: .userInitiated),
+         queue: DispatchQueue = DispatchQueue(label: "Barforge.SpeedTest", qos: .userInitiated),
          clock: @escaping Clock = { ProcessInfo.processInfo.systemUptime },
          scheduler: Scheduler? = nil) {
         precondition(!transports.isEmpty, "a speed test needs a transport")

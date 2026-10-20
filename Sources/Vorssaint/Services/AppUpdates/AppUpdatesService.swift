@@ -838,6 +838,7 @@ final class AppUpdatesService: ObservableObject {
     /// exists to do safely.
     private static func isOwnBundle(_ bundleID: String) -> Bool {
         bundleID == Bundle.main.bundleIdentifier || bundleID.hasPrefix("com.vorssaint")
+            || bundleID.hasPrefix("de.foerther.barforge")
     }
 
     private static let ownPackageTokens: Set<String> = ["vorssaint", "vorssaint@beta", "vorssaint-beta"]

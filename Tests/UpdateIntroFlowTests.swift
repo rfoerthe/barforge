@@ -10,6 +10,7 @@ enum UpdateIntroFlowTests {
         static var version = "3.4.0"
         static var isBeta: Bool { version.contains("beta") }
         static var isDeveloperBuild = false
+        static var isForkBuild = false
     }
     enum UserDefaults { static var standard: Foundation.UserDefaults! }
     enum DispatchQueue {

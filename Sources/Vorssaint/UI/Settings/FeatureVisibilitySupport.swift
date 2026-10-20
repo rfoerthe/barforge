@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Combine
 import Foundation
@@ -437,6 +438,9 @@ enum FeatureVisibilitySupport {
 
     static func isPageVisible(_ page: SettingsPage,
                               isAvailable: (AppFeature) -> Bool) -> Bool {
+        // A fork does not ask for donations or community visits on the
+        // original project's behalf.
+        if page == .support && AppInfo.isForkBuild { return false }
         let gate = features(for: page)
         return gate.isEmpty || gate.contains(where: isAvailable)
     }

@@ -567,7 +567,7 @@ enum AppManagementFeatureTests {
             if case let .failure(reason) = UninstallerSupport.evaluate(url) { return reason }
             return nil
         }
-        let ownApp = selectionBundle("Copy.app", bundleID: "com.vorssaint.utils.dev")
+        let ownApp = selectionBundle("Copy.app", bundleID: "de.foerther.barforge.dev")
         let plainFolder = selectionFixture.appendingPathComponent("Folder", isDirectory: true)
         try? FileManager.default.createDirectory(at: plainFolder, withIntermediateDirectories: true)
         let document = selectionFixture.appendingPathComponent("Notes.txt")
