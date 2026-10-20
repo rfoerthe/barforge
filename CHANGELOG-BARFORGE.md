@@ -26,6 +26,7 @@ Based on Vorssaint 3.4.1.
 ### Changed
 - Barforge needs macOS 26 Tahoe or later.
 - The fork is called Barforge, with its own anvil icon and the bundle identifier `de.foerther.barforge`, as Vorssaint's trademark policy asks of forks. It installs as Barforge.app and shares no settings or permissions with Vorssaint or an earlier build of the fork: export your settings there under Settings → Advanced → Backup, remove an earlier fork build with its fan helper (Settings → Advanced → Uninstall completely), then install Barforge, import the settings and grant its permissions again.
+- A new app icon: a lit, bevelled anvil on a light tile. The Dock icon on macOS 26 shows the anvil in two tones, its lit top and bevels lighter than the body, and keeps its light, dark and tinted looks, and the menu bar icon and the in-app mark take the new anvil outline.
 - Barforge has its own version numbers, starting with 1.0.0, based on Vorssaint 3.4.1. Settings → About shows both. Release notes and What's New list Barforge's changes first, then those of the Vorssaint releases a version brings.
 - Settings → About names Vorssaint as the original project, says Barforge is an unofficial version it does not endorse, and links the GPL. GitHub links lead to rfoerthe/vorssaint-utils.
 - Barforge does not update itself, so no Vorssaint release replaces it: new versions come from its releases page, and the menu bar icon's right-click menu offers no Check for updates….
