@@ -12,8 +12,8 @@ dependencies. `Package.swift` supports editor indexing; it does not assemble or
 sign the app bundle.
 
 ```sh
-git clone https://github.com/rfoerthe/vorssaint-utils.git
-cd vorssaint-utils
+git clone https://github.com/rfoerthe/barforge.git
+cd barforge
 ./build.sh --dev
 ./build/BarforgeDeveloper --selftest
 ./build.sh --test
@@ -99,7 +99,7 @@ a stable release carries the fix, and can close the issue after two weeks withou
 a response. If the PR addresses only part of an issue, say exactly which part.
 
 For agent-assisted work, see [contributing with an agent](docs/AI-CONTRIBUTIONS.md).
-Bug reports and feature requests use the [issue forms](https://github.com/rfoerthe/vorssaint-utils/issues/new/choose).
+Bug reports and feature requests use the [issue forms](https://github.com/rfoerthe/barforge/issues/new/choose).
 Report vulnerabilities through [private security reporting](SECURITY.md).
 
 ## Releases (maintainers)

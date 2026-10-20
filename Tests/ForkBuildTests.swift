@@ -7,7 +7,7 @@ import Foundation
 /// official update that would replace it.
 enum ForkBuildTests {
     static func run(_ suite: TestSuite) {
-        suite.expect(AppInfoSupport.forkRepository("rfoerthe/vorssaint-utils") == "rfoerthe/vorssaint-utils"
+        suite.expect(AppInfoSupport.forkRepository("rfoerthe/barforge") == "rfoerthe/barforge"
                      && AppInfoSupport.forkRepository(" owner/repo.name ") == "owner/repo.name",
                      "a plain owner/name is a fork")
         for invalid in [nil, "", "rfoerthe", "a/b/c", "/repo", "owner/", "owner/re po",
@@ -19,7 +19,7 @@ enum ForkBuildTests {
         let info = NSDictionary(contentsOfFile: "Resources/Info.plist") as? [String: Any]
         let version = info?["CFBundleShortVersionString"] as? String ?? ""
         let fork = info?["VorssaintForkRepository"] as? String
-        suite.expect(AppInfoSupport.forkRepository(fork) == "rfoerthe/vorssaint-utils",
+        suite.expect(AppInfoSupport.forkRepository(fork) == "rfoerthe/barforge",
                      "this fork stamps its repository into the bundle")
         let parsed = UpdateServiceSupport.SemanticVersion(raw: version)
         suite.expect(parsed != nil && !version.contains("+") && parsed?.isPrerelease == false,

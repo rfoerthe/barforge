@@ -81,7 +81,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>VorssaintForkRepository</key>
-	<string>rfoerthe/vorssaint-utils</string>
+	<string>rfoerthe/barforge</string>
 	<key>BarforgeUpstreamVersion</key>
 	<string>3.4.1</string>
 </dict>

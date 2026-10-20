@@ -14,16 +14,16 @@
   <a href="#everything-it-does">Features</a> ·
   <a href="#private-by-default">Privacy</a> ·
   <a href="CHANGELOG-BARFORGE.md">Barforge changelog</a> ·
-  <a href="https://github.com/rfoerthe/vorssaint-utils/issues">Issues</a>
+  <a href="https://github.com/rfoerthe/barforge/issues">Issues</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/rfoerthe/vorssaint-utils/releases"><img src="https://img.shields.io/github/v/release/rfoerthe/vorssaint-utils?label=release&color=4c8dff" alt="Latest release"></a>
+  <a href="https://github.com/rfoerthe/barforge/releases"><img src="https://img.shields.io/github/v/release/rfoerthe/barforge?label=release&color=4c8dff" alt="Latest release"></a>
   <a href="#what-you-need"><img src="https://img.shields.io/badge/macOS-26%2B%20Apple%20Silicon-black" alt="macOS 26 and newer, Apple Silicon"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-blue" alt="License GPL 3.0 or later"></a>
 </p>
 
-> **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [Barforge changelog](CHANGELOG-BARFORGE.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/vorssaint-utils/issues), not upstream.
+> **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [Barforge changelog](CHANGELOG-BARFORGE.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/barforge/issues), not upstream.
 
 <p align="center">
   <img src="docs/assets/readme/panel-mixer.png" width="196" alt="Volume mixer with per app sliders, one app boosted past 100 percent">
@@ -147,7 +147,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 
 ## Install
 
-Grab the disk image from the [releases page](https://github.com/rfoerthe/vorssaint-utils/releases) and drag Barforge into Applications. Barforge has no Homebrew cask: `brew install --cask vorssaint` installs the original app, not this fork.
+Grab the disk image from the [releases page](https://github.com/rfoerthe/barforge/releases) and drag Barforge into Applications. Barforge has no Homebrew cask: `brew install --cask vorssaint` installs the original app, not this fork.
 
 Builds are signed with an Apple Developer ID and notarized, so macOS opens them without a fuss. Barforge does not update itself; new versions come from the releases page.
 
@@ -181,8 +181,8 @@ See the [permissions guide](docs/PERMISSIONS.md) for which features need access 
 ### Build it yourself
 
 ```sh
-git clone https://github.com/rfoerthe/vorssaint-utils.git
-cd vorssaint-utils
+git clone https://github.com/rfoerthe/barforge.git
+cd barforge
 ./build.sh --dev            # build the separate Developer variant
 ./build.sh --dev --install  # install and launch it
 ./build.sh --clean          # remove the build artifacts
