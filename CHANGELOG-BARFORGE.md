@@ -19,6 +19,7 @@ CHANGELOG.md.
 ### Changed
 - Barforge updates itself again, from the releases of rfoerthe/barforge. It looks for a new version after launch and then hourly, and installs one only when the disk image and the app inside are signed with the same Developer ID as the running Barforge and notarized by Apple, so a Vorssaint release never replaces it. Settings → About → Updates switches the check off, includes betas and shows the release notes first, as in Vorssaint, and the menu bar icon's right-click menu offers Check for updates… again. Barforge 1.0.1 and earlier do not update themselves: install the first version after them once from the releases page.
 - A build that is not signed with a Developer ID says in Settings → About → Updates that it cannot update itself.
+- Settings in the menu bar panel, and every other way to open Settings, closes the panel, so only the Settings window stays on screen. The panel can still be opened again beside it.
 
 ## [1.0.1] - 2026-10-20
 
