@@ -41,13 +41,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.2</string>
+	<string>1.0.3-beta.1</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>101</string>
+	<string>104</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -83,6 +83,6 @@
 	<key>VorssaintForkRepository</key>
 	<string>rfoerthe/barforge</string>
 	<key>BarforgeUpstreamVersion</key>
-	<string>3.4.1</string>
+	<string>3.4.2</string>
 </dict>
 </plist>

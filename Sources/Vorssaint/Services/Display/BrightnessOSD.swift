@@ -20,9 +20,13 @@ enum BrightnessOSD {
             }
             return
         }
+        // A display mirroring another has no screen of its own; the overlay
+        // goes on the screen the mirror set shares, in hardware or software.
+        let sharedScreenID = CGDisplayPrimaryDisplay(displayID)
+        let mirroredID = CGDisplayMirrorsDisplay(displayID)
         guard let screen = NSScreen.screens.first(where: {
-            ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?
-                .uint32Value == displayID
+            let number = ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+            return number == displayID || number == sharedScreenID || number == mirroredID
         }) else { return }
 
         // One hosting controller for the panel's lifetime: a slider drag
