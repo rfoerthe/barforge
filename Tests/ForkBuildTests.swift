@@ -21,9 +21,17 @@ enum ForkBuildTests {
         let fork = info?["VorssaintForkRepository"] as? String
         suite.expect(AppInfoSupport.forkRepository(fork) == "rfoerthe/barforge",
                      "this fork stamps its repository into the bundle")
-        let parsed = UpdateServiceSupport.SemanticVersion(raw: version)
-        suite.expect(parsed != nil && !version.contains("+") && parsed?.isPrerelease == false,
-                     "Barforge numbers its own releases with a plain version (\(version))")
+        // A pre-release takes only the forms Tools/github-release.sh publishes
+        // as a pre-release and AppInfo.isBeta treats as one, e.g. 1.0.3-beta.1.
+        suite.expect(isReleaseVersion(version),
+                     "Barforge numbers its own releases with a plain or pre-release version (\(version))")
+        for valid in ["1.0.3", "1.0.3-alpha.1", "1.0.3-beta.1", "1.0.3-beta.12", "1.0.3-rc.2"] {
+            suite.expect(isReleaseVersion(valid), "\(valid) is a Barforge release version")
+        }
+        for invalid in ["", "1.0", "1.0.3-beta", "1.0.3-beta.1.1", "1.0.3-preview.1", "1.0.3-Beta.1",
+                        "1.0.3+mx.1", "1.0.3-beta.1+mx.1", "v1.0.3"] {
+            suite.expect(!isReleaseVersion(invalid), "\(invalid) is not a Barforge release version")
+        }
         let upstream = info?["BarforgeUpstreamVersion"] as? String ?? ""
         suite.expect(UpdateServiceSupport.SemanticVersion(raw: upstream) != nil && !upstream.contains("+"),
                      "the bundle names the Vorssaint release it is made from (\(upstream))")
@@ -52,6 +60,12 @@ enum ForkBuildTests {
                          && !text.attribution.contains("%@"),
                          "the fork names the original project and its license (\(language.rawValue))")
         }
+    }
+
+    private static func isReleaseVersion(_ version: String) -> Bool {
+        UpdateServiceSupport.SemanticVersion(raw: version) != nil
+            && version.range(of: #"^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$"#,
+                             options: .regularExpression) != nil
     }
 
     /// Each Barforge release names its Vorssaint base and brings the Vorssaint
