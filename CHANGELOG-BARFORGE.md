@@ -14,6 +14,11 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Changed
+- An available update no longer turns the menu bar icon blue, which barely stood out on a blue menu bar. The banner in the menu bar panel still announces it, and the icon stays shown while one is waiting even when it is set to hide beside the menu bar metrics.
+
 ## [1.0.3-beta.1] - 2026-10-21
 
 Based on Vorssaint 3.4.2.
