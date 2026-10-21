@@ -1,12 +1,12 @@
 # Privacy
 
-Barforge is built to be local-first. Core features run on your Mac, and the app has no account or cloud dashboard. Barforge operates no servers of its own: temporary screenshot and recording links and feedback you explicitly choose to send go to services operated by the Vorssaint project.
+Barforge is built to be local-first. Core features run on your Mac, and the app has no account or cloud dashboard. Barforge operates no servers of its own: temporary screenshot and recording links you explicitly choose to create go to services operated by the Vorssaint project, and feedback opens an issue form on GitHub in your browser.
 
 ## The short version
 
 - **No account.** There is nothing to sign up for and nobody to log in as.
 - **No subscription.** The app is free and stays free, with nothing held back behind a paid tier.
-- **No automatic telemetry.** Barforge gathers no usage stats, crash reports or device identifiers. Feedback sends technical details only when you select them after seeing the complete list.
+- **No automatic telemetry.** Barforge gathers no usage stats, crash reports or device identifiers. Feedback fills technical details into its GitHub form only when you select them after seeing the complete list.
 - **No Barforge analytics or tracking.** There are no analytics kits, no ad networks and no third party tracking anywhere in the app.
 - **No data selling.** Barforge never sells personal information or shared screenshots and recordings.
 - **Your settings stay put.** Preferences and saved state live in the app's own local storage on your Mac and are never uploaded.
@@ -51,9 +51,9 @@ The uploaded PNG is decoded and rebuilt without embedded metadata. The image and
 
 The service validates and rebuilds the MP4 without its original metadata. The video and link metadata are permanently deleted when the link expires or you delete it, and the service does not create backups. Anyone with the link can view, download, save or redistribute the video, and active links are available to the service operator for abuse moderation. Share only with people you trust.
 
-7. **Feedback, only when you press Send.** A submission sends the category you choose and the text you type. The optional technical details switch adds only the app version and build, macOS version, Mac model and app language shown in the form. It never includes your name, account, email address, device identifier, logs, screenshots, files or clipboard content. Your public IP address is processed temporarily in memory for rate limiting and is not attached to the feedback.
+7. **Feedback, only when you continue to GitHub.** Barforge itself sends nothing. Continue on GitHub opens the bug report or feature request form of [rfoerthe/barforge](https://github.com/rfoerthe/barforge/issues) in your browser, filled in through the link with the category you choose and the text you type. The optional technical details switch adds only the app version and build, update channel, macOS version, Mac model and app language shown in the window. It never includes your name, account, email address, device identifier, logs, screenshots, files or clipboard content. If the text is too long for the link, Barforge puts it on your clipboard for you to paste into the form.
 
-Feedback is delivered to private support channels visible to the service owner. After delivery, the text and any technical details you selected remain there until the service owner deletes them. The temporary delivery copy is then deleted; if delivery never succeeds, that copy is permanently deleted after 7 days. No contact information is sent, so feedback cannot receive a direct reply.
+Nothing is filed until you submit the form on GitHub, which needs a GitHub account and happens under GitHub's own privacy policy. The issue is public, and the maintainer can reply to it there. Check the text before you submit it. You can edit the issue on GitHub later, and the maintainer can delete it on request.
 
 8. **Per-app AirPlay, only while you route an app to AirPlay.** The audio of the apps you set to AirPlay in the Volume Mixer is streamed, from memory, to the AirPlay speaker you pick on your local network. Barforge hands it to macOS's own AirPlay stack, which finds the speaker and makes the connection; Barforge does not contact the speaker or any other address itself, and nothing leaves your local network through this feature. Only the routed apps' audio is sent. It is not saved or recorded, and streaming stops as soon as no app is routed to AirPlay or the speaker is disconnected.
 

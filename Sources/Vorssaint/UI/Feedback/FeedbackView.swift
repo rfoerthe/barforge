@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -10,8 +11,8 @@ struct FeedbackView: View {
     @State private var kind: FeedbackKind
     @State private var message = ""
     @State private var includeDiagnostics = false
-    @State private var isSending = false
     @State private var wasSent = false
+    @State private var copiedText = false
     @State private var errorMessage: String?
 
     private let diagnostics = FeedbackDiagnostics.current()
@@ -25,7 +26,7 @@ struct FeedbackView: View {
     private var count: Int { message.utf16.count }
     private var canSend: Bool {
         let trimmedCount = message.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count
-        return trimmedCount >= 10 && count <= 2_000 && !isSending
+        return trimmedCount >= 10 && count <= 2_000
     }
 
     var body: some View {
@@ -114,7 +115,7 @@ struct FeedbackView: View {
                         Label(strings.privacyNote, systemImage: "hand.raised")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Label(strings.retentionNote, systemImage: "clock")
+                        Label(strings.retentionNote, systemImage: "globe")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -133,12 +134,6 @@ struct FeedbackView: View {
                         .lineLimit(2)
                 }
                 Spacer()
-                if isSending {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text(strings.sending)
-                        .foregroundStyle(.secondary)
-                }
                 Button(strings.sendButton) { send() }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -193,7 +188,7 @@ struct FeedbackView: View {
                 .foregroundStyle(.green)
             Text(strings.sentTitle)
                 .font(.title2.weight(.semibold))
-            Text(strings.sentCaption)
+            Text(copiedText ? strings.copiedCaption : strings.sentCaption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 400)
@@ -208,25 +203,18 @@ struct FeedbackView: View {
 
     private func send() {
         guard canSend else { return }
-        isSending = true
         errorMessage = nil
-        Task {
-            do {
-                try await FeedbackService.shared.submit(
-                    kind: kind,
-                    message: message,
-                    diagnostics: includeDiagnostics ? diagnostics : nil
-                )
-                wasSent = true
-                message = ""
-            } catch FeedbackError.rateLimited {
-                errorMessage = strings.rateLimitError
-            } catch FeedbackError.unavailable {
-                errorMessage = strings.unavailableError
-            } catch {
-                errorMessage = strings.genericError
-            }
-            isSending = false
+        switch FeedbackService.open(kind: kind,
+                                    message: message,
+                                    diagnostics: includeDiagnostics ? diagnostics : nil) {
+        case .opened:
+            copiedText = false
+            wasSent = true
+        case .openedWithCopiedText:
+            copiedText = true
+            wasSent = true
+        case .failed:
+            errorMessage = strings.genericError
         }
     }
 }
