@@ -331,8 +331,10 @@ final class StatusItemController {
         refresh()
     }
 
-    /// Reflects keep-awake state and an available update in the icon. Updates
-    /// keep the blue attention glyph; an active session uses the chosen icon.
+    /// Reflects keep-awake state in the icon; an active session uses the
+    /// chosen icon. An available update leaves the glyph's color alone, since
+    /// a tint barely stands out on a colored menu bar and the panel's banner
+    /// already announces it, but it keeps the glyph shown.
     /// With the mute indicator option on, a red slashed mic joins the glyph
     /// while the microphone is muted, whatever the underlying state. The
     /// glyph can also hide entirely while metrics render in the title (user
@@ -372,9 +374,8 @@ final class StatusItemController {
         // refresh() runs on every monitor tick and lands here; re-rendering
         // the same image every 2 seconds would be wasted composition, so the
         // image is only touched when some ingredient actually changed.
-        let stateKey = [String(hidden), String(mainItemHidden), String(updateAvailable),
-                        String(keepAwakeActive), KeepAwakeIconTint.current.rawValue,
-                        KeepAwakeActiveIcon.current.rawValue, BlackHoleGlyph.chosenSymbolName,
+        let stateKey = [String(hidden), String(mainItemHidden), String(keepAwakeActive),
+                        KeepAwakeIconTint.current.rawValue, KeepAwakeActiveIcon.current.rawValue, BlackHoleGlyph.chosenSymbolName,
                         String(micBadgeActive)].joined(separator: "|")
         guard stateKey != lastIconStateKey else { return }
         lastIconStateKey = stateKey
@@ -387,12 +388,7 @@ final class StatusItemController {
             button.image = Self.emptyStatusImage
             return
         }
-        let stateImage: NSImage?
-        if updateAvailable {
-            stateImage = BlackHoleGlyph.attentionImage()
-        } else {
-            stateImage = BlackHoleGlyph.image(active: keepAwakeActive)
-        }
+        let stateImage = BlackHoleGlyph.image(active: keepAwakeActive)
         if micBadgeActive {
             button.image = BlackHoleGlyph.micMutedImage(over: stateImage) ?? stateImage
         } else {
@@ -999,13 +995,6 @@ enum BlackHoleGlyph {
                       y: CGFloat(high - 1 - maxY) / unit,
                       width: CGFloat(maxX - minX + 1) / unit,
                       height: CGFloat(maxY - minY + 1) / unit)
-    }
-
-    /// A blue, full-strength glyph used to flag an available update. Non-template
-    /// (a real color), drawn by masking blue into the glyph's shape.
-    static func attentionImage() -> NSImage? {
-        guard let glyph = mark() else { return fallback(active: true) }
-        return tintedImage(glyph, color: .systemBlue) ?? fallback(active: true)
     }
 
     /// The given state image with a red slashed microphone beside it, shown
