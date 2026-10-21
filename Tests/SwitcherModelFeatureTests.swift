@@ -2040,7 +2040,7 @@ enum SwitcherModelFeatureTests {
         // Barforge numbers its own versions; the Vorssaint release it is made
         // from is what the pin is about.
         let plistVersion = (releasePlist?["BarforgeUpstreamVersion"] as? String) ?? ""
-        suite.expect(plistVersion == "3.4.1",
+        suite.expect(plistVersion == "3.4.2",
                "bumping the app version requires re-deciding the support prompt pin above")
         let plistBuild = (releasePlist?["CFBundleVersion"] as? String) ?? ""
         suite.expect(plistBuild == "104",

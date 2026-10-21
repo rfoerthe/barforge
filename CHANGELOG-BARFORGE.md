@@ -14,6 +14,14 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [1.0.3-beta.1] - 2026-10-21
+
+Based on Vorssaint 3.4.2.
+
+### Changed
+- Barforge is based on Vorssaint 3.4.2 and brings its changes listed below, except those for the Dynamic Island, which Barforge does not include.
+- Barforge has beta versions. They are offered only with Settings → About → Updates → Receive beta updates switched on, which a beta turns on by itself; Barforge 1.0.2 and other stable versions do not receive them otherwise.
+
 ## [1.0.2] - 2026-10-20
 
 Based on Vorssaint 3.4.1.
