@@ -19,6 +19,10 @@ CHANGELOG.md.
 ### Changed
 - An available update no longer turns the menu bar icon blue, which barely stood out on a blue menu bar. The banner in the menu bar panel still announces it, and the icon stays shown while one is waiting even when it is set to hide beside the menu bar metrics.
 - Feedback goes to Barforge instead of the Vorssaint project. Continue on GitHub in the feedback window opens the bug report or feature request form of rfoerthe/barforge in the browser, filled in with the text and, if selected, the technical details, and the issue is filed only once it is submitted there. Issues are public and can be answered. A text too long for the link is put on the clipboard to paste into the form.
+- Check for updates… in the menu bar icon's right-click menu opens Settings on About, where the Updates section shows the check and its result.
+
+### Fixed
+- Looking for updates with beta updates switched on no longer reports "Check failed: -" when GitHub briefly answers with an empty list of releases; Barforge asks again a few seconds later. A check that does fail names the reason, such as the HTTP status.
 
 ## [1.0.3-beta.1] - 2026-10-21
 

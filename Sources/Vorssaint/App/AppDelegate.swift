@@ -1593,6 +1593,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     @objc private func menuCheckUpdates() {
         UpdateService.shared.check(manual: true)
+        // The check's progress and result live in About's Updates section.
+        SettingsRouter.shared.page = .about
         openSettingsWindow()
     }
 
