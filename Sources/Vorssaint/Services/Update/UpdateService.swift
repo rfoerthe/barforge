@@ -124,8 +124,12 @@ final class UpdateService: ObservableObject {
         if case .downloading = state { return }
         if case .installing = state { return }
         state = .checking
+        requestReleases(manual: manual, retriesLeft: 2)
+    }
 
-        let endpoint = includeBetaUpdates
+    private func requestReleases(manual: Bool, retriesLeft: Int) {
+        let includeBetas = includeBetaUpdates
+        let endpoint = includeBetas
             ? "https://api.github.com/repos/\(repository)/releases?per_page=10"
             : "https://api.github.com/repos/\(repository)/releases/latest"
 
@@ -134,32 +138,47 @@ final class UpdateService: ObservableObject {
         request.setValue("Barforge/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
         request.cachePolicy = .reloadIgnoringLocalCacheData
 
-        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
             DispatchQueue.main.async {
-                self.lastChecked = Date()
-                guard let data, error == nil else {
-                    self.availableNotes = nil
-                    self.state = .failed(error?.localizedDescription ?? "-")
+                var releases: [GitHubRelease]?
+                var decodeError: Error?
+                if let data, error == nil {
+                    do {
+                        releases = includeBetas
+                            ? try JSONDecoder().decode([GitHubRelease].self, from: data)
+                            : [try JSONDecoder().decode(GitHubRelease.self, from: data)]
+                    } catch {
+                        decodeError = error
+                    }
+                }
+
+                switch UpdateServiceSupport.releaseFetchOutcome(
+                    transportError: error?.localizedDescription,
+                    status: (response as? HTTPURLResponse)?.statusCode,
+                    decodedCount: releases?.count,
+                    decodeError: decodeError?.localizedDescription,
+                    retriesLeft: retriesLeft
+                ) {
+                case .retry:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        self.requestReleases(manual: manual, retriesLeft: retriesLeft - 1)
+                    }
                     return
-                }
-
-                let releases: [GitHubRelease]
-                if self.includeBetaUpdates {
-                    releases = (try? JSONDecoder().decode([GitHubRelease].self, from: data)) ?? []
-                } else if let single = try? JSONDecoder().decode(GitHubRelease.self, from: data) {
-                    releases = [single]
-                } else {
-                    releases = []
-                }
-
-                guard !releases.isEmpty else {
+                case .noReleases:
+                    self.lastChecked = Date()
                     self.availableNotes = nil
-                    self.state = .failed(error?.localizedDescription ?? "-")
+                    self.state = .upToDate
                     return
+                case let .failed(reason):
+                    self.lastChecked = Date()
+                    self.availableNotes = nil
+                    self.state = .failed(reason)
+                    return
+                case .releases:
+                    self.lastChecked = Date()
                 }
-
-                let candidates = releases.map { rel -> UpdateServiceSupport.ReleaseCandidate in
+                let candidates = (releases ?? []).map { rel -> UpdateServiceSupport.ReleaseCandidate in
                     let asset = rel.assets.first { $0.name.hasSuffix(".dmg") }
                     return UpdateServiceSupport.ReleaseCandidate(
                         tagName: rel.tagName,
@@ -174,7 +193,7 @@ final class UpdateService: ObservableObject {
                 if let chosen = UpdateServiceSupport.selectUpdate(
                     from: candidates,
                     currentVersion: AppInfo.version,
-                    includeBetas: self.includeBetaUpdates
+                    includeBetas: includeBetas
                 ) {
                     let versionClean = chosen.tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV "))
                     self.downloadURL = chosen.dmgURL

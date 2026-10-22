@@ -134,6 +134,36 @@ enum UpdateServiceSupport {
         return candidateVersion > currentVersion
     }
 
+    // MARK: - Release List Response
+
+    /// What one answer from the releases endpoint means for the check.
+    enum ReleaseFetchOutcome: Equatable {
+        /// At least one release came back; pick from it.
+        case releases
+        /// An empty list while tries remain: ask again shortly.
+        case retry
+        /// Still empty after every try: nothing newer to offer.
+        case noReleases
+        case failed(String)
+    }
+
+    /// GitHub's API now and then answers 200 with an empty list for a
+    /// repository that has releases, and seconds later with the full list.
+    /// That answer earns another try, never a "failed" with nothing to say.
+    /// `decodedCount` is nil when the body did not decode as releases, and
+    /// `decodeError` then carries why.
+    static func releaseFetchOutcome(transportError: String?,
+                                    status: Int?,
+                                    decodedCount: Int?,
+                                    decodeError: String?,
+                                    retriesLeft: Int) -> ReleaseFetchOutcome {
+        if let transportError { return .failed(transportError) }
+        if let status, !(200..<300).contains(status) { return .failed("HTTP \(status)") }
+        guard let decodedCount else { return .failed(decodeError ?? "HTTP \(status ?? 0)") }
+        if decodedCount > 0 { return .releases }
+        return retriesLeft > 0 ? .retry : .noReleases
+    }
+
     // MARK: - Release Candidate Selection
 
     struct ReleaseCandidate {

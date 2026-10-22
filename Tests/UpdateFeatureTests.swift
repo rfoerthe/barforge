@@ -1153,6 +1153,26 @@ enum UpdateFeatureTests {
         let selectedFromHigherBeta = UpdateServiceSupport.selectUpdate(from: candidateList, currentVersion: "3.3.4-beta.1", includeBetas: false)
         suite.expect(selectedFromHigherBeta == nil, "user on beta turning off betas does not downgrade to older stable")
 
+        // Release list responses
+        func fetchOutcome(error: String? = nil, status: Int? = 200, count: Int? = 1,
+                          decodeError: String? = nil, retriesLeft: Int = 2)
+            -> UpdateServiceSupport.ReleaseFetchOutcome {
+            UpdateServiceSupport.releaseFetchOutcome(transportError: error, status: status,
+                                                     decodedCount: count, decodeError: decodeError,
+                                                     retriesLeft: retriesLeft)
+        }
+        suite.expect(fetchOutcome() == .releases, "a non-empty release list is used")
+        suite.expect(fetchOutcome(count: 0) == .retry,
+               "an empty release list is asked again while tries remain")
+        suite.expect(fetchOutcome(count: 0, retriesLeft: 0) == .noReleases,
+               "an empty release list after every try means nothing newer, not a failure")
+        suite.expect(fetchOutcome(status: 403, count: nil, decodeError: "bad shape") == .failed("HTTP 403"),
+               "a refused request names its HTTP status")
+        suite.expect(fetchOutcome(count: nil, decodeError: "bad shape") == .failed("bad shape"),
+               "an undecodable body names why")
+        suite.expect(fetchOutcome(error: "offline", status: nil, count: nil) == .failed("offline"),
+               "a transport error is reported as is")
+
         let knownDigest = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
         suite.expect(UpdateServiceSupport.sha256Matches(Data("abc".utf8), expectedHex: knownDigest),
                "update media accepts its pinned SHA-256 digest")
