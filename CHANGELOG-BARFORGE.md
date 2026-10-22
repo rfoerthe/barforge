@@ -14,14 +14,25 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.3-beta.2] - 2026-10-23
+
+Based on Vorssaint 3.4.2.
 
 ### Changed
+- Barforge brings the changes Vorssaint made after 3.4.2 so far, listed below, except the one for the Dynamic Island, which Barforge does not include.
+- Command Bar accepts British unit spellings and spaced fluid-ounce names.
+- The window switcher's icon row, previews and hints use Liquid Glass when available and enabled.
 - An available update no longer turns the menu bar icon blue, which barely stood out on a blue menu bar. The banner in the menu bar panel still announces it, and the icon stays shown while one is waiting even when it is set to hide beside the menu bar metrics.
 - Feedback goes to Barforge instead of the Vorssaint project. Continue on GitHub in the feedback window opens the bug report or feature request form of rfoerthe/barforge in the browser, filled in with the text and, if selected, the technical details, and the issue is filed only once it is submitted there. Issues are public and can be answered. A text too long for the link is put on the clipboard to paste into the form.
 - Check for updates… in the menu bar icon's right-click menu opens Settings on About, where the Updates section shows the check and its result.
 
 ### Fixed
+- The cleaner leaves system log files out of app leftovers.
+- Command Bar handles extreme date offsets without crashing and keeps tiny non-temperature unit conversions from reading as zero.
+- Clipboard history ignores marked temporary content and restores the previous copy without another notice, while preserving ordinary copies and sensitive-text filtering.
+- Pinned GPU, temperature and fan menu bar readings follow the selected System monitor update interval.
+- Volume mixer recognizes headphones from their Core Audio device information, including models whose names do not say headphones.
+- Screenshot area selection keeps its crosshair over other apps, and card shadows follow the captured window's own rounded corners.
 - Looking for updates with beta updates switched on no longer reports "Check failed: -" when GitHub briefly answers with an empty list of releases; Barforge asks again a few seconds later. A check that does fail names the reason, such as the HTTP status.
 
 ## [1.0.3-beta.1] - 2026-10-21
