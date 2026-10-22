@@ -14,7 +14,9 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.3-beta.2] - 2026-10-23
+
+Based on Vorssaint 3.4.2.
 
 ### Changed
 - Barforge brings the changes Vorssaint made after 3.4.2 so far, listed below, except the one for the Dynamic Island, which Barforge does not include.
