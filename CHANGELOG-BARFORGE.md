@@ -14,6 +14,21 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Added
+- Window layout can reserve space for Stage Manager when maximizing or arranging windows, including the green-button override. Settings → Window layout → Reserve space for Stage Manager.
+- Switch Spaces by dragging a button now accepts the middle mouse button, including upward drags for Mission Control and downward drags for App Exposé. A short click keeps its normal behavior. Settings → Mouse → Mouse button shortcuts.
+
+### Changed
+- Barforge brings the further changes Vorssaint made after 3.4.2, listed here, except those for the Dynamic Island, which Barforge does not include.
+
+### Fixed
+- Scrolling screenshots preserve the selected width, keep sparse Terminal output aligned and continue through smaller overlaps on long pages, including blank spacing and low-contrast content.
+- Volume mixer leaves Discord and Teams audio untouched by default to prevent call echo when sharing audio. Their app menus can re-enable volume control, with a reminder to turn it off before sharing; saved levels and outputs are preserved.
+- Volume mixer no longer cuts off buffered sound or replays it late after short gaps in captured audio.
+- Screen recordings avoid loud noise from 16-bit USB microphones.
+
 ## [1.0.4-beta.1] - 2026-10-24
 
 Based on Vorssaint 3.4.2.
