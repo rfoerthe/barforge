@@ -260,6 +260,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/FeatureCatalog.swift
         Sources/Vorssaint/Core/FeaturePresets.swift
         Sources/Vorssaint/Core/FeatureHubStrings.swift
+        Sources/Vorssaint/Core/MixerScreenSharingStrings.swift
         Sources/Vorssaint/Core/ShortcutSettingsStrings.swift
         Sources/Vorssaint/Core/SettingsBackupSupport.swift
         Sources/Vorssaint/Core/BackupStrings.swift
@@ -489,6 +490,8 @@ if (( TEST )); then
         Sources/Vorssaint/Services/Metrics/TemperatureSensorSelector.swift
         Sources/Vorssaint/Services/Metrics/SustainedAlertGate.swift
         Sources/Vorssaint/Services/WindowLayout/WindowLayoutSupport.swift
+        Sources/Vorssaint/Services/WindowLayout/WindowStageManagerSupport.swift
+        Sources/Vorssaint/Core/WindowStageManagerStrings.swift
         Sources/Vorssaint/Services/WindowLayout/WindowGestureSupport.swift
         Sources/Vorssaint/Core/WindowDirectionalStrings.swift
         Sources/Vorssaint/Core/PointerDisplayStrings.swift
