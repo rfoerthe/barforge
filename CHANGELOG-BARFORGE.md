@@ -14,6 +14,14 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [1.0.4-beta.1] - 2026-10-24
+
+Based on Vorssaint 3.4.2.
+
+### Changed
+- The menu bar icon's right-click menu is grouped more clearly. Keep awake stays at the top, followed by Settings…, About Barforge and Check for updates…, then the tools from Homebrew to Open shelf, and Quit Barforge at the bottom, each group set apart by a separator.
+- The right-click menu's Kill Process entry reads Kill Process…, since it opens a list to pick from.
+
 ## [1.0.3] - 2026-10-24
 
 Based on Vorssaint 3.4.2.
