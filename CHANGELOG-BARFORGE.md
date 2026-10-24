@@ -14,6 +14,11 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Added
+- The menu bar icon's right-click menu has Homebrew, Kill Process and Port Manager entries above Uninstall an app…, each opening Settings on its page. Each appears only while its feature is installed.
+
 ## [1.0.3-beta.2] - 2026-10-23
 
 Based on Vorssaint 3.4.2.

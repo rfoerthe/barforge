@@ -1531,6 +1531,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         aboutItem.target = self
         menu.addItem(aboutItem)
 
+        if AppFeature.homebrew.isAvailable {
+            let homebrewItem = NSMenuItem(title: strings.homebrewName,
+                                          action: #selector(menuOpenHomebrew), keyEquivalent: "")
+            homebrewItem.target = self
+            menu.addItem(homebrewItem)
+        }
+
+        if AppFeature.killProcess.isAvailable {
+            let killProcessItem = NSMenuItem(title: FeatureStrings.killProcess(L10n.shared.language).pageTitle,
+                                             action: #selector(menuOpenKillProcess), keyEquivalent: "")
+            killProcessItem.target = self
+            menu.addItem(killProcessItem)
+        }
+
+        if AppFeature.portManager.isAvailable {
+            let portManagerItem = NSMenuItem(title: FeatureStrings.portManager(L10n.shared.language).title,
+                                             action: #selector(menuOpenPortManager), keyEquivalent: "")
+            portManagerItem.target = self
+            menu.addItem(portManagerItem)
+        }
+
         if AppFeature.uninstaller.isAvailable {
             let uninstallItem = NSMenuItem(title: strings.uninstallerMenuItem,
                                            action: #selector(menuOpenUninstaller), keyEquivalent: "")
@@ -1579,6 +1600,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     @objc private func menuOpenSettings() {
+        openSettingsWindow()
+    }
+
+    @objc private func menuOpenHomebrew() {
+        SettingsRouter.shared.page = .homebrew
+        openSettingsWindow()
+    }
+
+    @objc private func menuOpenKillProcess() {
+        SettingsRouter.shared.page = .killProcess
+        openSettingsWindow()
+    }
+
+    @objc private func menuOpenPortManager() {
+        SettingsRouter.shared.page = .portManager
         openSettingsWindow()
     }
 
