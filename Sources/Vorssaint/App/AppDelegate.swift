@@ -1071,6 +1071,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             guard let self, self.popover.isShown else { return }
             guard !PanelInteractionState.shared.preventsPopoverDismissal else { return }
             guard self.statusController.containsStatusItem(at: NSEvent.mouseLocation) == false else { return }
+            // After activation was handed back to another app and the panel
+            // reopened, macOS can report a click on the panel to this monitor
+            // as well, so a click on a panel row would close the panel.
+            guard !self.panelContains(NSEvent.mouseLocation) else { return }
             self.closePopover(reason: .outsideClick)
         }
 
@@ -1106,6 +1110,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             NSEvent.removeMonitor(monitor)
             popoverKeyboardMonitor = nil
         }
+    }
+
+    /// The panel's visible content, without the transparent margin and arrow
+    /// of the popover window, so a click beside the panel still dismisses it.
+    private func panelContains(_ screenPoint: NSPoint) -> Bool {
+        guard let view = popover.contentViewController?.view,
+              let window = view.window, window.isVisible, !window.ignoresMouseEvents else { return false }
+        return window.convertToScreen(view.convert(view.bounds, to: nil)).contains(screenPoint)
     }
 
     private func shouldDismissPopover(forLocalEvent event: NSEvent) -> Bool {

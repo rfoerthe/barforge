@@ -31,6 +31,7 @@ Based on Vorssaint 3.4.2.
 - Check for updates… in the menu bar icon's right-click menu opens Settings on About, where the Updates section shows the check and its result.
 
 ### Fixed
+- After the menu bar icon was clicked several times in a row, a click on an entry in the menu bar panel could close the panel instead of opening the entry.
 - The cleaner leaves system log files out of app leftovers.
 - Command Bar handles extreme date offsets without crashing and keeps tiny non-temperature unit conversions from reading as zero.
 - Clipboard history ignores marked temporary content and restores the previous copy without another notice, while preserving ordinary copies and sensitive-text filtering.
