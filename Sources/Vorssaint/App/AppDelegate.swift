@@ -1543,6 +1543,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         aboutItem.target = self
         menu.addItem(aboutItem)
 
+        // Only a build that can install an update offers to look for one; see AppInfo.receivesUpdates.
+        if AppInfo.receivesUpdates {
+            let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
+            updatesItem.target = self
+            menu.addItem(updatesItem)
+        }
+
+        menu.addItem(.separator())
+
         if AppFeature.homebrew.isAvailable {
             let homebrewItem = NSMenuItem(title: strings.homebrewName,
                                           action: #selector(menuOpenHomebrew), keyEquivalent: "")
@@ -1551,7 +1560,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         }
 
         if AppFeature.killProcess.isAvailable {
-            let killProcessItem = NSMenuItem(title: FeatureStrings.killProcess(L10n.shared.language).pageTitle,
+            // The page opens a list to pick from, so the entry ends in an ellipsis like Uninstall an app….
+            let killProcessItem = NSMenuItem(title: FeatureStrings.killProcess(L10n.shared.language).pageTitle + "…",
                                              action: #selector(menuOpenKillProcess), keyEquivalent: "")
             killProcessItem.target = self
             menu.addItem(killProcessItem)
@@ -1578,14 +1588,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(shelfItem)
         }
 
-        // Only a build that can install an update offers to look for one; see AppInfo.receivesUpdates.
-        if AppInfo.receivesUpdates {
-            let updatesItem = NSMenuItem(title: strings.menuCheckUpdates, action: #selector(menuCheckUpdates), keyEquivalent: "")
-            updatesItem.target = self
-            menu.addItem(updatesItem)
+        // Without any feature entry the separator above already closes the app entries.
+        if menu.items.last?.isSeparatorItem == false {
+            menu.addItem(.separator())
         }
-
-        menu.addItem(.separator())
 
         let quitItem = NSMenuItem(title: strings.menuQuit, action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
