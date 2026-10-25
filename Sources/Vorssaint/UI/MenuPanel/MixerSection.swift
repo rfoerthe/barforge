@@ -52,7 +52,10 @@ struct MixerSection: View {
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("NSSystemColorsDidChangeNotification"))) { _ in
             refreshSliderTint()
         }
-        .onAppear { mixer.refreshApps() }
+        .onAppear {
+            mixer.refreshApps()
+            mixer.refreshAlertVolume()
+        }
     }
 
     private var mixerControls: some View {
@@ -234,6 +237,38 @@ struct MixerSection: View {
                 .help(l10n.s.mixerSoundEffectsOutputTooltip)
             }
 
+            if let volume = mixer.alertVolume {
+                HStack(spacing: 8) {
+                    Image(systemName: volume <= 0.001 ? "bell.slash.fill" : "bell.fill")
+                        .font(.system(size: 10.5, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 16)
+
+                    MixerVolumeSlider(value: alertVolumeBinding,
+                                      normalTint: normalSliderTint,
+                                      boostTint: normalSliderTint,
+                                      isBoosting: false,
+                                      accentRevision: accentRevision,
+                                      glassEnabled: glassEnabled,
+                                      maximum: 1,
+                                      accessibilityLabel: l10n.s.mixerSoundEffectsOutputTitle)
+
+                    EditableVolumePercent(currentPercent: MixerRoutingSupport.displayPercent(forVolume: volume),
+                                          maximumPercent: 100,
+                                          width: 36,
+                                          editorID: "system-alert",
+                                          editingID: $editingVolumeID,
+                                          accessibilityLabel: l10n.s.mixerSoundEffectsOutputTitle) {
+                        Text("\(MixerRoutingSupport.displayPercent(forVolume: volume))%")
+                            .font(.system(size: 10.5, weight: .medium))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    } onCommit: {
+                        mixer.setAlertVolume($0)
+                    }
+                }
+            }
+
             if systemSoundOutputDevices.isEmpty {
                 inputMessage(l10n.s.mixerSystemOutputNoDevices, systemImage: "bell.slash")
             }
@@ -266,6 +301,13 @@ struct MixerSection: View {
         Binding(
             get: { mixer.systemOutputVolume ?? 0 },
             set: { setSystemOutputVolume($0) }
+        )
+    }
+
+    private var alertVolumeBinding: Binding<Double> {
+        Binding(
+            get: { mixer.alertVolume ?? 0 },
+            set: { mixer.setAlertVolume($0) }
         )
     }
 
