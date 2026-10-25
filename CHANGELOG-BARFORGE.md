@@ -14,17 +14,36 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.4-beta.2] - 2026-10-25
+
+Based on Vorssaint 3.4.2.
 
 ### Added
+- Screenshots can copy only image data, without a file URL, for apps that otherwise paste the file instead of its image. Settings → Screenshot → Copy as image only.
+- Quit on close can handle selected menu bar apps that keep a Dock icon after their last window closes. The list starts empty, and existing exceptions still apply. Settings → Quit on close → Menu bar apps to quit.
 - Window layout can reserve space for Stage Manager when maximizing or arranging windows, including the green-button override. Settings → Window layout → Reserve space for Stage Manager.
 - Switch Spaces by dragging a button now accepts the middle mouse button, including upward drags for Mission Control and downward drags for App Exposé. A short click keeps its normal behavior. Settings → Mouse → Mouse button shortcuts.
 - Volume mixer has its own slider for the alert volume under System sounds, the level macOS uses for alerts and sound effects.
 
 ### Changed
-- Barforge brings the further changes Vorssaint made after 3.4.2, listed here, except those for the Dynamic Island, which Barforge does not include.
+- Barforge brings the further changes Vorssaint made after 3.4.2, listed here, except those for the Dynamic Island and Fan Control, which Barforge does not include.
+- Clipboard history uses a smaller decoded-thumbnail cache while keeping the window preview cache unchanged.
+- Shelf's Remove items after dropping explains that holding ⌥ Option while dragging always copies files instead of moving them.
 
 ### Fixed
+- Features keeps its rows and scroll position stable when restart and unused-feature notices change.
+- The window switcher can travel directly to fullscreen and hidden-Space windows, recover their titles and observe closing without repeating a delivered close request.
+- Opening the window switcher uses fewer Accessibility requests when many windows are open.
+- The window switcher's search field stays within its panel and remains readable on light backgrounds and Liquid Glass.
+- Focus follows mouse preserves window order when Bring the window to the front is off.
+- Quit on close ignores confirmed stale surfaces left by closed windows while preserving minimized windows and windows on other Spaces.
+- The menu bar panel recovers from interrupted closes so later clicks can open it again.
+- Recent captures keeps its Clear history confirmation open and removes a pending confirmation when the palette closes.
+- The screenshot editor copies the latest edits when an earlier automatic copy is still pending.
+- Volume mixer preserves gain on supported multichannel outputs and rebuilds its audio capture when device formats or sample rates change.
+- Disk-space alerts refresh capacity readings and avoid treating a smaller capacity estimate as the only available free space.
+- System monitor recognizes the alternate M1 CPU sensor layout and the measured 14-core M4 Max configuration while preserving readings on other Max models.
+- Power can use desktop DC input when the adapter reading is unavailable, without presenting it as system-only consumption.
 - Scrolling screenshots preserve the selected width, keep sparse Terminal output aligned and continue through smaller overlaps on long pages, including blank spacing and low-contrast content.
 - Volume mixer leaves Discord and Teams audio untouched by default to prevent call echo when sharing audio. Their app menus can re-enable volume control, with a reminder to turn it off before sharing; saved levels and outputs are preserved.
 - Volume mixer no longer cuts off buffered sound or replays it late after short gaps in captured audio.
