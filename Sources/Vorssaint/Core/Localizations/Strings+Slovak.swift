@@ -555,7 +555,7 @@ extension Strings {
         shelfCloseAfterDrop: "Zavrieť po pustení do inej aplikácie",
         shelfCloseAfterDropCaption: "Zavrie policu, keď cieľ položky prijme. Pripnutie v paneli ju ponechá otvorenú.",
         shelfRemoveAfterDrop: "Odstrániť položky po pustení",
-        shelfRemoveAfterDropCaption: "Položky, ktoré prijme iná aplikácia, policu opustia. Vypnite to, ak tam má ostať kópia. Pripnuté položky tam ostanú vždy.",
+        shelfRemoveAfterDropCaption: "Položky, ktoré prijme iná aplikácia, policu opustia. Vypnite to, ak tam má ostať kópia. Pripnuté položky tam ostanú vždy. Ak pri ťahaní podržíte ⌥ Option, súbory sa vždy skopírujú a nepresunú.",
         shelfExclusionsTitle: "Automatické výnimky",
         shelfExclusionsEmpty: "Nepridali ste žiadne aplikácie.",
         shelfExclusionsCaption: "Zatrasenie a zóna na pustenie v lište s ponukami ostanú vypnuté pri ťahaní spustenom v týchto aplikáciách. Skratka a Otvoriť teraz fungujú ďalej.",

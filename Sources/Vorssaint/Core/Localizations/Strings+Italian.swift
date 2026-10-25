@@ -555,7 +555,7 @@ extension Strings {
         shelfCloseAfterDrop: "Chiudi dopo il rilascio in un’altra app",
         shelfCloseAfterDropCaption: "Chiude lo scaffale quando la destinazione accetta gli elementi. La puntina nel pannello lo mantiene aperto.",
         shelfRemoveAfterDrop: "Rimuovi gli elementi dopo il rilascio",
-        shelfRemoveAfterDropCaption: "Gli elementi accettati da un’altra app lasciano lo scaffale. Disattiva per conservarne una copia. Gli elementi fissati restano sempre.",
+        shelfRemoveAfterDropCaption: "Gli elementi accettati da un’altra app lasciano lo scaffale. Disattiva per conservarne una copia. Gli elementi fissati restano sempre. Tieni premuto ⌥ Opzione durante il trascinamento per copiare sempre i file invece di spostarli.",
         shelfExclusionsTitle: "Eccezioni automatiche",
         shelfExclusionsEmpty: "Nessuna app aggiunta.",
         shelfExclusionsCaption: "Lo scuotimento e l’area nella barra dei menu restano inattivi per i trascinamenti avviati in queste app. La scorciatoia e Apri ora funzionano ancora.",

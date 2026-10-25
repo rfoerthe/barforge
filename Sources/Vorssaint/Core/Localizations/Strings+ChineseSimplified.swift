@@ -555,7 +555,7 @@ extension Strings {
         shelfCloseAfterDrop: "拖放到其他 App 后关闭",
         shelfCloseAfterDropCaption: "目标接收项目后关闭暂存架。面板中的图钉可让它保持打开。",
         shelfRemoveAfterDrop: "拖放后移除项目",
-        shelfRemoveAfterDropCaption: "其他 App 接收的项目会离开暂存架。关闭此项可保留副本。已固定的项目始终保留。",
+        shelfRemoveAfterDropCaption: "其他 App 接收的项目会离开暂存架。关闭此项可保留副本。已固定的项目始终保留。拖移时按住 ⌥ Option 键，文件将始终被拷贝而非移动。",
         shelfExclusionsTitle: "自动例外",
         shelfExclusionsEmpty: "尚未添加 App。",
         shelfExclusionsCaption: "从这些 App 开始拖移时，摇动手势和菜单栏区域不会打开。快捷键和立即打开仍可使用。",

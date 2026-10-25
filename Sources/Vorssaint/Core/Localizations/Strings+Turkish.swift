@@ -555,7 +555,7 @@ extension Strings {
         shelfCloseAfterDrop: "Başka bir uygulamaya bırakınca kapat",
         shelfCloseAfterDropCaption: "Hedef öğeleri kabul edince rafı kapatır. Paneldeki iğne rafı açık tutar.",
         shelfRemoveAfterDrop: "Bıraktıktan sonra öğeleri kaldır",
-        shelfRemoveAfterDropCaption: "Başka bir uygulamanın kabul ettiği öğeler raftan çıkar. Bir kopyayı tutmak için kapat. Sabitlenen öğeler her zaman kalır.",
+        shelfRemoveAfterDropCaption: "Başka bir uygulamanın kabul ettiği öğeler raftan çıkar. Bir kopyayı tutmak için kapat. Sabitlenen öğeler her zaman kalır. Dosyaları taşımak yerine her zaman kopyalamak için sürüklerken ⌥ Option tuşunu basılı tut.",
         shelfExclusionsTitle: "Otomatik istisnalar",
         shelfExclusionsEmpty: "Uygulama eklenmedi.",
         shelfExclusionsCaption: "Bu uygulamalarda başlayan sürüklemelerde sallama ve menü çubuğu alanı açılmaz. Kısayol ve Şimdi aç çalışmaya devam eder.",

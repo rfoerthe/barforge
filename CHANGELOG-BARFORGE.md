@@ -23,6 +23,7 @@ CHANGELOG.md.
 
 ### Changed
 - Barforge brings the further changes Vorssaint made after 3.4.2, listed here, except those for the Dynamic Island, which Barforge does not include.
+- Shelf's Remove items after dropping explains that holding ⌥ Option while dragging always copies files instead of moving them.
 
 ### Fixed
 - Scrolling screenshots preserve the selected width, keep sparse Terminal output aligned and continue through smaller overlaps on long pages, including blank spacing and low-contrast content.

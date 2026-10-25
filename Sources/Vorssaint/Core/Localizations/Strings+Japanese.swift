@@ -555,7 +555,7 @@ extension Strings {
         shelfCloseAfterDrop: "別のアプリにドロップしたら閉じる",
         shelfCloseAfterDropCaption: "ドロップ先が項目を受け取るとシェルフを閉じます。パネルのピンで開いたままにできます。",
         shelfRemoveAfterDrop: "ドロップ後に項目を削除",
-        shelfRemoveAfterDropCaption: "別のアプリが受け取った項目をシェルフから削除します。コピーを残す場合はオフにします。固定した項目は常に残ります。",
+        shelfRemoveAfterDropCaption: "別のアプリが受け取った項目をシェルフから削除します。コピーを残す場合はオフにします。固定した項目は常に残ります。ドラッグ中に ⌥ Option キーを押したままにすると、ファイルは移動されず常にコピーされます。",
         shelfExclusionsTitle: "自動表示の例外",
         shelfExclusionsEmpty: "アプリは追加されていません。",
         shelfExclusionsCaption: "これらのアプリから始めたドラッグでは、振る操作とメニューバーの領域は開きません。ショートカットと今すぐ開くは引き続き使えます。",
