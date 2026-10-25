@@ -14,7 +14,9 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.4-beta.2] - 2026-10-25
+
+Based on Vorssaint 3.4.2.
 
 ### Added
 - Window layout can reserve space for Stage Manager when maximizing or arranging windows, including the green-button override. Settings → Window layout → Reserve space for Stage Manager.
