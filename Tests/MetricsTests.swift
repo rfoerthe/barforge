@@ -17,6 +17,7 @@ struct MetricsTests {
             }),
             ("metrics", {
                 MetricsFeatureTests.run(suite)
+                DiskCapacityTests.run(suite)
                 ProcessNameContract.run(suite)
                 SystemMonitorCPUTests.run(suite)
                 SystemMonitorPlanTests.run(suite)
@@ -54,6 +55,7 @@ struct MetricsTests {
                 MixerOutputAdjustmentContract.run(suite)
                 MixerHeadphonesDisconnectContract.run(suite)
                 MixerLevelCompensationContract.run(suite)
+                MixerTapConfigurationTests.run(suite)
                 SoundOutputSwitchContract.run(suite)
                 MixerUniversalRoutingContract.run(suite)
                 AirPlayRingBufferContract.run(suite)
@@ -84,6 +86,8 @@ struct MetricsTests {
             }),
             ("repository", { RepositoryFeatureTests.run(suite) }),
             ("screenshots", {
+                ScreenshotClipboardTests.run(suite)
+                ScreenshotAutoCopyTests.run(suite)
                 ScreenshotCanvasSupportTests.run(suite)
                 ScreenshotImageLayerTests.run(suite)
                 ScreenshotCanvasModelTests.run(suite)
@@ -92,6 +96,7 @@ struct MetricsTests {
                 ScreenshotPreviewHoverTests.run(suite)
                 ScreenshotWatermarkTests.run(suite)
                 ScreenshotFeatureTests.run(suite)
+                RecentCapturePanelTests.run(suite)
                 ScreenshotSpotlightEditingTests.run(suite)
                 ScreenshotShareCompletionTests.run(suite)
                 ScreenshotAutoShelfTests.run(suite)
@@ -193,8 +198,12 @@ struct MetricsTests {
             }),
             ("spaces-order", { SpacesOrderTests.run(suite) }),
             ("switcher", {
+                AXWindowResolverTests.run(suite)
+                SwitcherSearchLayoutTests.run(suite)
                 SwitcherScrollContract.run(suite)
                 SwitcherActivationTests.run(suite)
+                AXHiddenSpaceLookupTests.run(suite)
+                SwitcherWindowCloseTests.run(suite)
                 WindowServerCaptureContract.run(suite)
             }),
             ("keep-awake", {
