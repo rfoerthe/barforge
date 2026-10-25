@@ -19,6 +19,7 @@ CHANGELOG.md.
 ### Added
 - Window layout can reserve space for Stage Manager when maximizing or arranging windows, including the green-button override. Settings → Window layout → Reserve space for Stage Manager.
 - Switch Spaces by dragging a button now accepts the middle mouse button, including upward drags for Mission Control and downward drags for App Exposé. A short click keeps its normal behavior. Settings → Mouse → Mouse button shortcuts.
+- Volume mixer has its own slider for the alert volume under System sounds, the level macOS uses for alerts and sound effects.
 
 ### Changed
 - Barforge brings the further changes Vorssaint made after 3.4.2, listed here, except those for the Dynamic Island, which Barforge does not include.

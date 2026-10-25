@@ -87,6 +87,10 @@ final class AppVolumeMixer: ObservableObject {
     @Published private(set) var currentSystemSoundOutputDeviceUID: String?
     @Published private(set) var systemOutputVolume: Double?
     @Published private(set) var systemOutputMuted: Bool?
+    /// The alert volume (System Settings > Sound > Alert volume), 0...1, or
+    /// nil when it could not be read. It scales alerts and sound effects on
+    /// the sound effects output, independently of the main output volume.
+    @Published private(set) var alertVolume: Double?
     @Published private(set) var outputSwitchError: String?
     /// Set when tap creation fails with a permission error, so the panel can
     /// point at the System Audio Recording consent.
@@ -286,6 +290,7 @@ final class AppVolumeMixer: ObservableObject {
         if currentSystemSoundOutputDeviceUID != nil { currentSystemSoundOutputDeviceUID = nil }
         if systemOutputVolume != nil { systemOutputVolume = nil }
         if systemOutputMuted != nil { systemOutputMuted = nil }
+        if alertVolume != nil { alertVolume = nil }
         if outputSwitchError != nil { outputSwitchError = nil }
         if needsPermission { needsPermission = false }
         processMonitoringEnabled = false
@@ -502,6 +507,31 @@ final class AppVolumeMixer: ObservableObject {
         // state follows it on an output that has the switch.
         let mutes = MixerRoutingSupport.mutesOutput(atVolume: clamped)
         if systemOutputMuted != nil, systemOutputMuted != mutes { systemOutputMuted = mutes }
+        return true
+    }
+
+    /// Reads the alert volume again. The system announces no change to it,
+    /// so the panel asks whenever it appears. Main thread only, like
+    /// NSAppleScript itself.
+    func refreshAlertVolume() {
+        let volume = Self.alertVolume()
+        if alertVolume != volume { alertVolume = volume }
+    }
+
+    @discardableResult
+    func setAlertVolume(_ volume: Double) -> Bool {
+        let clamped = min(max(volume, 0), 1)
+        // A drag reports far more steps than the whole percents the system
+        // keeps; only a new percent is worth a script run.
+        let changesPercent = alertVolume.map {
+            MixerRoutingSupport.displayPercent(forVolume: $0)
+                != MixerRoutingSupport.displayPercent(forVolume: clamped)
+        } ?? true
+        guard !changesPercent || Self.setAlertVolume(clamped) else {
+            refreshAlertVolume()
+            return false
+        }
+        if alertVolume != clamped { alertVolume = clamped }
         return true
     }
 
@@ -2067,6 +2097,22 @@ final class AppVolumeMixer: ObservableObject {
             }
         }
         return false
+    }
+
+    /// Core Audio exposes no public property for the alert volume, so it goes
+    /// through Standard Additions' volume settings, the same 0-100 level the
+    /// Sound settings slider shows. Scripting additions run in this process
+    /// and send no Apple Event, so no Automation consent is asked for.
+    static func alertVolume() -> Double? {
+        let result = AppleScriptRunner.run("(alert volume of (get volume settings)) as text")
+        guard result.ok, let percent = Double(result.output) else { return nil }
+        return min(max(percent / 100, 0), 1)
+    }
+
+    @discardableResult
+    static func setAlertVolume(_ volume: Double) -> Bool {
+        let percent = Int((min(max(volume, 0), 1) * 100).rounded())
+        return AppleScriptRunner.run("set volume alert volume \(percent)").ok
     }
 
     /// System volume as people mean it: the default output device's main
