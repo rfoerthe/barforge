@@ -60,7 +60,7 @@ enum SettingsDirectory {
                             if feature == .clipboardHistory {
                                 return FeatureStrings.commandBar(language).sourceClipboard
                             }
-                            return feature.hubTitle(s, hub: hub)
+                            return feature.hubTitle(s, hub: hub, language: language)
                         }
                     if pageItem.page == .general {
                         rows.insert(SettingsSidebarItem(
@@ -143,7 +143,7 @@ enum SettingsDirectory {
             }
         let hub = FeatureStrings.hub(language)
         let featureItems = SettingsSearchSupport.featureItems(language: language) { feature in
-            feature.hubTitle(s, hub: hub)
+            feature.hubTitle(s, hub: hub, language: language)
         }
         var items = SettingsSearchSupport.combinedItems(pageItems: pageItems,
                                                         featureItems: featureItems)
@@ -179,7 +179,7 @@ enum SettingsDirectory {
                 SettingsDirectoryItem(page: .features, title: FeatureStrings.hub(language).pageTitle,
                                        icon: "square.grid.2x2",
                                        featureKeywords: AppFeature.allCases.map {
-                                        ($0, [$0.hubTitle(s, hub: FeatureStrings.hub(language))])
+                                        ($0, [$0.hubTitle(s, hub: FeatureStrings.hub(language), language: language)])
                                        }),
                 SettingsDirectoryItem(page: .energy, title: s.tabEnergy, icon: "bolt.fill",
                                        featureKeywords: [
@@ -220,6 +220,7 @@ enum SettingsDirectory {
                                                            s.invertHorizontalScroll]),
                                         (.scrollHorizontal, [s.scrollHorizontalName,
                                                             s.scrollHorizontalModifierLabel]),
+                                        (.scrollZoom, [s.zoomSection, s.verticalZoom, s.pinchZoom]),
                                         (.middleClick, [s.middleClickTapPicker]),
                                         (.focusFollowsMouse, [s.focusFollowsMouseName,
                                                               s.focusFollowsMouseDelay,
@@ -381,6 +382,10 @@ enum SettingsDirectory {
                                                             .emptyTrashTitle,
                                                          FeatureStrings.brightness(language)
                                                             .keyboardLight]),
+                                        (.quitApps, [s.quitAppsName,
+                                                     FeatureStrings.quickToggles(language).quitAllTitle,
+                                                     FeatureStrings.quickToggles(language).quitOthersTitle,
+                                                     FeatureStrings.quickToggles(language).exceptionsTitle]),
                                         (.cameraPreview,
                                          [FeatureStrings.cameraPreview(language).pageTitle]),
                                         (.wallpaper,

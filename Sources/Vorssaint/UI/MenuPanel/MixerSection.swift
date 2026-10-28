@@ -1420,6 +1420,7 @@ private struct MixerVolumeSlider: View {
                 .accessibilityValue("\(percentage)%")
 #endif
         }
+        .overlay(SliderScrollArea(value: $value, range: 0...maximum))
     }
 
     private var nativeSlider: some View {

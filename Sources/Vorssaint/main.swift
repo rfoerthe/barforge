@@ -4,6 +4,12 @@
 
 import AppKit
 
+// Select backup mode before cleanup and diagnostic arguments can act. Invalid
+// backup commands must leave files, input mappings and recovery journals alone.
+if let command = SettingsBackupSupport.command(in: CommandLine.arguments) {
+    SettingsBackup.runCommandAndExit(command)
+}
+
 SuperKeyMappingGuard.runIfRequestedAndExit()
 Defaults.register()
 MouseAccelerationGuard.runIfRequestedAndExit()

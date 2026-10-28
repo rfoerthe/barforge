@@ -14,6 +14,30 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Added
+- The menu panel's mixer sliders can be adjusted with a mouse wheel or trackpad. Thanks to @JB-OD.
+- An optional Zoom feature turns a modifier and mouse-wheel movement into app zoom or pinch gestures, with separate controls and scroll exceptions. Thanks to @ahmadhatahet.
+- An optional Quit apps panel can request normal quits for one app, all apps or all except the current app, with a saved list of apps to keep running. Thanks to @thedankest.
+- Command Bar converts days, weeks and fixed 365-day years, with English and Portuguese unit names. Thanks to @asim-sde.
+- Settings backups can be exported or imported with `--export-settings FILE` and `--import-settings FILE`; importing requires the app to be closed. Thanks to @DrakeEvans.
+- Clipboard history can show source app icons in list view. The option starts off and preserves file icons and selection controls. Settings → Clipboard history → Show source app icons in list view. Thanks to @ywu73.
+
+### Changed
+- Barforge brings the further changes Vorssaint made after 1.0.4-beta.2's base, listed here, except those for the Dynamic Island, which Barforge does not include.
+- Homebrew opens installer, setup and password-required commands in the default app for Unix executables, without Terminal Automation consent. Barforge no longer asks for Automation access to Terminal. Thanks to @hertza-haeon.
+- Snippet lists in Settings and the library use alphabetical order. Thanks to @Zekuath.
+- The window switcher allows up to 10 columns while preserving Auto and screen-width limits. Settings → Window switcher → Options → Maximum columns. Thanks to @EugeneCarldotme.
+
+### Fixed
+- The radial menu's action editor keeps its file picker over the editor window, avoiding an invisible panel on multi-display setups. Thanks to @saiganeshreddy7.
+- Mic Mute describes its device-control limits and reports known failures even when no microphone could be changed. Siri and some apps may still hear audio. Thanks to @sarat03 for the diagnosis.
+- The onboarding feature picker stays responsive when scrolling. Thanks to @yousefhamza.
+- Ultra-wide wallpaper previews stay within their own grid cells. Thanks to @ozanuslan.
+- Command Bar finds English built-in commands and system answers when the interface uses another language. Thanks to @ywu73.
+- Extra Brightness keeps app windows visible in Mission Control's desktop thumbnails. Thanks to @othmanehousni.
+
 ## [1.0.4-beta.2] - 2026-10-25
 
 Based on Vorssaint 3.4.2.

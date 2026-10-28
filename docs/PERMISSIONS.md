@@ -15,7 +15,7 @@ You can review or change every grant in System Settings, under Privacy and Secur
 | Notifications | Yes | Keep awake, battery, Monitor and update alerts |
 | Full Disk Access | Yes | A deeper uninstaller scan |
 | Administrator (one time) | Yes | Password free closed lid toggling |
-| Automation | Yes | Finder actions and Homebrew Terminal handoff |
+| Automation | Yes | Finder actions |
 | App Management | Yes | App installs, updates and removal |
 
 ## Accessibility
@@ -145,9 +145,8 @@ The color picker also uses this permission for Barforge's magnifier and keyboard
 - **Finder cut and paste**, which reads the current Finder selection and the destination folder, then moves the files.
 - **Uninstaller**, which moves leftover files to the Trash.
 - **Empty the Trash** in Quick toggles, which asks Finder to empty it. The other quick toggles, dark mode included, need no permission.
-- **Homebrew manager**, which can open Terminal with the exact Homebrew install or setup command when the app should not collect a password itself.
 
-**If you say no.** Those Finder or Terminal handoff steps will not go through. You can switch Automation back on in System Settings, under Privacy and Security, Automation.
+**If you say no.** Those Finder steps will not go through. You can switch Automation back on in System Settings, under Privacy and Security, Automation.
 
 **Optional.** Yes.
 

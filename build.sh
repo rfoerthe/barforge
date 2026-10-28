@@ -276,6 +276,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/CameraPreviewStrings.swift
         Sources/Vorssaint/Core/WallpaperStrings.swift
         Sources/Vorssaint/Services/Wallpaper/WallpaperSupport.swift
+        Sources/Vorssaint/UI/MenuPanel/WallpaperThumbnailView.swift
         Sources/Vorssaint/Core/ScratchpadStrings.swift
         Sources/Vorssaint/Core/FinderRenameStrings.swift
         Sources/Vorssaint/Core/CommandBarStrings.swift
@@ -457,6 +458,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/OwnKeyEvent.swift
         Sources/Vorssaint/Services/ScrollWheelSupport.swift
         Sources/Vorssaint/Services/HorizontalWheelScrolling.swift
+        Sources/Vorssaint/UI/SliderScroll.swift
         Sources/Vorssaint/Services/SmoothScrollSupport.swift
         Sources/Vorssaint/Services/MouseAcceleration/MouseAccelerationSupport.swift
         Sources/Vorssaint/Services/FocusFollowsMouse/FocusFollowsMouseSupport.swift

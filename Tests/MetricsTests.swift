@@ -37,7 +37,11 @@ struct MetricsTests {
                 SuperKeyTapContract.run(suite)
                 PointerScreenContract.run(suite)
             }),
-            ("scroll-modifier", { ScrollHorizontalModifierTests.run(suite) }),
+            ("scroll-modifier", {
+                ScrollHorizontalModifierTests.run(suite)
+                ScrollZoomFocusTests.run(suite)
+                SliderScrollTests.run(suite)
+            }),
             ("linear-scroll", { LinearScrollTapTests.run(suite) }),
             ("logitech-mx", { LogitechMXTests.run(suite) }),
             ("fork-build", { ForkBuildTests.run(suite) }),
@@ -126,10 +130,13 @@ struct MetricsTests {
                 UtilitiesFeatureTests.run(suite)
                 TextSnippetExpansionTests.run(suite)
                 QuickTogglesAlertTests.run(suite)
+                QuickTogglesQuitAllTests.run(suite)
+                QuitAppsRuntimeTests.run(suite)
                 PortManagerRefreshTests.run(suite)
             }),
             ("settings", {
                 SettingsFeatureTests.run(suite)
+                RadialFilePickerTests.run(suite)
                 SettingsWindowTests.run { suite.expect($0, $1) }
                 MonitorTokenTests.run(suite)
             }),
@@ -212,7 +219,10 @@ struct MetricsTests {
                 KeepAwakeLidSleepTests.run { suite.expect($0, $1) }
                 KeepAwakeTimerHandoffTests.run { suite.expect($0, $1) }
             }),
-            ("wallpaper", { WallpaperContract.run(suite) }),
+            ("wallpaper", {
+                WallpaperContract.run(suite)
+                WallpaperThumbnailTests.run(suite)
+            }),
             ("emoji", { CommandBarEmojiContract.run(suite) }),
         ]
         var selected = Set<String>()
