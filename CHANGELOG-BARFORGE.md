@@ -14,7 +14,9 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.4-beta.3] - 2026-10-28
+
+Based on Vorssaint 3.4.2.
 
 ### Added
 - The menu panel's mixer sliders can be adjusted with a mouse wheel or trackpad. Thanks to @JB-OD.
@@ -25,7 +27,7 @@ CHANGELOG.md.
 - Clipboard history can show source app icons in list view. The option starts off and preserves file icons and selection controls. Settings → Clipboard history → Show source app icons in list view. Thanks to @ywu73.
 
 ### Changed
-- Barforge brings the further changes Vorssaint made after 1.0.4-beta.2's base, listed here, except those for the Dynamic Island, which Barforge does not include.
+- Barforge brings the further changes Vorssaint made since 1.0.4-beta.2, listed here, except those for the Dynamic Island, which Barforge does not include.
 - Homebrew opens installer, setup and password-required commands in the default app for Unix executables, without Terminal Automation consent. Barforge no longer asks for Automation access to Terminal. Thanks to @hertza-haeon.
 - Snippet lists in Settings and the library use alphabetical order. Thanks to @Zekuath.
 - The window switcher allows up to 10 columns while preserving Auto and screen-width limits. Settings → Window switcher → Options → Maximum columns. Thanks to @EugeneCarldotme.
