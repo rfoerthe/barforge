@@ -246,6 +246,12 @@ struct SystemSection: View {
         refreshBreakdown()
     }
 
+    private func cpuScopeChanged() {
+        guard expanded == .cpu else { return }
+        breakdownRows = []
+        refreshBreakdown()
+    }
+
     private func refreshBreakdown() {
         guard let kind = expanded, kind != .cpu || !sysCPUCores || cpuAppsExpanded else { return }
         lastBreakdownRefresh = Date()
@@ -277,6 +283,13 @@ struct SystemSection: View {
     private func breakdownList(for kind: BreakdownKind) -> some View {
         if expanded == kind {
             VStack(alignment: .leading, spacing: 4) {
+                // Under the per-core bars the switch sits in the apps header.
+                if kind == .cpu, !sysCPUCores {
+                    HStack {
+                        Spacer(minLength: 0)
+                        CPUAllUsersToggle(onChange: cpuScopeChanged)
+                    }
+                }
                 if breakdownRows.isEmpty {
                     Text(breakdownIsLoading ? l10n.s.breakdownMeasuring : emptyBreakdownText(for: kind))
                         .font(.system(size: 10.5))
@@ -451,20 +464,25 @@ struct SystemSection: View {
                     if !monitor.snapshot.cpuCoreUsage.isEmpty {
                         CPUCoreMatrix(usage: monitor.snapshot.cpuCoreUsage)
                     }
-                    Button {
-                        toggleCPUApps()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 8, weight: .semibold))
-                                .foregroundStyle(.secondary)
-                                .rotationEffect(.degrees(cpuAppsExpanded ? 90 : 0))
-                            subsectionLabel(FeatureStrings.cpuCores(l10n.language).apps)
-                            Spacer(minLength: 0)
+                    HStack(spacing: 8) {
+                        Button {
+                            toggleCPUApps()
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 8, weight: .semibold))
+                                    .foregroundStyle(.secondary)
+                                    .rotationEffect(.degrees(cpuAppsExpanded ? 90 : 0))
+                                subsectionLabel(FeatureStrings.cpuCores(l10n.language).apps)
+                                Spacer(minLength: 0)
+                            }
+                            .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
+                        .buttonStyle(.plain)
+                        if cpuAppsExpanded {
+                            CPUAllUsersToggle(onChange: cpuScopeChanged)
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
                 if !sysCPUCores || cpuAppsExpanded {
                     breakdownList(for: .cpu)

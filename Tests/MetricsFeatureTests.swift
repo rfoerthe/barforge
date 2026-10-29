@@ -595,6 +595,16 @@ enum MetricsFeatureTests {
                                                        elapsed: 2,
                                                        processorCount: 18), 0,
                     "process CPU counter resets do not create utilization spikes")
+        suite.expect(MetricFormat.psCPUTimeNanoseconds("  0:01.50") == 1_500_000_000,
+                     "ps CPU time reads seconds and centiseconds")
+        suite.expect(MetricFormat.psCPUTimeNanoseconds("63:36.58") == 3_816_580_000_000,
+                     "ps CPU time keeps minutes past an hour as minutes")
+        suite.expect(MetricFormat.psCPUTimeNanoseconds("1-02:03:04.05") == 93_784_050_000_000,
+                     "ps CPU time accepts days and hours")
+        suite.expect(MetricFormat.psCPUTimeNanoseconds("abc") == nil
+                     && MetricFormat.psCPUTimeNanoseconds("1:2:3:4.00") == nil
+                     && MetricFormat.psCPUTimeNanoseconds("") == nil,
+                     "malformed ps CPU time is rejected")
         suite.expectClose(MetricFormat.processReconciliationScale(sampledTotal: 12,
                                                              aggregatePercentage: 7), 7.0 / 12.0,
                     "process usage scales down when attribution exceeds the aggregate")

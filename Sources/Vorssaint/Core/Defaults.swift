@@ -440,6 +440,8 @@ enum DefaultsKey {
     static let monitorSysTemps = "monitorSysTemps"
     static let monitorSysCPU = "monitorSysCPU"
     static let monitorSysCPUCores = "monitorSysCPUCores"
+    /// CPU app lists include other users' processes (root, daemons) too.
+    static let monitorCPUAllUsers = "monitorCPUAllUsers"
     static let monitorSysGPU = "monitorSysGPU"
     static let monitorSysBattery = "monitorSysBattery"
     static let monitorSysMemory = "monitorSysMemory"
@@ -1354,6 +1356,7 @@ enum Defaults {
         DefaultsKey.monitorSysTemps: true,
         DefaultsKey.monitorSysCPU: true,
         DefaultsKey.monitorSysCPUCores: true,
+        DefaultsKey.monitorCPUAllUsers: false,
         DefaultsKey.monitorSysGPU: true,
         DefaultsKey.monitorSysBattery: true,
         DefaultsKey.monitorSysMemory: true,

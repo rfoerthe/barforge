@@ -413,6 +413,38 @@ enum MetricFormat {
         return boundedPercentage(Double(currentNanoseconds - previousNanoseconds) / capacityNanoseconds * 100)
     }
 
+    /// `ps -o time` cumulative CPU time ("mmm:ss.cc", optionally "[d-]hh:mm:ss")
+    /// as nanoseconds. Only `ps` (setuid root) can read other users' processes.
+    static func psCPUTimeNanoseconds(_ text: Substring) -> UInt64? {
+        var rest = text.trimmingCharacters(in: .whitespaces)[...]
+        var days: UInt64 = 0
+        if let dash = rest.firstIndex(of: "-") {
+            guard let value = UInt64(rest[..<dash]) else { return nil }
+            days = value
+            rest = rest[rest.index(after: dash)...]
+        }
+        let fields = rest.split(separator: ":", omittingEmptySubsequences: false)
+        guard (1...3).contains(fields.count), let secondsField = fields.last else { return nil }
+        let secondsParts = secondsField.split(separator: ".", omittingEmptySubsequences: false)
+        guard (1...2).contains(secondsParts.count),
+              let seconds = UInt64(secondsParts[0]) else { return nil }
+        var fraction: UInt64 = 0
+        if secondsParts.count == 2 {
+            let digits = secondsParts[1].prefix(9)
+            guard !digits.isEmpty, let value = UInt64(digits) else { return nil }
+            fraction = value * UInt64(pow(10, Double(9 - digits.count)))
+        }
+        var wholeSeconds = days * 86_400
+        var multiplier: UInt64 = 1
+        for field in fields.dropLast().reversed() {
+            multiplier *= 60
+            guard let value = UInt64(field) else { return nil }
+            wholeSeconds += value * multiplier
+        }
+        wholeSeconds += seconds
+        return wholeSeconds * 1_000_000_000 + fraction
+    }
+
     /// Sampling APIs do not share a clock and can briefly over-attribute work.
     /// Never let the process rows claim more than the matching aggregate meter.
     static func processReconciliationScale(sampledTotal: Double,
