@@ -262,6 +262,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/FeatureHubStrings.swift
         Sources/Vorssaint/Core/MixerScreenSharingStrings.swift
         Sources/Vorssaint/Core/ShortcutSettingsStrings.swift
+        Sources/Vorssaint/Core/SwitcherShortcutStrings.swift
         Sources/Vorssaint/Core/SettingsBackupSupport.swift
         Sources/Vorssaint/Core/BackupStrings.swift
         Sources/Vorssaint/Core/SnippetStrings.swift
@@ -347,6 +348,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/ReleaseChangeAliases.swift
         Sources/Vorssaint/Core/WhatsNewStrings.swift
         Sources/Vorssaint/Core/URLCleaning.swift
+        Sources/Vorssaint/Services/URLCleanerLinkMetadata.swift
         Sources/Vorssaint/Services/GeneralPasteboardAccess.swift
         Sources/Vorssaint/Services/Clipboard/ClipboardHistoryWrite.swift
         Sources/Vorssaint/Services/Audio/AirPlayRouteManager.swift

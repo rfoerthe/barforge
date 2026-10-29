@@ -282,8 +282,10 @@ def main():
               "    private func restoreManagedDisplays(", "    func restoreDisplaysLeftOff(",
               "    private func commitDisplayToggle(", "    private func finishDisplayToggle(",
               "    private func restoreManagedDisplayIfHeadless(",
+              "    private func performHeadlessDisplayRestoration(",
               "    private func recordDiscoveredTopology(", "    private func discardReplacedDisplay(",
-              "    private func displaysWokeUp(", "    private func screensChanged("])
+              "    private func displaysWillSleep(", "    private func displaysWokeUp(",
+              "    private func reapplyManagedDisplayDisables(", "    private func screensChanged("])
           + "}\n}\n")
     write("BrightnessStep.swift", "import CoreGraphics\nimport Foundation\nimport os\n"
           + "extension BrightnessStepTests {\n"
@@ -568,7 +570,7 @@ def main():
           + "extension RepositoryFeatureTests.URLCleanerSiteSwitchHost {\n"
           + "".join(declaration("Sources/Vorssaint/UI/Settings/URLCleanerSettings.swift",
                                 prefix).replace("private ", "", 1)
-                    for prefix in ["    private func setSite(", "    private func remove("])
+                    for prefix in ["    private func addSite(", "    private func setSite(", "    private func remove("])
           + "}\n")
     write("ClipboardSource.swift", "import Foundation\n"
           + "extension ClipboardFeatureTests.SourceHost {\n"
@@ -649,16 +651,24 @@ def main():
           + declaration(bar, "    enum Mode:")
           + "final class Uninstaller: UninstallerState {\nstatic let shared = Uninstaller()\n"
           + "".join(declaration(uninstall, prefix) for prefix in [
-              "    var isRemoving: Bool", "    func select(appURL:",
+              "    var isRemoving: Bool", "    var canRemoveSelected: Bool", "    func select(appURL:",
+              "    func retryHomebrewCheck()",
               "    func reset()", "    func setInclude(", "    struct HomebrewRemovalConfirmation",
               "    var homebrewRemovalConfirmation:", "    func removeSelectedWithHomebrew("])
           + "}\nfinal class Service: ServiceState {\n"
           + "".join(declaration(bar, prefix).replace("private func", "func", 1) for prefix in [
               "    @Published var query", "    private func beginUninstallReview(",
               "    private func handleUninstallKey(", "    func stepBack()",
+              "    private func confirmUninstallReview(",
               "    private func finishUninstallReview()"])
           + "}\n}\nextension UninstallerFlowTests.Finder {\n"
           + declaration("Sources/Vorssaint/Services/Finder/FinderCutPaste.swift", "    static func selectionURLs(")
+          + "}\n")
+    homebrew = "Sources/Vorssaint/Services/Homebrew/HomebrewManager.swift"
+    write("HomebrewOwnership.swift", "import Foundation\n"
+          + "extension HomebrewOwnershipTests.Manager {\n"
+          + declaration(homebrew, "    func packageManagingApplication(")
+          + declaration(homebrew, "    private func finishOwnershipLoad(")
           + "}\n")
     write("UninstallerCommandBarCleanup.swift", "import Foundation\n"
           + "extension UninstallerCommandBarCleanupTests {\n"
@@ -932,7 +942,13 @@ def main():
     write("SuperKeyTap.swift", "import CoreGraphics\nimport Foundation\n"
           + "extension SuperKeyTapContract {\nfinal class SuperKeyService: State {\n"
           + "".join(declaration(super_key, prefix).replace("private func", "func", 1)
-                    for prefix in ["    private func runEventTap()", "    private func setMappingFailure("])
+                    for prefix in ["    private func runEventTap()", "    private func setMappingFailure(",
+                                   "    private func handle(", "    private static func classify("])
+            .replace("CGEvent.tapCreate(", "Tap.create(")
+          + "}\nfinal class ShortcutRecordingTap: RecordingState {\n"
+          + "".join(declaration("Sources/Vorssaint/Services/ShortcutRecordingTap.swift", prefix)
+                    .replace("private static func", "static func", 1)
+                    for prefix in ["    static func begin(", "    private static func handle("])
             .replace("CGEvent.tapCreate(", "Tap.create(")
           + "}\n}\n")
 
@@ -1017,19 +1033,34 @@ def main():
     write("OverlayPanelDeclaration.swift", "import AppKit\n"
           + declaration("Sources/Vorssaint/UI/OverlayPanel.swift", "class OverlayPanel:"))
     shelf = "Sources/Vorssaint/Services/Shelf/ShelfService.swift"
-    write("ShelfDragCompletion.swift", "import Foundation\n\nextension ShelfDragCompletionContract {\n"
-          + "final class Service {\nvar activeInternalDragIDs: [UUID] = []\n"
+    write("ShelfDragCompletion.swift", "import AppKit\n\nextension ShelfDragCompletionContract {\n"
+          + "final class Service {\nstatic var shared = Service()\n"
+          + declaration(shelf, "    struct Item:")
+          + "var items: [Item] = []\nvar selection: Set<UUID> = []\n"
+          + "var activeInternalDragIDs: [UUID] = []\nvar internalDragHoldsPackageContent = false\n"
           + "weak var internalDragWindow: NSWindow?\nvar internalDragWasMerged = false\n"
           + "var panel: NSWindow?\nvar dockedPanel: NSWindow?\n"
           + "var isPinned = false\nvar isVisible = false\nvar dockedVisible = false\n"
           + "var removed: [UUID] = []\nvar protectedIDs: Set<UUID> = []\n"
           + "var floatingClosures = 0\nvar dockedClosures = 0\n"
-          + "func endInteraction() {}\nfunc removeItems(_ ids: [UUID]) { removed += ids }\n"
+          + "func beginInteraction() {}\nfunc endInteraction() {}\n"
+          + "func removeItems(_ ids: [UUID]) { removed += ids }\n"
+          + "var replacements: [Item] = []\nfunc replaceItem(_ item: Item) { replacements.append(item) }\n"
+          + "func handleDeadDrag(_ items: [Item]) {}\n"
           + "func hide() { floatingClosures += 1; isVisible = false }\n"
           + "func collapseDocked() { dockedClosures += 1; dockedVisible = false }\n"
+          + "".join(declaration(shelf, prefix) for prefix in [
+              "    func selectedItems()", "    private func selectedItems(in",
+              "    func dragItems(for items:", "    private func appendDragLeaves(",
+              "    func livingDragItems(", "    private static func resolvedBookmarkPath(",
+              "    private func rebookedItem(", "    func pasteboardWriter(",
+              "    func sourceOperationMask("])
           + declaration(shelf, "    func beginInternalDrag(")
           + declaration(shelf, "    func finishInternalDrag(")
           + declaration(shelf, "    func completeInternalDrag(")
+          + "}\nfinal class Tile: TileState {\n"
+          + declaration("Sources/Vorssaint/UI/Shelf/ShelfTilesView.swift", "    private func beginItemDrag(")
+              .replace("private func", "func", 1)
           + "}\n}\n")
     recorder = "Sources/Vorssaint/Services/Recorder/RecorderEditorController.swift"
     write("RecorderZoomAiming.swift", "import Foundation\nimport Combine\n"
@@ -1080,6 +1111,14 @@ def main():
           + "}\n}\n")
     switcher = "Sources/Vorssaint/UI/Switcher/SwitcherView.swift"
     switcher_service = "Sources/Vorssaint/Services/Switcher/AppSwitcher.swift"
+    write("SwitcherAllWindows.swift", "import AppKit\n"
+          + "extension SwitcherAllWindowsTests.Model {\n"
+          + "".join(declaration(switcher_service, prefix).replace("private ", "", 1)
+                    for prefix in ["    private func initialSelectionIndex(",
+                                   "    private func advanceSelection(",
+                                   "    private func advanceAppSelection(",
+                                   "    private func advanceWindowInSelectedApp("])
+          + "}\n")
     write("SwitcherScroll.swift", "import AppKit\nimport SwiftUI\n"
           + "extension SwitcherScrollContract {\nstruct Strip: View {\n"
           + "@ObservedObject var switcher: Model\n"
