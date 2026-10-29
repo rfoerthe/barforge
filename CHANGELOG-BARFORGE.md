@@ -14,6 +14,25 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Added
+- The window switcher has an optional All windows shortcut that cycles through individual windows across apps in every layout, including Large icons. Settings → Window switcher → All windows. Thanks to BrainAPP for the suggestion.
+
+### Changed
+- Barforge brings the further changes Vorssaint made since 1.0.4-beta.3, listed here, except those for the Dynamic Island and its AI Agents, which Barforge does not include.
+
+### Fixed
+- Display controls restore manually disabled monitors to their off state after wake while keeping the last usable display on. Explicit restoration remains available. Thanks to @Fenrir200678.
+- Network readings avoid counting mirrored virtual interfaces twice, keep routed bridges counted and start a fresh baseline when switching connections to prevent false traffic spikes. Thanks to @Zekuath.
+- Super key modifiers reach session-based hotkey tools regardless of startup order, including after login. Shortcut recording still owns the source key and its solo actions. Thanks to @complicat9d for the diagnosis.
+- The uninstaller checks Homebrew again for each app and pauses removal when its package status cannot be verified, with a refresh action to retry. Thanks to @tzimpel.
+- URL Cleaner cleans Safari links that carry rich previews, preserving supported previews and removing tracking from their navigation addresses. Thanks to @anschmieg for the diagnosis.
+- Shelf copies files dragged from inside app packages or libraries, preserving the originals. Ordinary files and whole packages can still move. Thanks to @Dexist-hub.
+- Image exports and newly saved profiles preserve a zero watermark margin. Thanks to @JeanBaeez.
+- URL Cleaner rules added from links with login details or ports now match the intended site. Previously saved rules containing login details or ports need to be added again. Thanks to @g1obalworlds.
+- Quit Protection follows changes to macOS app-switcher shortcuts and respects required Fn, preventing unprotected quits after Barforge's switcher closes. Thanks to @ruvelro.
+
 ## [1.0.4-beta.3] - 2026-10-28
 
 Based on Vorssaint 3.4.2.

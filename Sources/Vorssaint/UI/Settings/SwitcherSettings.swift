@@ -13,6 +13,7 @@ struct SwitcherSettings: View {
     @ObservedObject private var secureInput = SecureInputMonitor.shared
     @AppStorage(DefaultsKey.switcherEnabled) private var switcherEnabled = true
     @AppStorage(DefaultsKey.switcherShortcut) private var switcherShortcutStorage = GlobalShortcut.switcherDefault.storageValue
+    @AppStorage(DefaultsKey.switcherAllWindowsShortcutEnabled) private var allWindowsShortcutEnabled = false
     @AppStorage(DefaultsKey.switcherTakeOverSystemShortcuts) private var switcherTakeOverSystemShortcuts = false
     @AppStorage(DefaultsKey.switcherIconRowMode) private var switcherIconRowMode = false
     @AppStorage(DefaultsKey.switcherSimpleMode) private var switcherSimpleMode = false
@@ -159,6 +160,22 @@ struct SwitcherSettings: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                SettingsRow(symbol: "macwindow.on.rectangle",
+                            title: FeatureStrings.switcherShortcuts(l10n.language).allWindows,
+                            caption: FeatureStrings.switcherShortcuts(l10n.language).allWindowsCaption) {
+                    Toggle(FeatureStrings.switcherShortcuts(l10n.language).allWindows,
+                           isOn: $allWindowsShortcutEnabled)
+                        .labelsHidden()
+                        .onChange(of: allWindowsShortcutEnabled) { _, _ in
+                            AppSwitcher.shared.syncWithPreferences()
+                        }
+                }
+                if allWindowsShortcutEnabled {
+                    ShortcutPreferenceRow(role: .switcherAllWindows,
+                                          isEnabled: switcherEnabled) {
+                        AppSwitcher.shared.syncWithPreferences()
+                    }
+                }
                 SettingsRow(symbol: "command", title: l10n.s.switcherTakeOverSystemShortcuts,
                             caption: l10n.s.switcherTakeOverSystemShortcutsCaption) {
                     Toggle(l10n.s.switcherTakeOverSystemShortcuts, isOn: $switcherTakeOverSystemShortcuts)
