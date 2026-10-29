@@ -388,14 +388,31 @@ final class ProcessUsageService {
 
     // MARK: - CPU
 
-    private var previousCPUSample: (time: TimeInterval, perPid: [pid_t: UInt64])?
+    private var previousCPUSample: (time: TimeInterval, perPid: [pid_t: UInt64], allUsers: Bool)?
     private let cpuSampleLock = NSLock()
+
+    var cpuIncludesAllUsers: Bool {
+        UserDefaults.standard.bool(forKey: DefaultsKey.monitorCPUAllUsers)
+    }
+
+    /// The "All users" switch changed: drop rows and the baseline sampled under
+    /// the other setting, so the next sample re-primes with the new scope.
+    func cpuScopeDidChange() {
+        cpuSampleLock.lock()
+        previousCPUSample = nil
+        cpuSampleLock.unlock()
+        cacheLock.lock()
+        cpuCache = nil
+        energyCache = nil
+        cacheLock.unlock()
+    }
 
     func topCPU(limit: Int = 5,
                 sampleInterval: TimeInterval = 2,
                 aggregatePercentage: Double? = nil) -> [ProcessUsage] {
         let now = ProcessInfo.processInfo.systemUptime
         let minimumInterval = max(0.5, sampleInterval * 0.8)
+        let allUsers = cpuIncludesAllUsers
 
         cpuSampleLock.lock()
         let previousTime = previousCPUSample?.time
@@ -414,13 +431,13 @@ final class ProcessUsageService {
         cacheLock.unlock()
 
         let sampleStartedAt: UInt64? = AppFeature.killProcess.isAvailable ? mach_absolute_time() : nil
-        let current = Self.cpuTimePerPid()
+        let current = Self.cpuTimePerPid(includingOtherUsers: allUsers)
         cpuSampleLock.lock()
         let previous = previousCPUSample
-        previousCPUSample = (now, current)
+        previousCPUSample = (now, current, allUsers)
         cpuSampleLock.unlock()
 
-        guard let previous, now > previous.time,
+        guard let previous, previous.allUsers == allUsers, now > previous.time,
               now - previous.time < max(30, sampleInterval * 4) else {
             return finishCPU(nil, limit: limit)
         }
@@ -445,7 +462,9 @@ final class ProcessUsageService {
 
     /// Cumulative user + system CPU nanoseconds for every process visible to
     /// libproc. Deltas over the monitor interval avoid `ps`'s separate average.
-    private static func cpuTimePerPid() -> [pid_t: UInt64] {
+    /// libproc refuses other users' processes; with `includingOtherUsers` the
+    /// setuid `ps` fills those in at its centisecond resolution.
+    private static func cpuTimePerPid(includingOtherUsers: Bool) -> [pid_t: UInt64] {
         var timebase = mach_timebase_info_data_t()
         guard mach_timebase_info(&timebase) == KERN_SUCCESS else { return [:] }
         let estimatedCount = max(1, Int(proc_listallpids(nil, 0)))
@@ -457,6 +476,7 @@ final class ProcessUsageService {
 
         var perPid: [pid_t: UInt64] = [:]
         perPid.reserveCapacity(Int(count))
+        var unreadable: Set<pid_t> = []
         for pid in pids.prefix(min(Int(count), pids.count)) where pid > 0 {
             var info = rusage_info_current()
             let status = withUnsafeMutablePointer(to: &info) { pointer in
@@ -464,7 +484,10 @@ final class ProcessUsageService {
                     proc_pid_rusage(pid, RUSAGE_INFO_CURRENT, rebound)
                 }
             }
-            guard status == 0 else { continue }
+            guard status == 0 else {
+                unreadable.insert(pid)
+                continue
+            }
             let total = info.ri_user_time.addingReportingOverflow(info.ri_system_time)
             guard !total.overflow,
                   let nanoseconds = MetricFormat.machTimeNanoseconds(
@@ -473,6 +496,19 @@ final class ProcessUsageService {
                       denominator: timebase.denom
                   ) else { continue }
             perPid[pid] = nanoseconds
+        }
+        if includingOtherUsers, !unreadable.isEmpty {
+            // Only the PIDs libproc refused, so each PID keeps one source
+            // across samples and its own deltas stay consistent.
+            let result = Shell.run("/bin/ps", ["-Ao", "pid=,time="])
+            if result.status == 0 {
+                for line in result.output.split(separator: "\n") {
+                    let columns = line.split(separator: " ", maxSplits: 1, omittingEmptySubsequences: true)
+                    guard columns.count == 2, let pid = pid_t(columns[0]), unreadable.contains(pid),
+                          let nanoseconds = MetricFormat.psCPUTimeNanoseconds(columns[1]) else { continue }
+                    perPid[pid] = nanoseconds
+                }
+            }
         }
         return perPid
     }

@@ -143,6 +143,29 @@ struct ActivityMonitorButton: View {
     }
 }
 
+/// "All users" switch over a CPU apps list. Without it the list holds only
+/// this user's processes: libproc refuses CPU times for the rest.
+struct CPUAllUsersToggle: View {
+    @ObservedObject private var l10n = L10n.shared
+    @AppStorage(DefaultsKey.monitorCPUAllUsers) private var allUsers = false
+    var onChange: () -> Void = {}
+
+    var body: some View {
+        let strings = FeatureStrings.cpuCores(l10n.language)
+        Toggle(strings.allUsers, isOn: $allUsers)
+            .toggleStyle(.checkbox)
+            .controlSize(.mini)
+            .font(.system(size: 10))
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .help(strings.allUsersHelp)
+            .onChange(of: allUsers) { _, _ in
+                ProcessUsageService.shared.cpuScopeDidChange()
+                onChange()
+            }
+    }
+}
+
 struct MetricDetailView: View {
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var monitor = SystemMonitor.shared
@@ -314,6 +337,12 @@ struct MetricDetailView: View {
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(.tertiary)
                 Spacer(minLength: 0)
+                if kind.processKind == .cpu {
+                    CPUAllUsersToggle {
+                        processRows = []
+                        refreshProcessRows(force: true)
+                    }
+                }
                 ActivityMonitorButton()
             }
             if processRows.isEmpty {

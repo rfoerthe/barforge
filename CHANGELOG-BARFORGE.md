@@ -14,6 +14,11 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Added
+- The CPU apps list in the menu panel and the CPU detail view has an All users switch that also lists other users' processes, such as root and system daemons, by CPU load. It starts off. The GPU list already includes every user.
+
 ## [1.0.4] - 2026-10-29
 
 Based on Vorssaint 3.4.2.
