@@ -2028,22 +2028,23 @@ enum SwitcherModelFeatureTests {
                "update showcase intro starts unseen")
         suite.expect(registeredDefaults[DefaultsKey.updateShowcaseMediaOverride] as? String == "",
                "update showcase media override is empty by default")
-        suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.2",
-               "support prompt is deliberately pinned to the 3.4.2 stable release")
-        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: "3.3.2")
-               && SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: nil),
+        suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.3",
+               "support prompt is deliberately pinned to the 3.4.3 stable release")
+        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: "3.3.2")
+               && SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: nil),
                "support prompt shows once after updating to its pinned release")
-        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: "3.4.0-support")
-               && SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: "3.4.1-support"),
-               "people who saw an earlier support prompt receive the revised message in 3.4.2")
-        suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: SupportUpdateIntroInfo.seenVersion)
-               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: SupportUpdateIntroInfo.seenVersion),
+        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: "3.4.0-support")
+               && SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: "3.4.2-support"),
+               "people who completed the 3.4.2 invitation receive the 3.4.3 invitation")
+        suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.4", lastSeenVersion: SupportUpdateIntroInfo.seenVersion)
+               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: SupportUpdateIntroInfo.seenVersion),
                "support prompt stays hidden after it is seen, through later patches")
-        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: "3.4.2"),
+        suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3", lastSeenVersion: "3.4.3"),
                "premature support markers from beta onboarding do not suppress the stable invitation")
         suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.0", lastSeenVersion: nil)
                && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.1", lastSeenVersion: nil)
-               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2-beta.2", lastSeenVersion: nil)
+               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.2", lastSeenVersion: nil)
+               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.3-beta.2", lastSeenVersion: nil)
                && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.5.0", lastSeenVersion: nil),
                "support prompt never leaks into another release or a beta")
         suite.expect(AppInfo.discordURL.absoluteString == "https://discord.gg/M6BwWH4BJp",
@@ -2063,18 +2064,18 @@ enum SwitcherModelFeatureTests {
         suite.expect(plistVersion == "3.4.2",
                "bumping the app version requires re-deciding the support prompt pin above")
         let plistBuild = (releasePlist?["CFBundleVersion"] as? String) ?? ""
-        suite.expect(plistBuild == "104",
+        suite.expect(plistBuild == "105",
                "every app version needs its own incremented bundle build")
-        suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.2",
-               "the support prompt is prepared for the 3.4.2 stable release")
+        suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.3",
+               "the support prompt is prepared for the 3.4.3 stable release")
         for version in ["3.4.0-beta.1", "3.4.0-beta.7", "3.4.0-beta.10"] {
             suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: nil),
                    "beta updates do not request the support introduction")
         }
-        for version in ["3.4.2", "3.4.3", "3.4.10", "3.4.99"] {
+        for version in ["3.4.3", "3.4.4", "3.4.10", "3.4.99"] {
             suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: "3.4.0")
                    && !SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: SupportUpdateIntroInfo.seenVersion),
-                   "stable patches from 3.4.2 share one support invitation and never repeat it")
+                   "stable patches from 3.4.3 share one support invitation and never repeat it")
         }
         suite.expect(registeredDefaults[DefaultsKey.mixerLowerVolumeOnHeadphonesDisconnect] as? Bool == false,
                "headphone disconnect volume lowering is opt-in")
