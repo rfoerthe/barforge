@@ -25,23 +25,6 @@
 
 > **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [Barforge changelog](CHANGELOG-BARFORGE.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/barforge/issues), not upstream.
 
-<h2 align="center">Sponsors</h2>
-
-<p align="center">
-  Help keep Vorssaint free and open source. Share your product with Mac users.
-</p>
-
-<table align="center">
-  <tr>
-    <td align="center" width="520">
-      <br>
-      <strong>Your product here</strong><br>
-      <sub>Your logo · Your name · Your link</sub><br><br>
-      <a href="SPONSORS.md"><strong>Become our first sponsor →</strong></a><br><br>
-    </td>
-  </tr>
-</table>
-
 <p align="center">
   <img src="docs/assets/readme/panel-mixer.png" width="196" alt="Volume mixer with per app sliders, one app boosted past 100 percent">
   <img src="docs/assets/readme/panel-system.png" width="196" alt="System tab with temperatures, usage graphs and memory pressure">
