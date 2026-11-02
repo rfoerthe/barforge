@@ -14,10 +14,16 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.5] - 2026-11-02
+
+Based on Vorssaint 3.4.3.
 
 ### Added
 - The CPU apps list in the menu panel and the CPU detail view has an All users switch that also lists other users' processes, such as root and system daemons, by CPU load. It starts off. The GPU list already includes every user.
+
+### Changed
+- Barforge is based on Vorssaint 3.4.3. Barforge 1.0.4 already brought nearly all of its changes; the one still missing is the Zoom change below. Those for the Dynamic Island with its AI Agents and for Fan Control stay out, as Barforge does not include them.
+- Zoom keeps only Pinch Zoom, which turns a modifier and mouse-wheel movement into pinch gestures in supported apps. The keyboard Zoom option, which zoomed the window under the pointer through the app's own zoom, is gone. Settings → Mouse → Zoom.
 
 ## [1.0.4] - 2026-10-29
 
