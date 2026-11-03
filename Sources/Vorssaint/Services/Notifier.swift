@@ -15,7 +15,17 @@ enum Notifier {
     private static let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "vorssaint",
                                     category: "notifications")
 
+    /// The notification centre aborts the process when it cannot resolve an
+    /// app bundle: a bare binary started from the terminal, or a bundle
+    /// replaced or moved out from under a running copy. Every entry point
+    /// checks this first, so such a run simply posts nothing.
+    static var isAvailable: Bool {
+        Bundle.main.bundleIdentifier != nil
+            && FileManager.default.fileExists(atPath: Bundle.main.bundlePath)
+    }
+
     static func requestPermission() {
+        guard isAvailable else { return }
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             // A denied prompt is the user's call; a request that ERRORS means
             // notifications silently cannot work at all — leave a trace so
@@ -36,6 +46,7 @@ enum Notifier {
                                          body: String,
                                          undoTitle: String,
                                          transactionID: UUID) {
+        guard isAvailable else { return }
         let center = UNUserNotificationCenter.current()
         let undo = UNNotificationAction(
             identifier: whatsAppOrganizerUndoActionIdentifier,
@@ -61,6 +72,7 @@ enum Notifier {
                              body: String,
                              categoryIdentifier: String?,
                              userInfo: [AnyHashable: Any]) {
+        guard isAvailable else { return }
         let center = UNUserNotificationCenter.current()
         center.getNotificationSettings { settings in
             guard settings.authorizationStatus == .authorized

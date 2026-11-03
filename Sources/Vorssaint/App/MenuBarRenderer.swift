@@ -1022,7 +1022,8 @@ enum MenuBarRenderer {
         return stackedRatesImage(lines: lines,
                                  reservedLines: ["↓000B", "↑000B"],
                                  cacheKey: cacheKey,
-                                 style: style)
+                                 style: style,
+                                 pinsLabelLeading: true)
     }
 
     private static func diskActivityBlockImage(read: String,
@@ -1040,7 +1041,8 @@ enum MenuBarRenderer {
     private static func stackedRatesImage(lines: [String],
                                           reservedLines: [String],
                                           cacheKey: NSString,
-                                          style: MenuBarBlockStyle) -> NSImage {
+                                          style: MenuBarBlockStyle,
+                                          pinsLabelLeading: Bool = false) -> NSImage {
         let font = NSFont.monospacedSystemFont(ofSize: networkBlockFontSize(style: style),
                                                weight: .semibold)
         let lineHeight = networkBlockLineHeight(style: style)
@@ -1055,9 +1057,17 @@ enum MenuBarRenderer {
             let bottomY = (imageSize.height - contentHeight) / 2
             for (index, line) in lines.enumerated() {
                 let y = bottomY + lineHeight * CGFloat(1 - index)
-                let lineSize = (line as NSString).size(withAttributes: attrs)
-                let x = max(0.5, imageSize.width - lineSize.width - 0.5)
-                (line as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: attrs)
+                // With a pinned label the first character (the arrow) sits at
+                // the leading edge and only the value is right-aligned, so the
+                // arrows stay in one column while the digits change.
+                let label = pinsLabelLeading ? String(line.prefix(1)) : ""
+                let value = pinsLabelLeading ? String(line.dropFirst()) : line
+                if !label.isEmpty {
+                    (label as NSString).draw(at: NSPoint(x: 0.5, y: y), withAttributes: attrs)
+                }
+                let valueSize = (value as NSString).size(withAttributes: attrs)
+                let x = max(0.5, imageSize.width - valueSize.width - 0.5)
+                (value as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: attrs)
             }
             return true
         }

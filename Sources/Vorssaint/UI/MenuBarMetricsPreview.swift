@@ -174,16 +174,21 @@ struct MenuBarMetricsPreview: View {
                           pressure: pressure)
         case let .networkBlock(down, up, style):
             let rows = networkUploadFirst ? [("↑", up), ("↓", down)] : [("↓", down), ("↑", up)]
-            VStack(alignment: .trailing, spacing: -0.6) {
-                Text(rows[0].0 + rows[0].1)
+            VStack(spacing: -0.6) {
+                ForEach(0..<2, id: \.self) { index in
+                    HStack(spacing: 0) {
+                        Text(rows[index].0)
+                        Spacer(minLength: 0)
+                        Text(rows[index].1)
+                    }
                     .lineLimit(1)
-                Text(rows[1].0 + rows[1].1)
-                    .lineLimit(1)
+                }
             }
             .font(.system(size: MenuBarRenderer.networkBlockFontSize(style: style),
                           weight: .semibold,
                           design: .monospaced))
             .foregroundStyle(.white)
+            .padding(.horizontal, 0.5)
             .frame(width: MenuBarRenderer.rateBlockWidth(style: style),
                    height: style == .readable ? 22 : 20,
                    alignment: .center)
