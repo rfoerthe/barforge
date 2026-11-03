@@ -219,6 +219,7 @@ struct MonitorAlertsControls: View {
     /// Checked slightly delayed so a just-fired authorization prompt has a
     /// chance to be answered before the warning appears.
     private func refreshNotificationStatus() {
+        guard Notifier.isAvailable else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             UNUserNotificationCenter.current().getNotificationSettings { settings in
                 DispatchQueue.main.async {
