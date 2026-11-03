@@ -14,7 +14,12 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.6-beta.1] - 2026-11-03
+
+Based on Vorssaint 3.4.3.
+
+### Changed
+- The menu bar network rates keep their arrows in a fixed column at the left, with the values right-aligned beside them. The block keeps its width.
 
 ### Fixed
 - The per-core CPU bars on M5 Pro and M5 Max show Super and Performance cores as separate groups instead of one undivided CPU group. These chips tag their Super clusters "P" and their Performance clusters "M" in the device tree.
