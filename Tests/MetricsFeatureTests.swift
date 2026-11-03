@@ -1110,6 +1110,12 @@ enum MetricsFeatureTests {
         suite.expect(CPUCoreTopology.groups(levels: twoLevels, cores: registryCores,
                                             slots: [6, 0, 7, 1, 8, 2, 9, 3, 4, 5]).first?.indices == [0, 2, 4, 6],
                "group indices address the sampler's processor order")
+        let m5ProLevels = [(name: "Super", count: 6), (name: "Performance", count: 12)]
+        let m5ProCores = (0..<18).map { (id: $0, type: $0 < 12 ? "M" : "P") }
+        suite.expect(CPUCoreTopology.groups(levels: m5ProLevels, cores: m5ProCores, slots: Array(0..<18))
+                == [CPUCoreGroup(name: "Super", indices: Array(12..<18)),
+                    CPUCoreGroup(name: "Performance", indices: Array(0..<12))],
+               "M5 Pro P clusters are Super cores and M clusters are Performance cores")
         for broken in [Array(registryCores.dropLast()), registryCores + [registryCores[0]],
                        registryCores.map { (id: $0.id, type: "?") }] {
             suite.expect(CPUCoreTopology.groups(levels: twoLevels, cores: broken, slots: Array(0..<10)).map(\.name) == ["CPU"],

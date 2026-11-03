@@ -14,6 +14,11 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+### Fixed
+- The per-core CPU bars on M5 Pro and M5 Max show Super and Performance cores as separate groups instead of one undivided CPU group. These chips tag their Super clusters "P" and their Performance clusters "M" in the device tree.
+
 ## [1.0.5] - 2026-11-02
 
 Based on Vorssaint 3.4.3.
