@@ -179,7 +179,8 @@ enum CPUCoreTopology {
               cores.count == slots.count, Set(cores.map(\.id)) == Set(slots)
         else { return fallback }
         // XNU orders perflevels by cluster performance, not by logical CPU ID.
-        let order = ["S", "P", "E"]
+        // M5 Pro/Max tag Super clusters "P" and Performance clusters "M".
+        let order = ["S", "P", "M", "E"]
         let types = Set(cores.map(\.type))
         guard types.isSubset(of: Set(order)), types.count == levels.count else { return fallback }
         let byID = Dictionary(uniqueKeysWithValues: cores.map { ($0.id, $0.type) })
