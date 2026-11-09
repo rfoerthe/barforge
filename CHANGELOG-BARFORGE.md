@@ -14,7 +14,7 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.0.6] - 2026-11-09
 
 Based on Vorssaint 3.4.3.
 
@@ -28,6 +28,7 @@ Based on Vorssaint 3.4.3.
 
 ### Changed
 - Barforge brings the further changes Vorssaint made after 3.4.3 since Barforge 1.0.5, listed here, except those for the Dynamic Island with its AI Agents, which Barforge does not include.
+- The menu bar network rates keep their arrows in a fixed column at the left, with the values right-aligned beside them. The block keeps its width.
 - GIF exports can retain the full edited resolution and offer scale and frame-rate controls, with captions kept proportional at smaller sizes. Thanks to @COMEBACKISREAL.
 - Large clipboard images can be resized before opening in the screenshot editor, preserving native image formats, the primary HEIC image and its orientation. Thanks to @kit101.
 - Supported DDC monitors can use software picture dimming instead of hardware brightness commands, with pending brightness changes cancelled when switching modes. Thanks to @yavuzmeteafsar.
@@ -35,6 +36,7 @@ Based on Vorssaint 3.4.3.
 - Clipboard history remembers the list window's position after moves and resizes, keeping it visible when displays change. Thanks to @maxmeis.
 
 ### Fixed
+- The per-core CPU bars on M5 Pro and M5 Max show Super and Performance cores as separate groups instead of one undivided CPU group. These chips tag their Super clusters "P" and their Performance clusters "M" in the device tree.
 - Save as GIF and Copy as GIF export faster and use less memory, decoding the recording in order and encoding on the GPU when supported, with the existing encoder as a fallback.
 - The window switcher opens and switches more efficiently, reduces flashes when restoring minimized windows and cancels outdated activation requests after a newer selection. Thanks to @zhanghao87.
 - The window switcher keeps its opening shortcuts working during secure input, including All windows and quick modifier releases. Q/W remain unavailable in this mode and are blocked while the switcher owns the selection. Thanks to @phatina.
