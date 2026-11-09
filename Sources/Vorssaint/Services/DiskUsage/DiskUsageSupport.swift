@@ -37,12 +37,12 @@ struct DiskUsageVolumeSpace: Equatable {
                                     availableForImportantUsage: important)
     }
 
+    /// Capacity minus free space, purgeable space included.
+    var used: UInt64 { capacity - min(capacity, free) }
+
     /// Bytes the scan is expected to find: what the volume uses, without
     /// the space macOS can reclaim. Drives the progress of a volume scan.
-    var expectedScanBytes: UInt64 {
-        let used = capacity - min(capacity, free)
-        return used - min(used, purgeable)
-    }
+    var expectedScanBytes: UInt64 { used - min(used, purgeable) }
 }
 
 /// Why an item cannot be moved to the Trash.

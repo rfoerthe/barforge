@@ -120,8 +120,10 @@ private struct DiskAnalyzerSourceRow: View {
                 Text(title).font(.system(size: 13, weight: .semibold)).lineLimit(1)
                 if let disk {
                     usageBar(disk.space)
-                    Text(String(format: strings.freeOfFormat, DiskAnalyzerFormat.bytes(disk.space.free),
+                    Text(String(format: strings.usageFormat, DiskAnalyzerFormat.bytes(disk.space.used),
+                                DiskAnalyzerFormat.bytes(disk.space.free),
                                 DiskAnalyzerFormat.bytes(disk.space.capacity)))
+                        .monospacedDigit()
                         .font(.system(size: 11)).foregroundStyle(.secondary)
                 } else {
                     Text(path).font(.system(size: 11)).foregroundStyle(.secondary)
@@ -159,7 +161,7 @@ private struct DiskAnalyzerSourceRow: View {
     }
 
     private func usageBar(_ space: DiskUsageVolumeSpace) -> some View {
-        let used = space.capacity > 0 ? Double(space.capacity - min(space.capacity, space.free)) / Double(space.capacity) : 0
+        let used = space.capacity > 0 ? Double(space.used) / Double(space.capacity) : 0
         return GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Capsule().fill(.quaternary)

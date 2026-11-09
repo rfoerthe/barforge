@@ -301,6 +301,11 @@ enum DiskUsageTests {
                      && DiskUsageVolumeSpace(capacity: 1000, available: 600, availableForImportantUsage: nil).purgeable == 0,
                      "a smaller or missing important-use figure never invents purgeable space")
         suite.expect(space.expectedScanBytes == 350, "a volume scan expects used space minus purgeable space")
+        suite.expect(space.used == 400 && DiskUsageVolumeSpace(capacity: 10, free: 20, purgeable: 0).used == 0,
+                     "used space is capacity minus free space and never underflows")
+        let usage = DiskAnalyzerFeatureStrings.enUS.usageFormat
+        suite.expect(String(format: usage, "1 GB", "2 GB", "3 GB") == "1 GB used · 2 GB free · 3 GB total",
+                     "a disk row names its used, free and total space")
         suite.expect(DiskUsageVolumeSpace(capacity: 10, free: 20, purgeable: 5).expectedScanBytes == 0,
                      "inconsistent volume figures never underflow")
 
