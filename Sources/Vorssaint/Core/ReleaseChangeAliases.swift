@@ -144,6 +144,7 @@ enum ReleaseChangeAliases {
         case .wallpaper: return [.exact("Wallpaper"), "wallpaper gallery", "wallpapers"]
         case .killProcess: return ["kill process", "force kill", "process tree"]
         case .portManager: return ["port manager"]
+        case .diskAnalyzer: return ["disk analyzer", "disk analysis"]
         case .monitorCPU: return ["cpu temperature", "cpu load", "cpu readings", "per core", "per-core",
             "processor temperature", "process breakdowns", "cpu alert", "cpu and gpu temperatures"]
         case .monitorGPU: return ["gpu usage", "gpu load", "gpu temperature", "gpu temperatures",

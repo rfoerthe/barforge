@@ -392,6 +392,7 @@ enum SettingsDirectory {
                                         (.wallpaper,
                                          [FeatureStrings.wallpaper(language).pageTitle]),
                                         (.scratchpad, [FeatureStrings.scratchpad(language).pageTitle]),
+                                        (.diskAnalyzer, [FeatureStrings.diskAnalyzer(language).title]),
                                         (.cleaningMode, [s.cleaningMenuItem, s.cleaningKeepScreenVisibleToggle]),
                                        ]),
                 SettingsDirectoryItem(page: .screenshot,

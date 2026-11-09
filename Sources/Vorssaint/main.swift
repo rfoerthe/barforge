@@ -21,6 +21,7 @@ if CommandLine.arguments.contains("--selftest") {
 if CommandLine.arguments.contains("--sensors") {
     SensorDump.runAndExit()
 }
+DiskUsageDump.runIfRequestedAndExit()
 if CommandLine.arguments.contains("--uninstall") {
     Uninstaller.runAndExit()
 }

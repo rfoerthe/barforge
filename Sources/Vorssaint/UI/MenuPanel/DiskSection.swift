@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import AppKit
 import SwiftUI
@@ -445,6 +446,20 @@ struct DiskSection: View {
                     } label: {
                         Label(l10n.s.diskOpenInFinder, systemImage: "folder")
                             .font(.system(size: 10.5))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+                if AppFeature.diskAnalyzer.isAvailable {
+                    Button {
+                        appDelegate()?.closePopover()
+                        let path = disk.mountPath
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            DiskAnalyzerService.shared.show(path: path)
+                        }
+                    } label: {
+                        Label(FeatureStrings.diskAnalyzer(l10n.language).title, systemImage: "chart.pie")
+                            .font(.system(size: 10.5, weight: .medium))
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)

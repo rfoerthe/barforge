@@ -59,6 +59,7 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
     case soundOutputSwitcher
     case keyboardBrightnessShortcuts
     case windowMaximizer
+    case diskAnalyzer
 
     var page: SettingsPage {
         switch self {
@@ -74,7 +75,7 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
         case .finderCutPaste, .finderRename: return .cutPaste
         case .clipboardHistory, .pastePlain: return .clipboard
         case .quickLauncher, .quickToggles, .quitApps, .micMute, .cameraPreview, .wallpaper, .scratchpad,
-             .cleaningMode:
+             .cleaningMode, .diskAnalyzer:
             return .quickTools
         case .screenshot, .screenRecorder, .colorPicker, .screenOCR:
             return .screenshot
@@ -353,6 +354,8 @@ extension AppFeature {
         case .uninstaller: return FeatureSettingsDestination(.uninstaller)
         case .killProcess: return FeatureSettingsDestination(.killProcess)
         case .portManager: return FeatureSettingsDestination(.portManager)
+        case .diskAnalyzer:
+            return FeatureSettingsDestination(.quickTools, sectionAnchor: .diskAnalyzer)
         case .homebrew: return FeatureSettingsDestination(.homebrew)
         case .appUpdates: return FeatureSettingsDestination(.appUpdates)
         case .screenshot:
@@ -400,7 +403,7 @@ enum FeatureVisibilitySupport {
         case .shelf: return [.shelf]
         case .media: return [.mediaTools]
         case .quickTools: return [.quickLauncher, .quickToggles, .quitApps, .micMute,
-                                  .cameraPreview, .wallpaper, .scratchpad, .cleaningMode]
+                                  .cameraPreview, .wallpaper, .scratchpad, .cleaningMode, .diskAnalyzer]
         case .urlCleaner: return [.urlCleaner]
         case .cleaner: return [.cleaner]
         case .homebrew: return [.homebrew]

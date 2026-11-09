@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import SwiftUI
 
@@ -312,6 +313,23 @@ struct QuickToolsSettings: View {
                     Text(FeatureStrings.scratchpad(l10n.language).pageTitle)
                 }
                 .settingsFormSectionAnchor(.scratchpad)
+            }
+
+            if AppFeature.diskAnalyzer.isAvailable {
+                Section {
+                    Button {
+                        DiskAnalyzerService.shared.show()
+                    } label: {
+                        Label(FeatureStrings.diskAnalyzer(l10n.language).openButton,
+                              systemImage: "chart.pie")
+                    }
+                    Text(FeatureStrings.diskAnalyzer(l10n.language).settingsCaption)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text(FeatureStrings.diskAnalyzer(l10n.language).title)
+                }
+                .settingsFormSectionAnchor(.diskAnalyzer)
             }
 
             if AppFeature.cleaningMode.isAvailable {

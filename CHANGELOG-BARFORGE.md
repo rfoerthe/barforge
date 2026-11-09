@@ -14,6 +14,14 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+Based on Vorssaint 3.4.3.
+
+### Added
+- An optional Disk Analyzer shows what fills a disk or folder as rings or tiles. Hard links and APFS clones count once, apps and other packages count as one item until you open them, and a disk scan also shows hidden, purgeable and free space. Collect files and folders, then move them to the Trash together after a 5-second countdown you can stop. Open it from the Utilities section of the panel, a disk's tools, the quick panel, the Command Bar or the menu bar icon's right-click menu. Install it under Settings → Features. Without Full Disk Access, protected folders count as hidden space.
+- `Barforge --disk-usage PATH` prints what the Disk Analyzer counts for a folder, without opening a window.
+
 ## [1.0.6-beta.1] - 2026-11-03
 
 Based on Vorssaint 3.4.3.

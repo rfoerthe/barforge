@@ -134,6 +134,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 
 - **App updates.** Check store apps, package-managed apps and supported developer feeds in one list. Install managed updates together or open an app's own updater.
 - **Cleaner.** Remove caches, logs and app leftovers, manually or on a schedule.
+- **Disk Analyzer.** See what fills a disk or folder as rings or tiles, including hidden and purgeable space, and move what you no longer need to the Trash together after a short countdown.
 - **Messaging downloads.** Review, organize or move messaging downloads to the Trash using retention rules.
 - **Uninstaller.** Remove apps and review their related caches, preferences and helpers before moving them to the Trash.
 - **Homebrew manager.** Search, install and remove formulae and casks without opening a terminal.

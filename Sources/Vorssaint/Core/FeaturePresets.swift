@@ -140,7 +140,7 @@ extension AppFeature {
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .quitApps, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,
              .cameraPreview, .scratchpad, .commandBar, .screenRecorder, .wallpaper,
-             .diskImageInstaller, .killProcess, .portManager:
+             .diskImageInstaller, .killProcess, .portManager, .diskAnalyzer:
             return .idle
         // Device reports arrive only while a diverted control is used; the
         // mouse itself stays in charge of everything else.
