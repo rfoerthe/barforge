@@ -9,9 +9,12 @@ import Synchronization
 /// Every counter may be read from any thread while the scan writes it.
 final class DiskUsageScanProgress: Sendable {
     let files = Atomic<UInt64>(0)
-    /// Allocated bytes found so far, before shared data is counted once.
+    /// Allocated bytes found so far. A file that shares its data with hard
+    /// links or clones adds its share, so the total approaches the result.
     let bytes = Atomic<UInt64>(0)
     let cancelled = Atomic<Bool>(false)
+    /// Set once every folder is read, while the result is put together.
+    let evaluating = Atomic<Bool>(false)
     /// Finished share of the folder tree, in millionths. Each folder hands its
     /// share on to its subfolders in equal parts; a folder without subfolders
     /// counts its share as done once read.
@@ -28,13 +31,17 @@ final class DiskUsageScanProgress: Sendable {
 
     var isCancelled: Bool { cancelled.load(ordering: .relaxed) }
 
-    /// 0 … 1.
+    var isEvaluating: Bool { evaluating.load(ordering: .relaxed) }
+
+    /// 0 … 1. Reaches 1 only once the folders are read; the result is then
+    /// still being put together (`isEvaluating`).
     var fraction: Double {
+        if isEvaluating { return 1 }
         let expected = expectedBytes.load(ordering: .relaxed)
         let value = expected > 0
             ? Double(bytes.load(ordering: .relaxed)) / Double(expected)
             : Double(doneMillionths.load(ordering: .relaxed)) / 1_000_000
-        return min(1, max(0, value))
+        return min(0.99, max(0, value))
     }
 
     fileprivate func setCurrentPath(_ path: String) {
@@ -61,6 +68,7 @@ enum DiskUsageScanner {
         if let volume { progress.expectedBytes.store(volume.expectedScanBytes, ordering: .relaxed) }
         let name = root == "/" ? "/" : (root as NSString).lastPathComponent
         let folders = FolderQueue(root: root, name: name, context: context).run()
+        progress.evaluating.store(true, ordering: .relaxed)
 
         var tree = DiskUsageTree(nodes: [], rootPath: root)
         var shared: [SharedFile] = []
@@ -112,6 +120,13 @@ enum DiskUsageScanner {
         var allocatedSize: UInt64
         var cloneID: UInt64
         var cloneReferenceCount: UInt32
+
+        /// The share of its allocation that counts toward scan progress: data
+        /// shared by hard links or clones counts once over all its copies.
+        var progressBytes: UInt64 {
+            let copies = max(1, linkCount, cloneReferenceCount)
+            return allocatedSize / UInt64(copies)
+        }
     }
 
     /// A scanned file before it is placed in the flat tree.
@@ -223,7 +238,7 @@ enum DiskUsageScanner {
                     subfolders.append((entryPath, entry.name))
                 } else {
                     progress.files.add(1, ordering: .relaxed)
-                    progress.bytes.add(entry.allocatedSize, ordering: .relaxed)
+                    progress.bytes.add(entry.progressBytes, ordering: .relaxed)
                     files.append(PendingFile(
                         name: entry.name, size: entry.allocatedSize,
                         linkKey: entry.linkCount > 1 ? LinkKey(device: entry.device, fileID: entry.fileID) : nil,
@@ -429,61 +444,126 @@ enum DiskUsageScanner {
     /// the sum of its children.
     private static func countSharedDataOnce(in tree: inout DiskUsageTree, shared: [SharedFile]) {
         if !shared.isEmpty {
-            var linkOwners: [LinkKey: (node: Int, path: [UInt8])] = [:]
-            var cloneOwners: [UInt64: (node: Int, path: [UInt8])] = [:]
-            linkOwners.reserveCapacity(shared.count)
-            // Node ids are in path order before sorting, and so are the shared
-            // files: one pass keeps the folder path in a single buffer, and on
-            // equal paths the earlier file stays the owner.
-            var path = lowercasedBytes(tree.rootPath == "/" ? "" : tree.rootPath)
-            var folders: [(node: Int, length: Int)] = [(tree.root, path.count)]
-            var next = 0
-            for id in 1..<tree.nodes.count where next < shared.count {
-                let node = tree.nodes[id]
-                while let top = folders.last, top.node != node.parent { folders.removeLast() }
-                path.removeSubrange(folders[folders.count - 1].length...)
-                path.append(UInt8(ascii: "/"))
-                path.append(contentsOf: lowercasedBytes(node.name))
-                if node.kind == .directory {
-                    folders.append((id, path.count))
-                    continue
-                }
-                guard shared[next].node == id else { continue }
-                let file = shared[next]
-                next += 1
-                if let key = file.linkKey,
-                   linkOwners[key].map({ path.lexicographicallyPrecedes($0.path) }) ?? true {
-                    linkOwners[key] = (id, path)
-                }
-                if let key = file.cloneID,
-                   cloneOwners[key].map({ path.lexicographicallyPrecedes($0.path) }) ?? true {
-                    cloneOwners[key] = (id, path)
+            // How many files of each group this scan found. Hard links and
+            // clones are independent, so both are counted at once.
+            var linkCounts: [LinkKey: Int] = [:]
+            var cloneCounts: [UInt64: Int] = [:]
+            DispatchQueue.concurrentPerform(iterations: 2) { pass in
+                if pass == 0 {
+                    var counts: [LinkKey: Int] = [:]
+                    for file in shared { if let key = file.linkKey { counts[key, default: 0] += 1 } }
+                    linkCounts = counts
+                } else {
+                    var counts: [UInt64: Int] = [:]
+                    for file in shared { if let key = file.cloneID { counts[key, default: 0] += 1 } }
+                    cloneCounts = counts
                 }
             }
-            for file in shared {
-                if let key = file.linkKey, linkOwners[key]?.node != file.node {
+            // Only a group with several files here needs their paths compared.
+            let compared = shared.map { file in
+                (file.linkKey.map { linkCounts[$0, default: 0] > 1 } ?? false)
+                    || (file.cloneID.map { cloneCounts[$0, default: 0] > 1 } ?? false)
+            }
+            let paths = sharedFilePaths(of: tree, shared: shared, needed: compared)
+            // The owner of a group is the index of its file whose path sorts
+            // first; on equal paths the earlier file stays the owner.
+            var linkOwners: [LinkKey: Int] = [:]
+            var cloneOwners: [UInt64: Int] = [:]
+            DispatchQueue.concurrentPerform(iterations: 2) { pass in
+                if pass == 0 {
+                    var owners: [LinkKey: Int] = [:]
+                    for index in shared.indices where compared[index] {
+                        guard let key = shared[index].linkKey, linkCounts[key, default: 0] > 1 else { continue }
+                        if let owner = owners[key], !sortsFirst(paths[index], paths[owner]) { continue }
+                        owners[key] = index
+                    }
+                    linkOwners = owners
+                } else {
+                    var owners: [UInt64: Int] = [:]
+                    for index in shared.indices where compared[index] {
+                        guard let key = shared[index].cloneID, cloneCounts[key, default: 0] > 1 else { continue }
+                        if let owner = owners[key], !sortsFirst(paths[index], paths[owner]) { continue }
+                        owners[key] = index
+                    }
+                    cloneOwners = owners
+                }
+            }
+            for index in shared.indices where compared[index] {
+                let file = shared[index]
+                if let key = file.linkKey, let owner = linkOwners[key], owner != index {
                     tree.nodes[file.node].size = 0
-                } else if let key = file.cloneID, cloneOwners[key]?.node != file.node {
+                } else if let key = file.cloneID, let owner = cloneOwners[key], owner != index {
                     tree.nodes[file.node].size = 0
                 }
             }
         }
-        // Parents precede their children, so a reverse pass sums bottom-up.
-        for id in tree.nodes.indices.reversed() where tree.nodes[id].kind == .directory {
-            tree.nodes[id].size = tree.nodes[id].children.reduce(0) { $0 + tree.nodes[$1].size }
+        // Parents precede their children: in reverse order every folder is
+        // complete before it adds itself to its own parent.
+        tree.nodes.withUnsafeMutableBufferPointer { nodes in
+            for id in nodes.indices where nodes[id].kind == .directory { nodes[id].size = 0 }
+            for id in nodes.indices.reversed() {
+                if let parent = nodes[id].parent { nodes[parent].size += nodes[id].size }
+            }
         }
     }
 
-    private static func sortChildren(in tree: inout DiskUsageTree) {
-        for id in tree.nodes.indices where tree.nodes[id].children.count > 1 {
-            // Sort a copy: sorting in place while reading siblings would copy the node array.
-            var children = tree.nodes[id].children
-            children.sort { lhs, rhs in
-                let left = tree.nodes[lhs], right = tree.nodes[rhs]
-                return left.size != right.size ? left.size > right.size : left.name < right.name
+    /// The full path of every shared file that is `needed`, ASCII letters
+    /// lowered; the others stay empty. Node ids are in path order before
+    /// sorting, and so are the shared files, so one pass keeps the open
+    /// folder's path in a single buffer.
+    private static func sharedFilePaths(of tree: DiskUsageTree, shared: [SharedFile], needed: [Bool]) -> [[UInt8]] {
+        var paths = [[UInt8]](repeating: [], count: shared.count)
+        tree.nodes.withUnsafeBufferPointer { nodes in
+            var path = lowercasedBytes(tree.rootPath == "/" ? "" : tree.rootPath)
+            var folders: [(node: Int, length: Int)] = [(tree.root, path.count)]
+            for (index, file) in shared.enumerated() where needed[index] {
+                // The folders between the previous needed file and this one.
+                var chain: [Int] = []
+                var folder = nodes[file.node].parent
+                while let candidate = folder, !folders.contains(where: { $0.node == candidate }) {
+                    chain.append(candidate)
+                    folder = nodes[candidate].parent
+                }
+                while let top = folders.last, top.node != folder { folders.removeLast() }
+                path.removeSubrange(folders[folders.count - 1].length...)
+                for added in chain.reversed() {
+                    path.append(UInt8(ascii: "/"))
+                    appendLowercased(nodes[added].name, to: &path)
+                    folders.append((added, path.count))
+                }
+                var own = path
+                own.append(UInt8(ascii: "/"))
+                appendLowercased(nodes[file.node].name, to: &own)
+                paths[index] = own
             }
-            tree.nodes[id].children = children
         }
+        return paths
+    }
+
+    private static func sortChildren(in tree: inout DiskUsageTree) {
+        let folders = tree.nodes.indices.filter { tree.nodes[$0].children.count > 1 }
+        guard !folders.isEmpty else { return }
+        // Sorted on every core outside the node array, then written back: the
+        // comparisons read sizes and names in place instead of copying nodes.
+        let slices = min(folders.count, max(1, ProcessInfo.processInfo.activeProcessorCount * 4))
+        var sorted = [[Int]](repeating: [], count: folders.count)
+        tree.nodes.withUnsafeBufferPointer { nodes in
+            sorted.withUnsafeMutableBufferPointer { output in
+                let base = output.baseAddress!
+                DispatchQueue.concurrentPerform(iterations: slices) { slice in
+                    // Each slice writes only its own entries.
+                    for index in stride(from: slice, to: folders.count, by: slices) {
+                        var children = nodes[folders[index]].children
+                        children.sort { lhs, rhs in
+                            let left = nodes[lhs].size, right = nodes[rhs].size
+                            return left != right ? left > right : nodes[lhs].name < nodes[rhs].name
+                        }
+                        (base + index).pointee = children
+                    }
+                }
+            }
+        }
+        for (index, folder) in folders.enumerated() { tree.nodes[folder].children = sorted[index] }
     }
 
     // MARK: - Paths
@@ -491,6 +571,21 @@ enum DiskUsageScanner {
     /// UTF-8 bytes with ASCII letters lowered, the order shared files are compared in.
     private static func lowercasedBytes(_ text: String) -> [UInt8] {
         text.utf8.map { $0 >= 65 && $0 <= 90 ? $0 + 32 : $0 }
+    }
+
+    /// Byte order, a shorter path first when it is a prefix of the other.
+    static func sortsFirst(_ lhs: [UInt8], _ rhs: [UInt8]) -> Bool {
+        lhs.withUnsafeBufferPointer { left in
+            rhs.withUnsafeBufferPointer { right in
+                let common = min(left.count, right.count)
+                let order = common == 0 ? 0 : memcmp(left.baseAddress!, right.baseAddress!, common)
+                return order != 0 ? order < 0 : left.count < right.count
+            }
+        }
+    }
+
+    private static func appendLowercased(_ text: String, to bytes: inout [UInt8]) {
+        for byte in text.utf8 { bytes.append(byte >= 65 && byte <= 90 ? byte + 32 : byte) }
     }
 
     private static func normalized(_ path: String) -> String {

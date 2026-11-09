@@ -44,7 +44,8 @@ final class DiskAnalyzerService: ObservableObject {
     @Published private(set) var folders: [DiskAnalyzerFolder] = []
     @Published private(set) var results: [String: DiskUsageReport] = [:] {
         didSet {
-            // Colours follow each result's tree; work them out once per tree.
+            // Colours follow each result's tree; a fresh scan brings its own
+            // from the background, a grafted tree is worked out here.
             for (path, report) in results where hues[path]?.count != report.tree.nodes.count {
                 hues[path] = DiskUsageRingLayout.hues(of: report.tree)
             }
@@ -239,11 +240,15 @@ final class DiskAnalyzerService: ObservableObject {
         let progress = newScan.progress
         scanQueue.async { [weak self] in
             let tree = DiskUsageScanner.scan(newScan.path, volume: volume, progress: progress)
-            DispatchQueue.main.async { self?.finish(newScan, tree: tree) }
+            // Work that grows with the tree stays off the main thread.
+            let hues = newScan.graftInto == nil && !progress.isCancelled ? DiskUsageRingLayout.hues(of: tree) : nil
+            let report = hues == nil ? nil : DiskUsageReport(tree: tree)
+            DispatchQueue.main.async { self?.finish(newScan, tree: tree, report: report, hues: hues) }
         }
     }
 
-    private func finish(_ finished: Scan, tree: DiskUsageTree) {
+    private func finish(_ finished: Scan, tree: DiskUsageTree, report prepared: DiskUsageReport? = nil,
+                        hues preparedHues: [Double]? = nil) {
         guard scan?.progress === finished.progress else { return }
         scan = nil
         progressTimer?.invalidate()
@@ -264,8 +269,9 @@ final class DiskAnalyzerService: ObservableObject {
             }
             return
         }
-        var report = DiskUsageReport(tree: tree)
+        var report = prepared ?? DiskUsageReport(tree: tree)
         report.apply(marks: marks)
+        if let preparedHues { hues[finished.path] = preparedHues }
         results[finished.path] = report
         page = .report(finished.path)
         Permissions.shared.refresh()

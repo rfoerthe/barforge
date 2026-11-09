@@ -361,6 +361,10 @@ enum DiskUsageTests {
     }
 
     private static func recordDecoding(_ suite: TestSuite) {
+        let order: [[UInt8]] = [[], [0x2F], [0x2F, 0x61], [0x2F, 0x61, 0x2D], [0x2F, 0x61, 0x2F], [0x2F, 0x62]]
+        suite.expect(zip(order, order.dropFirst()).allSatisfy { DiskUsageScanner.sortsFirst($0, $1) && !DiskUsageScanner.sortsFirst($1, $0) }
+                     && !DiskUsageScanner.sortsFirst([0x2F, 0x61], [0x2F, 0x61]),
+                     "shared paths sort by bytes, a prefix first, equal paths not before each other")
         var record = [UInt8](repeating: 0, count: 12)
         record[0] = 12
         suite.expect(record.withUnsafeBytes { DiskUsageScanner.decodeEntry($0) } == nil,
@@ -434,7 +438,14 @@ enum DiskUsageTests {
         } else {
             suite.expect(false, "the symbolic link is in the result")
         }
-        suite.expect(progress.fraction == 1, "a finished folder scan reports full progress")
+        suite.expect(progress.fraction == 1 && progress.isEvaluating,
+                     "a finished scan reports full progress and that its result was put together")
+        let reading = DiskUsageScanProgress()
+        reading.doneMillionths.store(2_000_000, ordering: .relaxed)
+        reading.expectedBytes.store(10, ordering: .relaxed)
+        reading.bytes.store(50, ordering: .relaxed)
+        suite.expect(reading.fraction < 1 && !reading.isEvaluating,
+                     "progress never shows full while folders are still being read")
         suite.expect(progress.files.load(ordering: .relaxed) == UInt64(fileNodes.count),
                      "progress counts every file once")
         suite.expect(tree.nodes.indices.allSatisfy { tree.nodes[$0].kind != .file
@@ -458,7 +469,10 @@ enum DiskUsageTests {
         suite.expect(bulk.first.map { $0.cloneID != 0 && $0.cloneReferenceCount > 1 } == true,
                      "the bulk reader reports a clone's id and its reference count")
 
-        let tree = DiskUsageScanner.scan(folder)
+        let sharedProgress = DiskUsageScanProgress()
+        let tree = DiskUsageScanner.scan(folder, progress: sharedProgress)
+        suite.expect(sharedProgress.bytes.load(ordering: .relaxed) == tree.rootSize,
+                     "scan progress counts hard-linked and cloned data once, as the result does")
         let linkSize = allocated(folder + "/Zeta/original.bin")
         let cloneSize = allocated(folder + "/Beta/data.bin")
         suite.expect(node(tree, "alpha/hardlink.bin").map { tree.nodes[$0].size } == linkSize

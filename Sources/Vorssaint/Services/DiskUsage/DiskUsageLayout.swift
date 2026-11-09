@@ -94,16 +94,20 @@ enum DiskUsageRingLayout {
         var hues = [Double](repeating: 0, count: tree.nodes.count)
         let free = Double(tree.freeBytes(under: tree.root))
         let used = max(1, Double(tree.rootSize) - free)
-        func walk(_ folder: Int, start: Double) {
-            var position = start
-            for child in tree.nodes[folder].children where tree.nodes[child].kind != .free {
-                let share = Double(tree.nodes[child].size) / used
-                hues[child] = (position + share / 2).truncatingRemainder(dividingBy: 1)
-                if tree.nodes[child].kind == .directory { walk(child, start: position) }
-                position += share
+        // Where each folder's span starts. Parents precede their children, so
+        // one pass in node order places every folder before its contents.
+        var starts = [Double](repeating: 0, count: tree.nodes.count)
+        tree.nodes.withUnsafeBufferPointer { nodes in
+            for folder in nodes.indices where nodes[folder].kind == .directory {
+                var position = starts[folder]
+                for child in nodes[folder].children where nodes[child].kind != .free {
+                    let share = Double(nodes[child].size) / used
+                    hues[child] = (position + share / 2).truncatingRemainder(dividingBy: 1)
+                    starts[child] = position
+                    position += share
+                }
             }
         }
-        walk(tree.root, start: 0)
         return hues
     }
 }

@@ -189,13 +189,20 @@ private struct DiskAnalyzerScanningView: View {
         VStack(spacing: 14) {
             Text(String(format: strings.scanningFormat, service.displayName(ofPath: path)))
                 .font(.title3.weight(.semibold))
-            ProgressView(value: progress?.fraction ?? 0)
-                .frame(width: 360)
+            if progress?.isEvaluating == true {
+                // Every folder is read; the result is being put together.
+                ProgressView()
+                    .progressViewStyle(.linear)
+                    .frame(width: 360)
+            } else {
+                ProgressView(value: progress?.fraction ?? 0)
+                    .frame(width: 360)
+            }
             Text(String(format: strings.filesFormat,
                         DiskAnalyzerFormat.count(progress?.files.load(ordering: .relaxed) ?? 0)))
                 .font(.system(size: 12)).monospacedDigit().foregroundStyle(.secondary)
-            Text(progress?.currentPath ?? "")
-                .font(.system(size: 11)).foregroundStyle(.tertiary)
+            Text(progress?.isEvaluating == true ? strings.evaluating : progress?.currentPath ?? "")
+                .font(.system(size: 11)).foregroundStyle(progress?.isEvaluating == true ? .secondary : .tertiary)
                 .lineLimit(1).truncationMode(.middle)
                 .frame(maxWidth: 480)
             Button(strings.stop) { service.cancelScan() }
