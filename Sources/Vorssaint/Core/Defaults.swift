@@ -121,6 +121,7 @@ enum DefaultsKey {
     static let switcherShowShortcutHints = "switcherShowShortcutHints" // show the shortcut bar under the large-icon switcher
     static let switcherAppearanceDelay = "switcherAppearanceDelay" // milliseconds the shortcut must be held before the panel appears (SwitcherSupport.appearanceDelayMillisecondsRange)
     static let switcherInstantSelection = "switcherInstantSelection" // skip selection and reveal animations while browsing
+    static let switcherIgnoreHoverSelection = "switcherIgnoreHoverSelection" // pointer movement does not change the highlight; click still commits
     static let switcherScreenPlacement = "switcherScreenPlacement" // SwitcherScreenPlacement raw value: which display the panel opens on
     static let switcherCurrentDisplayOnly = "switcherCurrentDisplayOnly" // list only windows on the display under the pointer (issue #1391)
     static let switcherMaxColumns = "switcherMaxColumns" // 0 = Auto, else the most items per row (SwitcherSupport.maxColumnsRange)
@@ -233,6 +234,9 @@ enum DefaultsKey {
     // Set once the paths cached before paired discovery requests have been
     // dropped, so a monitor written off then is classified again exactly once.
     static let brightnessDDCWriteOnlyPathsRechecked = "brightnessDDCWriteOnlyPathsRechecked"
+    // The read checksum fix needs its own recheck even if the paired-request
+    // migration already ran and cached the monitor as write-only again.
+    static let brightnessDDCReadChecksumRechecked = "brightnessDDCReadChecksumRechecked"
     // Per-monitor connection paths a person has told this app to dim in
     // software: the only way to know a write-only channel swallows its writes
     // is to watch the panel, which no probe can do. Issue #1589.
@@ -355,6 +359,7 @@ enum DefaultsKey {
     static let panelControlMouseButtonShortcuts = "panelControlMouseButtonShortcuts"
     static let panelControlMouseAcceleration = "panelControlMouseAcceleration"
     static let panelControlLinearScroll = "panelControlLinearScroll"
+    static let panelControlSmoothScroll = "panelControlSmoothScroll"
     static let panelControlMouseClickDebounce = "panelControlMouseClickDebounce"
     static let panelControlSpacesOrder = "panelControlSpacesOrder"
     // Quick-control categories start collapsed and remember being opened.
@@ -558,6 +563,8 @@ enum DefaultsKey {
     static let clipboardHistoryLayout = "clipboardHistoryLayout" // cards | list, how the history window shows entries
     static let clipboardHistoryWindowWidth = "clipboardHistoryWindowWidth" // the list window's chosen size
     static let clipboardHistoryWindowHeight = "clipboardHistoryWindowHeight"
+    static let clipboardHistoryWindowX = "clipboardHistoryWindowX"
+    static let clipboardHistoryWindowY = "clipboardHistoryWindowY"
     static let clipboardHistoryMenuBarPreview = "clipboardHistoryMenuBarPreview" // show latest copy next to the menu bar icon
     static let clipboardHistoryMenuBarPreviewLength = "clipboardHistoryMenuBarPreviewLength" // characters shown before truncating
 
@@ -633,6 +640,7 @@ enum DefaultsKey {
     static let micMuteSavedVolume = "micMuteSavedVolume"     // input volume to restore on unmute (pre 3.2.0 state)
     static let micMuteSavedVolumes = "micMuteSavedVolumes"   // [device uid: input volume] to restore on unmute
     static let micMuteSavedChannelVolumes = "micMuteSavedChannelVolumes" // [device uid: [channel: input volume]] to restore on unmute
+    static let micMuteSavedControls = "micMuteSavedControls" // [device uid: [selector:element: original value]] pending restoration
     static let micMuteMutedDevices = "micMuteMutedDevices"   // uids of the devices this app muted
     static let micMuteMenuBarIndicator = "micMuteMenuBarIndicator" // badge the status icon while muted
     static let quickLauncherShortcutEnabled = "quickLauncherShortcutEnabled"
@@ -756,6 +764,7 @@ enum DefaultsKey {
     static let windowEdgeSnapEnabled = "windowEdgeSnapEnabled"
     static let windowEdgeSnapDisabledZones = "windowEdgeSnapDisabledZones" // comma-separated visual zone ids
     static let windowEdgeSnapZoneActions = "windowEdgeSnapZoneActions" // zone=action entries, + between split areas
+    static let windowEdgeSnapRestoreOnDrag = "windowEdgeSnapRestoreOnDrag" // dragging a snapped window away restores its earlier size
     static let windowGestureEnabled = "windowGestureEnabled"
     static let windowGestureModifiers = "windowGestureModifiers"
     static let windowGestureRaiseWindow = "windowGestureRaiseWindow"
@@ -1081,6 +1090,7 @@ enum Defaults {
         DefaultsKey.switcherShowShortcutHints: true,
         DefaultsKey.switcherAppearanceDelay: SwitcherSupport.defaultAppearanceDelayMilliseconds,
         DefaultsKey.switcherInstantSelection: false,
+        DefaultsKey.switcherIgnoreHoverSelection: false,
         DefaultsKey.switcherScreenPlacement: SwitcherScreenPlacement.fallback.rawValue,
         DefaultsKey.switcherCurrentDisplayOnly: false,
         DefaultsKey.switcherMaxColumns: 0,
@@ -1281,6 +1291,7 @@ enum Defaults {
         DefaultsKey.panelControlMouseButtonShortcuts: true,
         DefaultsKey.panelControlMouseAcceleration: true,
         DefaultsKey.panelControlLinearScroll: true,
+        DefaultsKey.panelControlSmoothScroll: true,
         DefaultsKey.panelControlMouseClickDebounce: true,
         DefaultsKey.panelControlSpacesOrder: true,
         DefaultsKey.panelControlWindowsExpanded: false,
@@ -1611,6 +1622,7 @@ enum Defaults {
         DefaultsKey.windowEdgeSnapEnabled: false,
         DefaultsKey.windowEdgeSnapDisabledZones: "",
         DefaultsKey.windowEdgeSnapZoneActions: "",
+        DefaultsKey.windowEdgeSnapRestoreOnDrag: false,
         DefaultsKey.windowGestureEnabled: false,
         DefaultsKey.windowGestureModifiers: WindowGestureSupport.defaultModifierStorageValue,
         DefaultsKey.windowGestureRaiseWindow: false,
@@ -1697,14 +1709,15 @@ enum Defaults {
         defaults.removeObject(forKey: "clipboardHistorySkipSensitive")
     }
 
-    /// Discovery used to send one request per read, which reads a monitor that
-    /// answers only paired requests as write-only. That verdict is cached and
-    /// never re-probed, so it would outlive the fix: drop the cache once.
+    /// Both unpaired discovery requests and the old read checksum could cache
+    /// a readable monitor as write-only. Recheck after the checksum fix even
+    /// if the paired-request migration ran; keep later verdicts intact.
     static func recheckBrightnessDDCWriteOnlyPaths(in defaults: UserDefaults) {
-        guard !defaults.bool(forKey: DefaultsKey.brightnessDDCWriteOnlyPathsRechecked) else {
+        guard !defaults.bool(forKey: DefaultsKey.brightnessDDCReadChecksumRechecked) else {
             return
         }
         defaults.set(true, forKey: DefaultsKey.brightnessDDCWriteOnlyPathsRechecked)
+        defaults.set(true, forKey: DefaultsKey.brightnessDDCReadChecksumRechecked)
         defaults.removeObject(forKey: DefaultsKey.brightnessDDCWriteOnlyPaths)
     }
 
