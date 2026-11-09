@@ -21,6 +21,34 @@ Based on Vorssaint 3.4.3.
 ### Added
 - An optional Disk Analyzer shows what fills a disk or folder as rings or tiles. Hard links and APFS clones count once, apps and other packages count as one item until you open them, and a disk scan also shows hidden, purgeable and free space. Collect files and folders, then move them to the Trash together after a 5-second countdown you can stop. Open it from the Utilities section of the panel, a disk's tools, the quick panel, the Command Bar or the menu bar icon's right-click menu. Install it under Settings → Features. Without Full Disk Access, protected folders count as hidden space.
 - `Barforge --disk-usage PATH` prints what the Disk Analyzer counts for a folder, without opening a window.
+- The window switcher can ignore hover selection while preserving clicks, keyboard navigation and hovered-window closing. Overflowing icon rows still slide at their edges. The option starts off. Thanks to @victorioustr.
+- Edge snapping can restore a window's previous size when it is dragged by its title bar, preserving manual resizing and using the size confirmed by the app. The option starts off and respects ignored apps. Thanks to @nisayera.
+- Both uninstaller result views offer a Select all checkbox with a mixed state, including optional rows when explicitly selected and preserving removal safeguards. Thanks to @heyseere.
+- Settings can live in your dotfiles: at each normal launch Barforge reads an optional `~/.config/barforge/settings.plist`, or the `barforge` folder under an absolute `XDG_CONFIG_HOME`, and applies only the settings it declares. Other preferences and snippets stay local, and the file is only read. See [Keeping settings in your dotfiles](docs/TROUBLESHOOTING.md#keeping-settings-in-your-dotfiles).
+
+### Changed
+- Barforge brings the further changes Vorssaint made after 3.4.3 since Barforge 1.0.5, listed here, except those for the Dynamic Island with its AI Agents, which Barforge does not include.
+- GIF exports can retain the full edited resolution and offer scale and frame-rate controls, with captions kept proportional at smaller sizes. Thanks to @COMEBACKISREAL.
+- Large clipboard images can be resized before opening in the screenshot editor, preserving native image formats, the primary HEIC image and its orientation. Thanks to @kit101.
+- Supported DDC monitors can use software picture dimming instead of hardware brightness commands, with pending brightness changes cancelled when switching modes. Thanks to @yavuzmeteafsar.
+- Keep Awake and Quick Snippet Menu shortcuts can be cleared without disabling their features, remain cleared after restarts and backup imports, and check conflicts when reset. Thanks to @maxmeis.
+- Clipboard history remembers the list window's position after moves and resizes, keeping it visible when displays change. Thanks to @maxmeis.
+
+### Fixed
+- Save as GIF and Copy as GIF export faster and use less memory, decoding the recording in order and encoding on the GPU when supported, with the existing encoder as a fallback.
+- The window switcher opens and switches more efficiently, reduces flashes when restoring minimized windows and cancels outdated activation requests after a newer selection. Thanks to @zhanghao87.
+- The window switcher keeps its opening shortcuts working during secure input, including All windows and quick modifier releases. Q/W remain unavailable in this mode and are blocked while the switcher owns the selection. Thanks to @phatina.
+- Focus follows mouse recovers keyboard focus when the usual no-raise activation fails, while preserving window order when Bring the window to the front is off. Thanks to @jerome-queck.
+- Window dragging and resizing find the target when an app's child controls cannot be identified through Accessibility, with bounded queries to limit delays from unresponsive apps. Thanks to @carlhuareforge.
+- Mic Mute also uses input volume and reapplies supported mute controls when another app changes them, while preserving each microphone's previous channel settings for restoration. Device and app limitations still apply. Thanks to @samueljim.
+- Volume mixer smooths volume changes and applies mute immediately across interruptions in captured audio. Thanks to @Chubi01.
+- Brightness controls correctly validate DDC replies and refresh previously cached monitor ranges. Thanks to @nikigan.
+- Recording previews and exports reuse GPU rendering resources to reduce memory growth, while preserving the orientation of imported videos. Thanks to @Zekuath and @zepeng-jin.
+- Picking a clipboard entry in Windows App or Microsoft Remote Desktop leaves it copied for manual paste, avoiding a stray "v" in the remote session. Thanks to @mevichitra.
+- Compact media workspaces use one scroll region, keeping controls reachable and allowing floating panels to grow again when more space becomes available. Thanks to @kit101.
+- Command Bar outlines selected results and actions so the selection remains visible on dark surfaces, preserving red for destructive actions. Thanks to @heyseere.
+- The Cleaner leaves an Application Support folder named after a vendor's domain alone while an app of that vendor is installed.
+- The menu panel's Controls section lists Smooth scrolling with the other scrolling switches.
 
 ## [1.0.6-beta.1] - 2026-11-03
 

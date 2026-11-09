@@ -11,6 +11,7 @@ if let command = SettingsBackupSupport.command(in: CommandLine.arguments) {
 }
 
 SuperKeyMappingGuard.runIfRequestedAndExit()
+let configuredFeatureKeys = SettingsBackup.applyConfigFileAtLaunch()
 Defaults.register()
 MouseAccelerationGuard.runIfRequestedAndExit()
 MouseAccelerationService.recoverPendingAtLaunch()
@@ -28,5 +29,6 @@ if CommandLine.arguments.contains("--uninstall") {
 
 let app = NSApplication.shared
 let delegate = AppDelegate()
+delegate.configuredFeatureKeys = configuredFeatureKeys
 app.delegate = delegate
 app.run()

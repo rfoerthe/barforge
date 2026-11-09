@@ -18,7 +18,8 @@ struct PanelMediaView: View {
     var onClose: () -> Void
 
     var body: some View {
-        MediaWorkspaceView(compact: true, onClose: onClose)
+        // Both the menu panel and launcher already scroll their utility content.
+        MediaWorkspaceView(compact: true, onClose: onClose, scrollsContent: false)
             .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
             .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
     }
@@ -128,11 +129,13 @@ struct MediaWorkspaceView: View {
 
     var compact: Bool
     var onClose: (() -> Void)?
+    private let scrollsContent: Bool
 
-    init(compact: Bool, onClose: (() -> Void)? = nil) {
+    init(compact: Bool, onClose: (() -> Void)? = nil, scrollsContent: Bool = true) {
         self.compact = compact
         self.onClose = onClose
         self.media = .shared
+        self.scrollsContent = scrollsContent
         _workspace = StateObject(wrappedValue: MediaWorkspaceSelection())
     }
 
@@ -217,15 +220,21 @@ struct MediaWorkspaceView: View {
         }
     }
 
-    private var layout: some View {
+    @ViewBuilder private var layout: some View {
+        if scrollsContent {
+            ScrollView { workspaceContent }
+        } else {
+            workspaceContent
+        }
+    }
+
+    private var workspaceContent: some View {
         VStack(alignment: .leading, spacing: compact ? 10 : 14) {
             header
             toolPicker
-            ScrollView {
-                content.padding(.trailing, 1)
-            }
-            .frame(maxHeight: compact ? 430 : .infinity)
+            content.padding(.trailing, 1)
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private var header: some View {
