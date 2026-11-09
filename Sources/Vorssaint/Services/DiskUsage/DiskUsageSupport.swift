@@ -130,3 +130,28 @@ enum DiskUsageSupport {
         return nil
     }
 }
+
+/// A folder the start page offers: scanned in this session, or kept across launches.
+struct DiskAnalyzerFolder: Identifiable, Equatable, Codable {
+    var id: String { path }
+    var path: String
+    var keptAt: Double?
+
+    var isKept: Bool { keptAt != nil }
+
+    /// Kept folders, oldest first.
+    static func loadKept(defaults: UserDefaults = .standard) -> [DiskAnalyzerFolder] {
+        guard let data = defaults.data(forKey: DefaultsKey.diskAnalyzerKeptFolders),
+              let folders = try? JSONDecoder().decode([DiskAnalyzerFolder].self, from: data) else { return [] }
+        return folders.filter(\.isKept).sorted { ($0.keptAt ?? 0) < ($1.keptAt ?? 0) }
+    }
+
+    static func saveKept(_ folders: [DiskAnalyzerFolder], defaults: UserDefaults = .standard) {
+        let kept = folders.filter(\.isKept)
+        if kept.isEmpty {
+            defaults.removeObject(forKey: DefaultsKey.diskAnalyzerKeptFolders)
+        } else if let data = try? JSONEncoder().encode(kept) {
+            defaults.set(data, forKey: DefaultsKey.diskAnalyzerKeptFolders)
+        }
+    }
+}

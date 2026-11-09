@@ -29,7 +29,7 @@ enum AppFeature: String, CaseIterable {
     // Tools
     case quickLauncher, quickToggles, quitApps, colorPicker, screenOCR, cleaningMode, mediaTools,
          cleaner, uninstaller, homebrew, appUpdates, screenshot, cameraPreview, radialMenu, scratchpad,
-         commandBar, screenRecorder, wallpaper, killProcess, portManager
+         commandBar, screenRecorder, wallpaper, killProcess, portManager, diskAnalyzer
     // System monitor, one entry per metric family (temperatures live with
     // their parent metric: CPU temp with CPU, battery temp with power).
     case monitorCPU, monitorGPU, monitorMemory, monitorNetwork, monitorDisk, monitorPower, connectedDevices
@@ -110,7 +110,8 @@ extension AppFeature {
             return .energyDisplay
         case .quickLauncher, .quickToggles, .quitApps, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
-             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager:
+             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
+             .diskAnalyzer:
             return .tools
         case .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
              .connectedDevices:
@@ -182,6 +183,7 @@ extension AppFeature {
         case .commandBar: return "command"
         case .killProcess: return "xmark.octagon"
         case .portManager: return "network"
+        case .diskAnalyzer: return "chart.pie"
         case .monitorCPU: return "cpu"
         case .monitorGPU: return "rectangle.connected.to.line.below"
         case .monitorMemory: return "memorychip"
@@ -257,7 +259,7 @@ extension AppFeature {
         case .windowLayout, .diskImageInstaller, .mixer, .micMute, .keepAwake,
              .quickLauncher, .quickToggles, .quitApps, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .scratchpad,
-             .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
+             .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager, .diskAnalyzer,
              .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
              .connectedDevices:
             return []
@@ -323,6 +325,8 @@ extension AppFeature {
         case .brightness: return [.accessibility]
         case .cleaner: return [.fullDiskAccess, .filesAndFolders, .notifications]
         case .uninstaller: return [.fullDiskAccess, .automationFinder]
+        // Without it, protected folders count as hidden space.
+        case .diskAnalyzer: return [.fullDiskAccess]
         case .homebrew: return [.appManagement]
         case .appUpdates: return [.notifications, .appManagement]
         case .diskImageInstaller: return [.appManagement]
@@ -414,7 +418,7 @@ extension AppFeature {
              .connectedDevices:
             return true
         case .focusFollowsMouse, .scrollHorizontal, .scrollZoom, .linearScroll, .diskImageInstaller, .audioPriority,
-             .wallpaper, .killProcess, .portManager, .spacesOrder, .logitechMX, .quitApps:
+             .wallpaper, .killProcess, .portManager, .spacesOrder, .logitechMX, .quitApps, .diskAnalyzer:
             return false
         }
     }

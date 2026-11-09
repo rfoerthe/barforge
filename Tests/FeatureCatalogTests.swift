@@ -387,7 +387,7 @@ enum FeatureCatalogTests {
 
         // MARK: Features hub catalog
 
-        suite.expect(AppFeature.allCases.count == 66, "feature catalog has 66 features")
+        suite.expect(AppFeature.allCases.count == 67, "feature catalog has 67 features")
         suite.expect(Set(AppFeature.allCases.map(\.rawValue)).count == AppFeature.allCases.count,
                "feature ids are unique")
         suite.expect(AppFeature.allCases.map(\.rawValue) == [
@@ -401,6 +401,7 @@ enum FeatureCatalogTests {
             "quickLauncher", "quickToggles", "quitApps", "colorPicker", "screenOCR", "cleaningMode", "mediaTools",
             "cleaner", "uninstaller", "homebrew", "appUpdates", "screenshot", "cameraPreview",
             "radialMenu", "scratchpad", "commandBar", "screenRecorder", "wallpaper", "killProcess", "portManager",
+            "diskAnalyzer",
             "monitorCPU", "monitorGPU", "monitorMemory", "monitorNetwork", "monitorDisk", "monitorPower",
             "connectedDevices",
         ], "feature ids are stable (they persist inside availability keys)")
@@ -1145,8 +1146,8 @@ enum FeatureCatalogTests {
         suite.expect(activeSet(.filesAndFolders, on: [DefaultsKey.whatsAppDownloadsEnabled]) == [.cleaner],
                "the cleaner owns WhatsApp Downloads folder access")
 
-        suite.expect(activeSet(.fullDiskAccess) == [.cleaner, .uninstaller],
-               "cleaner and uninstaller are on-demand full disk users")
+        suite.expect(activeSet(.fullDiskAccess) == [.cleaner, .uninstaller, .diskAnalyzer],
+               "cleaner, uninstaller and disk analyzer are on-demand full disk users")
         suite.expect(activeSet(.automationFinder, on: [DefaultsKey.finderCutPasteEnabled])
                 == [.finderCutPaste, .uninstaller, .quickToggles],
                "finder automation is used by cut and paste, the uninstaller and the quick toggles")

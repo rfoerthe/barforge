@@ -13,7 +13,7 @@ You can review or change every grant in System Settings, under Privacy and Secur
 | Camera | Yes | The camera preview mirror |
 | Bluetooth | Yes | Accessory battery levels in Monitor and Bluetooth on sleep |
 | Notifications | Yes | Keep awake, battery, Monitor and update alerts |
-| Full Disk Access | Yes | A deeper uninstaller scan |
+| Full Disk Access | Yes | A deeper uninstaller scan and complete Disk Analyzer results |
 | Administrator (one time) | Yes | Password free closed lid toggling |
 | Automation | Yes | Finder actions |
 | App Management | Yes | App installs, updates and removal |
@@ -120,9 +120,9 @@ The color picker also uses this permission for Barforge's magnifier and keyboard
 
 **Why it comes up.** The uninstaller hunts down the files an app leaves behind, like caches, preferences and logs. Some of those spots are protected by macOS and only open up with Full Disk Access.
 
-**What uses it.** The uninstaller, for a deeper scan.
+**What uses it.** The uninstaller, for a deeper scan, and the Disk Analyzer, to count protected folders such as Mail, Safari and Time Machine data.
 
-**If you say no.** The uninstaller still works and scans the places it can reach. It just might not surface files tucked away in protected folders.
+**If you say no.** The uninstaller still works and scans the places it can reach. It just might not surface files tucked away in protected folders. The Disk Analyzer counts the space it cannot read as hidden space and points you to the setting.
 
 **Optional.** Yes. There is no pop up for Full Disk Access. You add Barforge in System Settings, under Privacy and Security, Full Disk Access, and Barforge opens that pane for you when the feature calls for it.
 

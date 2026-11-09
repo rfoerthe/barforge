@@ -1701,6 +1701,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(portManagerItem)
         }
 
+        if AppFeature.diskAnalyzer.isAvailable {
+            let diskAnalyzerItem = NSMenuItem(title: FeatureStrings.diskAnalyzer(L10n.shared.language).title,
+                                              action: #selector(menuOpenDiskAnalyzer), keyEquivalent: "")
+            diskAnalyzerItem.target = self
+            menu.addItem(diskAnalyzerItem)
+        }
+
         if AppFeature.uninstaller.isAvailable {
             let uninstallItem = NSMenuItem(title: strings.uninstallerMenuItem,
                                            action: #selector(menuOpenUninstaller), keyEquivalent: "")
@@ -1761,6 +1768,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     @objc private func menuOpenPortManager() {
         SettingsRouter.shared.page = .portManager
         openSettingsWindow()
+    }
+
+    @objc private func menuOpenDiskAnalyzer() {
+        DiskAnalyzerService.shared.show()
     }
 
     @objc private func menuOpenUninstaller() {

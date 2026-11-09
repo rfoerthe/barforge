@@ -409,6 +409,9 @@ if (( TEST )); then
         Sources/Vorssaint/Services/DiskUsage/DiskUsageTree.swift
         Sources/Vorssaint/Services/DiskUsage/DiskUsageSupport.swift
         Sources/Vorssaint/Services/DiskUsage/DiskUsageScanner.swift
+        Sources/Vorssaint/Services/DiskUsage/DiskUsageReport.swift
+        Sources/Vorssaint/Services/DiskUsage/DiskUsageLayout.swift
+        Sources/Vorssaint/Core/DiskAnalyzerStrings.swift
         Sources/Vorssaint/Core/ForkBuildStrings.swift
         Sources/Vorssaint/Services/MouseClickDebounce/MouseClickDebounceSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift

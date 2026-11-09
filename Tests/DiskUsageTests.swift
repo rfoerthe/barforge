@@ -22,6 +22,241 @@ enum DiskUsageTests {
             readOnly(suite, root: root)
         }
         withFixture(suite) { root in cancellationAndDepth(suite, root: root) }
+        reportNavigation(suite)
+        reportCollector(suite)
+        ringLayout(suite)
+        tileLayout(suite)
+        keptFolders(suite)
+        strings(suite)
+    }
+
+    // MARK: - Report model
+
+    /// /r: A (a1 400, a2 200), B.app (b1 300), c 99, tiny 1 — 1000 bytes in all.
+    private static func sampleTree() -> DiskUsageTree {
+        func node(_ name: String, _ size: UInt64, _ kind: DiskUsageNode.Kind, _ parent: Int?,
+                  _ children: [Int] = [], package: Bool = false) -> DiskUsageNode {
+            DiskUsageNode(name: name, size: size, kind: kind, parent: parent, children: children, isPackage: package)
+        }
+        return DiskUsageTree(nodes: [
+            node("r", 1000, .directory, nil, [1, 4, 6, 7]),
+            node("A", 600, .directory, 0, [2, 3]),
+            node("a1", 400, .file, 1),
+            node("a2", 200, .file, 1),
+            node("B.app", 300, .directory, 0, [5], package: true),
+            node("b1", 300, .file, 4),
+            node("c", 99, .file, 0),
+            node("tiny", 1, .file, 0),
+        ], rootPath: "/r")
+    }
+
+    private static func reportNavigation(_ suite: TestSuite) {
+        var report = DiskUsageReport(tree: sampleTree())
+        suite.expect(report.current == 0 && !report.canGoBack && !report.canGoForward && !report.canGoUp,
+                     "a new result opens at its root with no history")
+        suite.expect(report.canOpen(1) && !report.canOpen(2) && !report.canOpen(4),
+                     "folders open, while files and closed packages are selected instead")
+        report.navigate(to: 1)
+        suite.expect(report.current == 1 && report.canGoBack && report.canGoUp, "opening a folder records history")
+        report.goBack()
+        suite.expect(report.current == 0 && report.canGoForward, "back returns to the previous folder")
+        report.goForward()
+        suite.expect(report.current == 1, "forward repeats the step")
+        report.goUp()
+        report.goBack()
+        suite.expect(report.current == 1 && report.canGoForward, "going up is a step of its own in the history")
+        report.navigate(to: 1)
+        report.goBack()
+        report.navigate(to: 4)
+        suite.expect(!report.canGoForward && report.history.last == 4, "a new step drops the way forward")
+        report.openPackage(4)
+        suite.expect(report.current == 4 && report.canOpen(4) && report.showsContents(of: 4),
+                     "an opened package shows its contents")
+        report.selected = 5
+        report.navigate(to: 0)
+        suite.expect(report.selected == nil, "moving to another folder clears the selection")
+
+        let listing = report.listing(of: 0)
+        suite.expect(listing.items == [1, 4, 6] && listing.smaller == [7],
+                     "items below the share threshold are grouped as smaller items")
+    }
+
+    private static func reportCollector(_ suite: TestSuite) {
+        var report = DiskUsageReport(tree: sampleTree())
+        report.navigate(to: 1)
+        report.apply(marks: ["/r/A"])
+        suite.expect(report.collected == [1] && report.isCollected(2) && !report.isCollected(4),
+                     "a mark collects the item and everything inside it")
+        suite.expect(report.sizes[0] == 400 && report.sizes[1] == 600 && report.collectedBytes == 600,
+                     "collected items leave the folders above them but keep their own size")
+        suite.expect(report.current == 0, "the open folder moves out of a collected one")
+        report.apply(marks: ["/r/A/a1", "/elsewhere", "/r/A/a1"])
+        suite.expect(report.collected == [2] && report.sizes[1] == 200 && report.sizes[0] == 600,
+                     "marks from other results are ignored and duplicates count once")
+        report.apply(marks: ["/"])
+        suite.expect(report.collected == [0], "a mark above the scanned folder covers the root")
+        report.apply(marks: [])
+        suite.expect(report.collected.isEmpty && report.sizes == report.tree.nodes.map(\.size),
+                     "clearing the marks restores every size")
+
+        suite.expect(DiskUsageMarks.adding("/r/A", to: ["/r/A/a1", "/r/c"]) == ["/r/c", "/r/A"],
+                     "a mark replaces the marks inside it")
+        suite.expect(DiskUsageMarks.adding("/r/A/a2", to: ["/r/A"]) == ["/r/A"],
+                     "a mark inside an existing one adds nothing")
+        suite.expect(DiskUsageMarks.adding("/r/AB", to: ["/r/A"]) == ["/r/A", "/r/AB"],
+                     "a sibling that shares a name prefix is a mark of its own")
+
+        let noSystem: (String) -> Bool = { _ in false }
+        let writable: (String) -> DiskUsageReadOnlyReason? = { _ in nil }
+        suite.expect(report.refusal(for: 0, isSystemPath: noSystem, readOnlyReason: writable) == .notAnItem,
+                     "the scanned folder itself cannot be collected")
+        suite.expect(report.refusal(for: 2, isSystemPath: noSystem, readOnlyReason: writable) == nil,
+                     "an ordinary file can be collected")
+        suite.expect(report.refusal(for: 2, isSystemPath: { $0 == "/r/A/a1" }, readOnlyReason: writable)
+                     == .neededBySystem(name: "a1"), "system paths are refused by name")
+        suite.expect(report.refusal(for: 2, isSystemPath: noSystem, readOnlyReason: { _ in .item }) == .locked(name: "a1")
+                     && report.refusal(for: 2, isSystemPath: noSystem, readOnlyReason: { _ in .folder("/r/A") })
+                         == .readOnlyFolder(path: "/r/A")
+                     && report.refusal(for: 2, isSystemPath: noSystem, readOnlyReason: { _ in .volume("/") })
+                         == .readOnlyVolume(path: "/"),
+                     "read-only items, folders and volumes are refused with their reason")
+        var backup = DiskUsageTree(nodes: [
+            DiskUsageNode(name: "Backups.backupdb", size: 1, kind: .directory, parent: nil, children: [1]),
+            DiskUsageNode(name: "Mac", size: 1, kind: .directory, parent: 0, children: []),
+        ], rootPath: "/Volumes/TM/Backups.backupdb")
+        backup.volumeCapacity = nil
+        suite.expect(DiskUsageReport(tree: backup).refusal(for: 1, isSystemPath: noSystem, readOnlyReason: writable)
+                     == .timeMachineBackup, "Time Machine backups are left to Time Machine")
+        var volume = sampleTree()
+        DiskUsageScanner.appendVolumeEntries(DiskUsageVolumeSpace(capacity: 5000, free: 3000, purgeable: 200),
+                                             to: &volume)
+        let volumeReport = DiskUsageReport(tree: volume)
+        suite.expect(volume.nodes.indices.filter { !volume.nodes[$0].kind.isOnDisk }.allSatisfy {
+            volumeReport.refusal(for: $0, isSystemPath: noSystem, readOnlyReason: writable) == .notAnItem
+        }, "hidden, purgeable and free space cannot be collected")
+        suite.expect(volumeReport.shownSize(0) == 2000, "a volume's root shows its used space without free space")
+
+        var edited = DiskUsageReport(tree: sampleTree())
+        edited.apply(marks: ["/r/A/a1"])
+        edited.navigate(to: 1)
+        edited.dropDeleted(path: "/r/A/a1")
+        suite.expect(edited.collected.isEmpty && edited.sizes[1] == 200 && edited.sizes[0] == 600
+                     && edited.tree.nodes[2].isRemoved && edited.current == 1,
+                     "a trashed item leaves the result and the collector")
+        let fresh = DiskUsageTree(nodes: [
+            DiskUsageNode(name: "A", size: 50, kind: .directory, parent: nil, children: [1]),
+            DiskUsageNode(name: "new", size: 50, kind: .file, parent: 0, children: []),
+        ], rootPath: "/r/A")
+        edited.apply(marks: ["/r/A/a2"])
+        edited.graft(fresh, into: 1)
+        suite.expect(edited.collected.isEmpty && edited.sizes[0] == 450 && edited.current == 1
+                     && edited.listing(of: 1).items.map { edited.tree.nodes[$0].name } == ["new"],
+                     "a rescanned folder replaces its contents and drops marks on what is gone")
+    }
+
+    // MARK: - Charts
+
+    private static func ringLayout(_ suite: TestSuite) {
+        var report = DiskUsageReport(tree: sampleTree())
+        report.openPackage(4)
+        report.navigate(to: 0)
+        let segments = DiskUsageRingLayout.segments(of: report)
+        let first = segments.filter { $0.ring == 1 }
+        suite.expect(first.map(\.item) == [.node(1), .node(4), .node(6), .smaller(0)] || first.map(\.item) == [.node(1), .node(4), .node(6)],
+                     "the first ring holds the open folder's items in order")
+        suite.expectClose(first.first { $0.item == .node(1) }?.span ?? 0, 0.6, "a folder's span is its share")
+        suite.expect(segments.contains { $0.ring == 2 && $0.item == .node(2) }
+                     && segments.contains { $0.ring == 2 && $0.item == .node(5) },
+                     "folders and opened packages continue into the next ring")
+        let a1 = segments.first { $0.item == .node(2) }
+        suite.expect(a1.map { abs($0.start - 0) < 1e-9 && abs($0.span - 0.4) < 1e-9 } == true,
+                     "children share their folder's angle")
+        suite.expect(DiskUsageRingLayout.hit(segments, radius: 0.1, angle: 0.1) == nil,
+                     "the centre disc is not a segment")
+        let ringOne = DiskUsageRingLayout.bounds(ofRing: 1)
+        suite.expect(DiskUsageRingLayout.hit(segments, radius: (ringOne.inner + ringOne.outer) / 2, angle: 0.7)?.item == .node(4),
+                     "a point inside a segment finds it")
+        let last = DiskUsageRingLayout.bounds(ofRing: DiskUsageRingLayout.ringCount)
+        suite.expect(abs(last.outer - 1) < 1e-9 && ringOne.inner == DiskUsageRingLayout.centreShare
+                     && (1..<DiskUsageRingLayout.ringCount).allSatisfy {
+                         abs(DiskUsageRingLayout.bounds(ofRing: $0).outer - DiskUsageRingLayout.bounds(ofRing: $0 + 1).inner) < 1e-9
+                     }, "the rings fill the space from the centre disc to the edge without gaps")
+
+        var collected = report
+        collected.apply(marks: ["/r/A"])
+        suite.expect(!DiskUsageRingLayout.segments(of: collected).contains { $0.item == .node(1) || $0.item == .node(2) },
+                     "collected items leave the rings")
+        var empty = DiskUsageReport(tree: DiskUsageTree(
+            nodes: [DiskUsageNode(name: "e", size: 0, kind: .directory, parent: nil, children: [])], rootPath: "/e"))
+        empty.selected = nil
+        suite.expect(DiskUsageRingLayout.segments(of: empty) == [.init(item: .empty, ring: 1, start: 0, span: 1)],
+                     "an empty folder draws one empty ring")
+        let hues = DiskUsageRingLayout.hues(of: sampleTree())
+        suite.expect(hues.allSatisfy { $0 >= 0 && $0 < 1 } && hues[1] != hues[4],
+                     "every item gets a hue, and neighbours differ")
+    }
+
+    private static func tileLayout(_ suite: TestSuite) {
+        let area = CGRect(x: 10, y: 20, width: 400, height: 300)
+        let values = [50.0, 30, 15, 5]
+        let rects = DiskUsageTileLayout.squarify(values, in: area)
+        let total = values.reduce(0, +)
+        suite.expect(rects.count == values.count, "every value gets a tile")
+        for (value, rect) in zip(values, rects) {
+            suite.expectClose(Double(rect.width * rect.height), value / total * Double(area.width * area.height),
+                              "a tile's area is its share", tol: 0.5)
+            suite.expect(area.insetBy(dx: -0.01, dy: -0.01).contains(rect), "tiles stay inside the area")
+        }
+        suite.expect(DiskUsageTileLayout.squarify([], in: area).isEmpty
+                     && DiskUsageTileLayout.squarify([1], in: .zero) == [.zero],
+                     "empty input or area lays out nothing visible")
+
+        var report = DiskUsageReport(tree: sampleTree())
+        report.openPackage(4)
+        report.navigate(to: 0)
+        let tiles = DiskUsageTileLayout.tiles(of: report, in: area)
+        let folder = tiles.first { $0.item == .node(1) }
+        suite.expect(folder?.isNested == true && folder?.depth == 1
+                     && tiles.contains { $0.item == .node(2) && $0.depth == 2 },
+                     "large folders show their contents inside, one level deeper")
+        if let folder, let inner = tiles.first(where: { $0.item == .node(2) }) {
+            suite.expect(folder.rect.contains(inner.rect)
+                         && DiskUsageTileLayout.hit(tiles, at: CGPoint(x: inner.rect.midX, y: inner.rect.midY))?.item == .node(2),
+                         "nested tiles lie inside their folder and are found first")
+        }
+        suite.expect(tiles.allSatisfy { $0.item != .node(7) }, "a tile too small to see is grouped")
+    }
+
+    private static func keptFolders(_ suite: TestSuite) {
+        let domain = "com.vorssaint.tests.disk-analyzer"
+        let defaults = UserDefaults(suiteName: domain)!
+        defaults.removePersistentDomain(forName: domain)
+        defer { defaults.removePersistentDomain(forName: domain) }
+        DiskAnalyzerFolder.saveKept([DiskAnalyzerFolder(path: "/b", keptAt: 20),
+                                     DiskAnalyzerFolder(path: "/session", keptAt: nil),
+                                     DiskAnalyzerFolder(path: "/a", keptAt: 10)], defaults: defaults)
+        suite.expect(DiskAnalyzerFolder.loadKept(defaults: defaults).map(\.path) == ["/a", "/b"],
+                     "only kept folders are saved, listed in the order they were kept")
+        DiskAnalyzerFolder.saveKept([], defaults: defaults)
+        suite.expect(defaults.object(forKey: DefaultsKey.diskAnalyzerKeptFolders) == nil,
+                     "forgetting the last folder removes the key")
+        suite.expect(!SettingsBackupSupport.exportKeys().contains(DefaultsKey.diskAnalyzerKeptFolders)
+                     && SettingsBackupSupport.exportKeys().contains(DefaultsKey.diskAnalyzerViewMode)
+                     && SettingsBackupSupport.exportKeys().contains(DefaultsKey.panelUtilityDiskAnalyzer),
+                     "the view choice and panel tile travel with backups, this Mac's folder paths do not")
+    }
+
+    private static func strings(_ suite: TestSuite) {
+        let english = DiskAnalyzerFeatureStrings.enUS
+        for language in AppLanguage.allCases where language != .enUS {
+            let text = FeatureStrings.diskAnalyzer(language)
+            suite.expect(text.title != english.title && text.hubDescription != english.hubDescription
+                         && text.collectorHint != english.collectorHint,
+                         "\(language.rawValue) translates the Disk Analyzer")
+        }
+        suite.expect(AppFeature.diskAnalyzer.group == .tools && !AppFeature.diskAnalyzer.installedByDefault
+                     && AppFeature.diskAnalyzer.permissions == [.fullDiskAccess],
+                     "the Disk Analyzer is an opt-in tool that can use Full Disk Access")
     }
 
     // MARK: - Fixture
