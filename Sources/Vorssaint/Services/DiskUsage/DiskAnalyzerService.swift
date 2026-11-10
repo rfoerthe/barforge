@@ -136,6 +136,7 @@ final class DiskAnalyzerService: ObservableObject {
         progressTimer = nil
         stopCountdown()
         results = [:]
+        displayNames = [:]
         marks = []
         message = nil
         hovered = nil
@@ -194,6 +195,8 @@ final class DiskAnalyzerService: ObservableObject {
     /// Discards a result; a folder that is not kept also leaves the list.
     func discardResult(_ path: String) {
         results[path] = nil
+        // Names are looked up again on demand; the results left refill theirs.
+        displayNames = [:]
         if page == .report(path) { page = .start }
         folders.removeAll { $0.path == path && !$0.isKept }
     }
