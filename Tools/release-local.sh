@@ -3,9 +3,9 @@
 # Copyright (C) 2026 Roland Foerther
 
 # Builds a signed, notarized DMG on this Mac with your own Developer ID, the way
-# the release workflow does for the official app: build, sign, notarize and
-# staple the app, package the DMG, sign, notarize and staple it, then verify
-# that Gatekeeper accepts both. The result is dist/Barforge-<version>.dmg.
+# the release workflow does for the official app: build from scratch, sign,
+# notarize and staple the app, package the DMG, sign, notarize and staple it,
+# then verify that Gatekeeper accepts both. Result: dist/Barforge-<version>.dmg.
 #
 # One-time setup:
 #   1. A "Developer ID Application" certificate with its private key in the
@@ -141,7 +141,11 @@ notarize() {
 }
 
 # ── App ──────────────────────────────────────────────────────────────────────
-echo "▸ Building…"
+echo "▸ Building from scratch…"
+# build.sh keeps the compiler's incremental records in build/objects, so a plain
+# build only recompiles what changed since the last one. A release must not
+# depend on what an earlier build left behind: start empty, like CI does.
+./build.sh --clean
 ./build.sh
 codesign --verify --deep --strict -R="$APP_REQUIREMENT" "$APP"
 # Read the details first: grep -q stops at the match, codesign then dies of

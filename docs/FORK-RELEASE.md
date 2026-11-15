@@ -49,7 +49,8 @@ From a clean, committed working tree:
 ./Tools/release-local.sh
 ```
 
-The script builds the app with `./build.sh` (which picks the Developer ID
+The script first runs `./build.sh --clean`, so nothing from an earlier build
+is reused, then builds the app with `./build.sh` (which picks the Developer ID
 automatically, with the hardened runtime and a secure timestamp), checks that
 it is signed by your team, notarizes and staples it, packages the DMG, signs,
 notarizes and staples that too, and finally checks that Gatekeeper reports
