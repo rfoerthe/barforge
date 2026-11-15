@@ -39,7 +39,7 @@ Per app volume, a real system monitor, a better app switcher, window snapping, D
 Choose individual features or start with a preset. Uninstalled features stop loading and disappear from the interface; reinstalling restores their settings. Setup asks only for the permissions your choices need.
 
 <p align="center">
-  <img src="docs/assets/readme/features-hub.png" width="720" alt="The Features hub in Settings, installing and uninstalling whole features">
+  <img src="docs/assets/readme/features-hub.png" width="720" alt="The Features hub in Settings with the install count, one-click bundles and per-feature install controls">
 </p>
 
 Reorder or hide panel sections, choose a compact layout, and export settings to another Mac or [keep them in your dotfiles](docs/TROUBLESHOOTING.md#keeping-settings-in-your-dotfiles). The app supports more than a dozen languages.
@@ -170,7 +170,7 @@ Barforge is local-first, with no account, analytics or tracking. The network is 
 Permissions get the same treatment. Every one is optional, the app explains each in plain words, shows which features actually use it, and even tells you when a permission you granted is no longer needed by anything, with a shortcut to revoke it.
 
 <p align="center">
-  <img src="docs/assets/readme/permissions.png" width="720" alt="The Permissions page showing what each permission does, which features use it, and an unused permission warning">
+  <img src="docs/assets/readme/permissions.png" width="720" alt="The Permissions page showing what each permission does, which features use it and whether it is granted">
 </p>
 
 See the [permissions guide](docs/PERMISSIONS.md) for which features need access and what remains available without it.
