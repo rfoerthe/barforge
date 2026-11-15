@@ -27,18 +27,18 @@ identifier `de.foerther.barforge`; the signing identity is your Developer ID.
    accept only Developer ID.
 
 2. **Notarization credentials**, stored once in the keychain under the profile
-   name `vorssaint-notary`. Either an App Store Connect API key (App Store
+   name `barforge-notary`. Either an App Store Connect API key (App Store
    Connect → Users and Access → Integrations → Team Keys, role *Developer*):
 
    ```bash
-   xcrun notarytool store-credentials vorssaint-notary --key AuthKey_XXXXXXXXXX.p8 --key-id XXXXXXXXXX --issuer <issuer-uuid>
+   xcrun notarytool store-credentials barforge-notary --key AuthKey_XXXXXXXXXX.p8 --key-id XXXXXXXXXX --issuer <issuer-uuid>
    ```
 
    or your Apple ID with an app-specific password from
    [account.apple.com](https://account.apple.com):
 
    ```bash
-   xcrun notarytool store-credentials vorssaint-notary --apple-id you@example.com --team-id <TEAMID>
+   xcrun notarytool store-credentials barforge-notary --apple-id you@example.com --team-id <TEAMID>
    ```
 
 ## Building a release

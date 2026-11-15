@@ -11,10 +11,10 @@
 #   1. A "Developer ID Application" certificate with its private key in the
 #      login keychain (Xcode → Settings → Accounts → Manage Certificates → +).
 #   2. Notarization credentials stored in the keychain under a profile name:
-#        xcrun notarytool store-credentials vorssaint-notary \
+#        xcrun notarytool store-credentials barforge-notary \
 #            --key AuthKey_XXXXXXXXXX.p8 --key-id XXXXXXXXXX --issuer <issuer-uuid>
 #      or, with an app-specific password instead of an API key:
-#        xcrun notarytool store-credentials vorssaint-notary \
+#        xcrun notarytool store-credentials barforge-notary \
 #            --apple-id you@example.com --team-id <TEAMID>
 #
 # Options:
@@ -24,7 +24,7 @@
 # Environment:
 #   SIGNING_IDENTITY  the identity to use when several Developer IDs are
 #                     installed (default: the only one)
-#   NOTARY_PROFILE    the notarytool keychain profile (default: vorssaint-notary)
+#   NOTARY_PROFILE    the notarytool keychain profile (default: barforge-notary)
 set -euo pipefail
 umask 022
 cd "$(dirname "$0")/.."
@@ -43,7 +43,7 @@ done
 APP_NAME="Barforge"
 APP="build/stage/$APP_NAME.app"
 APP_BUNDLE_ID="de.foerther.barforge"
-NOTARY_PROFILE="${NOTARY_PROFILE:-vorssaint-notary}"
+NOTARY_PROFILE="${NOTARY_PROFILE:-barforge-notary}"
 WORK=""
 MOUNT=""
 
@@ -95,9 +95,15 @@ fi
 APP_REQUIREMENT="identifier \"$APP_BUNDLE_ID\" and anchor apple generic and certificate leaf[subject.OU] = \"$TEAM_ID\""
 DMG_REQUIREMENT="anchor apple generic and certificate leaf[subject.OU] = \"$TEAM_ID\""
 
-if (( NOTARIZE )) && ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1; then
-    echo "✗ notarytool cannot use the keychain profile \"$NOTARY_PROFILE\"." >&2
-    echo "  Store credentials once (see the top of this script), or pass --skip-notarize." >&2
+if (( NOTARIZE )) && ! notary_check="$(xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" 2>&1)"; then
+    echo "✗ notarytool cannot use the keychain profile \"$NOTARY_PROFILE\":" >&2
+    print -r -- "$notary_check" | sed -e '/^[[:space:]]*$/d' -e 's/^/    /' >&2
+    if [[ "$notary_check" == *"agreement"* ]]; then
+        echo "  Accept the pending agreement at developer.apple.com/account (Account Holder)," >&2
+        echo "  then try again, or pass --skip-notarize." >&2
+    else
+        echo "  Store credentials once (see the top of this script), or pass --skip-notarize." >&2
+    fi
     exit 1
 fi
 
