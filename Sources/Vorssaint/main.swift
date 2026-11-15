@@ -11,8 +11,8 @@ if let command = SettingsBackupSupport.command(in: CommandLine.arguments) {
 }
 
 SuperKeyMappingGuard.runIfRequestedAndExit()
-let configuredFeatureKeys = SettingsBackup.applyConfigFileAtLaunch()
 Defaults.register()
+let configuredFeatureKeys = SettingsBackup.applyConfigFileAtLaunch()
 MouseAccelerationGuard.runIfRequestedAndExit()
 MouseAccelerationService.recoverPendingAtLaunch()
 

@@ -18,6 +18,7 @@ private final class SettingsDirectoryCache {
     private(set) var sections: [SettingsSidebarSection] = []
     private(set) var items: [SettingsSidebarItem] = []
     private var searchKey: Key?
+    private var searchState: SettingsSearchState?
     private var searchItems: [SettingsSearchItem] = []
 
     func navigation(strings: Strings, language: AppLanguage,
@@ -36,13 +37,15 @@ private final class SettingsDirectoryCache {
     }
 
     func search(strings: Strings, language: AppLanguage,
-                superKeySource: SuperKeySource, featureRevision: Int) -> [SettingsSearchItem] {
+                superKeySource: SuperKeySource, featureRevision: Int,
+                state: SettingsSearchState) -> [SettingsSearchItem] {
         let key = Key(language: language, superKeySource: superKeySource,
                       featureRevision: featureRevision)
-        if searchKey != key {
+        if searchKey != key || searchState != state {
             searchItems = SettingsDirectory.searchItems(
-                strings, language: language, superKeySource: superKeySource)
+                strings, language: language, superKeySource: superKeySource, state: state)
             searchKey = key
+            searchState = state
         }
         return searchItems
     }
@@ -57,6 +60,7 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.superKeySource) private var superKeySourceRaw =
         SuperKeySource.capsLock.rawValue
     @State private var searchQuery = ""
+    @State private var searchState: SettingsSearchState?
     @State private var activeSearchIndex: Int?
     @State private var directoryCache = SettingsDirectoryCache()
     @State private var collapsedSectionIDs: Set<Int> = []
@@ -141,7 +145,7 @@ struct SettingsView: View {
                     items: directoryCache.search(
                         strings: l10n.s, language: l10n.language,
                         superKeySource: SuperKeySource.sanitized(superKeySourceRaw),
-                        featureRevision: features.revision),
+                        featureRevision: features.revision, state: searchState ?? .current),
                     isAvailable: { features.isAvailable($0) }))
         }()
 
@@ -204,6 +208,14 @@ struct SettingsView: View {
             expandSelectedSection()
         }
         .onChange(of: features.revision) { _, _ in ensureVisiblePage() }
+        .onChange(of: hasSearchQuery) { _, searching in
+            searchState = searching ? .current : nil
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .merge(with: NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification))
+            .receive(on: RunLoop.main)) { _ in
+                if hasSearchQuery { searchState = .current }
+            }
         .onChange(of: searchResults, initial: true) { previous, current in
             updateSearchSelection(previous: previous, current: current)
         }

@@ -41,7 +41,6 @@ struct CommandBarView: View {
     @ObservedObject private var homebrew = HomebrewManager.shared
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var searchFocused: Bool
-    @State private var showHomebrewDetails = false
 
     /// The mark, made a handle. Dragging rides on AppKit's own window
     /// dragging — the same machinery a title bar uses — rather than a
@@ -153,6 +152,7 @@ struct CommandBarView: View {
             case .uninstallReview:
                 Divider()
                 uninstallReviewCard
+                UninstallerHomebrewLastLog(compact: true)
             case .uninstallHomebrewConfirm:
                 Divider()
                 uninstallHomebrewConfirmCard
@@ -831,7 +831,7 @@ struct CommandBarView: View {
     /// shows in Settings, just inline in the bar. Homebrew-managed apps are
     /// handled here too, not handed off to Settings: `.uninstallHomebrewConfirm`
     /// guards the extra confirmation `brew uninstall` needs, and
-    /// `HomebrewOperationStatusView` renders its live progress inline.
+    /// the Homebrew card renders its live progress inline.
     @ViewBuilder
     private var uninstallReviewCard: some View {
         switch uninstaller.phase {
@@ -909,14 +909,7 @@ struct CommandBarView: View {
             if let status = homebrew.operationStatus,
                status.action == .uninstall,
                status.package?.id == package.id {
-                HomebrewOperationStatusView(status: status,
-                                            log: homebrew.log,
-                                            terminalFallbackCommand: homebrew.terminalFallbackCommand,
-                                            compact: true,
-                                            showDetails: $showHomebrewDetails,
-                                            onCancel: homebrew.cancelOperation,
-                                            onClear: homebrew.clearLog,
-                                            onOpenTerminal: homebrew.openTerminalFallback)
+                HomebrewOperationOutputView(homebrew: homebrew, output: .status(status), compact: true)
                     .padding(.horizontal, 17)
                 if let tap = homebrew.untrustedTap {
                     HomebrewTrustCard(tap: tap, compact: true)

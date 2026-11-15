@@ -2135,32 +2135,32 @@ enum RepositoryFeatureTests {
         suite.expect(SecureInputSupport.holder(isEnabled: true,
                                          read: .holder(secureInputOwnPid),
                                          ownPid: secureInputOwnPid,
-                                         runningApp: { pid in ("Vorssaint", pid) },
+                                         runningApp: { pid in ("Barforge", pid) },
                                          isProcessAlive: { _ in
                                              secureInputOwnLivenessChecks += 1
                                              return true
                                          }) == .unknown,
-               "Vorssaint recorded as the active app is never named as holding secure input")
+               "Barforge recorded as the active app is never named as holding secure input")
         suite.expect(secureInputOwnLivenessChecks == 0,
-               "naming Vorssaint is refused before any liveness check")
+               "naming Barforge is refused before any liveness check")
         suite.expect(SecureInputSupport.holder(isEnabled: true,
                                          read: .holder(5555),
                                          ownPid: secureInputOwnPid,
-                                         runningApp: { _ in ("Vorssaint", secureInputOwnPid) },
+                                         runningApp: { _ in ("Barforge", secureInputOwnPid) },
                                          isProcessAlive: { _ in true }) == .unknown,
-               "a recorded helper owned by Vorssaint is not named either")
+               "a recorded helper owned by Barforge is not named either")
         suite.expect(SecureInputSupport.holder(isEnabled: true,
                                          read: .holder(secureInputOwnPid),
                                          ownPid: secureInputOwnPid,
                                          runningApp: { _ in nil },
                                          isProcessAlive: { _ in true }) == .unknown,
-               "Vorssaint recorded while it is not a regular app is never sent to log out")
+               "Barforge recorded while it is not a regular app is never sent to log out")
         suite.expect(SecureInputSupport.holder(isEnabled: true,
                                          read: .holder(4242),
                                          ownPid: secureInputOwnPid,
-                                         runningApp: { pid in ("Vorssaint", pid) },
+                                         runningApp: { pid in ("Barforge", pid) },
                                          isProcessAlive: { _ in true })
-                   == .app(name: "Vorssaint", pid: 4242),
+                   == .app(name: "Barforge", pid: 4242),
                "another copy of the app is told apart from this one by pid, not by name")
         // The rule above protects the row only if the monitor passes this
         // process, and the harness does not compile `SecureInputMonitor`.
@@ -2170,7 +2170,7 @@ enum RepositoryFeatureTests {
             .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
             .joined(separator: "\n")
         suite.expect(secureInputMonitorCode.contains("ownPid: getpid(),"),
-               "the secure input monitor passes its own pid, so the row never names Vorssaint")
+               "the secure input monitor passes its own pid, so the row never names Barforge")
 
         var secureInputUnavailableLookups = 0
         var secureInputUnavailableLivenessChecks = 0

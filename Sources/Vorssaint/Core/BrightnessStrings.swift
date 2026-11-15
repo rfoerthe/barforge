@@ -36,11 +36,24 @@ struct BrightnessFeatureStrings {
     let displayBrightnessIncrease: String
     let keyboardLight: String
     let keyboardLightCaption: String
+    let volumeToggle: String
+    let volumeCaption: String
+    let volumeLabel: String
+    let mute: String
+    let unmute: String
+    let volumeKeysToggle: String
+    let volumeKeysCaption: String
     let keyboardBrightnessShortcuts: String
     let keyboardBrightnessDecrease: String
     let keyboardBrightnessIncrease: String
     let softwareDimming: String
     let extendedDimming: String
+    let speakersStep: String
+    let speakersStepStandard: String
+    let speakersMinimum: String
+    let speakersMinimumCaption: String
+    let speakersMaximum: String
+    let speakersMaximumCaption: String
 }
 
 extension FeatureStrings {
@@ -95,11 +108,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Increase display brightness",
         keyboardLight: "Keyboard light",
         keyboardLightCaption: "Turns the keyboard backlight on or off.",
+        volumeToggle: "Monitor speakers",
+        volumeCaption: "Monitors with speakers of their own get a volume slider here, over the same channel their buttons use. Displays with no speakers never show one.",
+        volumeLabel: "Volume",
+        mute: "Mute",
+        unmute: "Unmute",
+        volumeKeysToggle: "Volume keys reach monitor speakers",
+        volumeKeysCaption: "While the sound comes out of a monitor, the keyboard volume keys move that monitor instead of a level macOS cannot change.",
         keyboardBrightnessShortcuts: "Use keyboard brightness shortcuts",
         keyboardBrightnessDecrease: "Decrease keyboard brightness",
         keyboardBrightnessIncrease: "Increase keyboard brightness",
         softwareDimming: "Dim the picture",
-        extendedDimming: "Extra dimming"
+        extendedDimming: "Extra dimming",
+        speakersStep: "Volume step",
+        speakersStepStandard: "Standard (6.25%)",
+        speakersMinimum: "Minimum volume",
+        speakersMinimumCaption: "Volume down stops here. Mute still silences the monitor.",
+        speakersMaximum: "Maximum volume",
+        speakersMaximumCaption: "Volume up stops here."
     )
 
     static let ptBR = BrightnessFeatureStrings(
@@ -131,11 +157,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Aumentar brilho da tela",
         keyboardLight: "Luz do teclado",
         keyboardLightCaption: "Liga ou desliga a luz do teclado.",
+        volumeToggle: "Alto-falantes do monitor",
+        volumeCaption: "Monitores com alto-falantes próprios ganham aqui um controle de volume, pelo mesmo canal que os botões deles usam. Telas sem alto-falantes nunca mostram um.",
+        volumeLabel: "Volume",
+        mute: "Silenciar",
+        unmute: "Ativar o som",
+        volumeKeysToggle: "Teclas de volume alcançam os alto-falantes do monitor",
+        volumeKeysCaption: "Enquanto o som sai por um monitor, as teclas de volume do teclado ajustam esse monitor em vez de um nível que o macOS não consegue mudar.",
         keyboardBrightnessShortcuts: "Usar atalhos para o brilho do teclado",
         keyboardBrightnessDecrease: "Diminuir brilho do teclado",
         keyboardBrightnessIncrease: "Aumentar brilho do teclado",
         softwareDimming: "Escurecer a imagem",
-        extendedDimming: "Escurecimento extra"
+        extendedDimming: "Escurecimento extra",
+        speakersStep: "Passo do volume",
+        speakersStepStandard: "Padrão (6,25%)",
+        speakersMinimum: "Volume mínimo",
+        speakersMinimumCaption: "Diminuir o volume para aqui. Silenciar ainda deixa o monitor mudo.",
+        speakersMaximum: "Volume máximo",
+        speakersMaximumCaption: "Aumentar o volume para aqui."
     )
 
     static let tr = BrightnessFeatureStrings(
@@ -167,11 +206,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Ekran parlaklığını artır",
         keyboardLight: "Klavye ışığı",
         keyboardLightCaption: "Klavye ışığını açar veya kapatır.",
+        volumeToggle: "Monitör hoparlörleri",
+        volumeCaption: "Kendi hoparlörü olan monitörler burada bir ses kaydırıcısı alır, düğmelerinin kullandığı kanal üzerinden. Hoparlörü olmayan ekranlarda hiç görünmez.",
+        volumeLabel: "Ses düzeyi",
+        mute: "Sesi kapat",
+        unmute: "Sesi aç",
+        volumeKeysToggle: "Ses tuşları monitör hoparlörlerine ulaşır",
+        volumeKeysCaption: "Ses bir monitörden çıkarken, klavyedeki ses tuşları macOS’un değiştiremediği bir düzey yerine o monitörü ayarlar.",
         keyboardBrightnessShortcuts: "Klavye parlaklığı kısayollarını kullan",
         keyboardBrightnessDecrease: "Klavye parlaklığını azalt",
         keyboardBrightnessIncrease: "Klavye parlaklığını artır",
         softwareDimming: "Görüntüyü karart",
-        extendedDimming: "Ek karartma"
+        extendedDimming: "Ek karartma",
+        speakersStep: "Ses adımı",
+        speakersStepStandard: "Standart (%6,25)",
+        speakersMinimum: "En düşük ses",
+        speakersMinimumCaption: "Sesi azaltma burada durur. Sessiz tuşu monitörü yine de susturur.",
+        speakersMaximum: "En yüksek ses",
+        speakersMaximumCaption: "Sesi artırma burada durur."
     )
 
     static let ru = BrightnessFeatureStrings(
@@ -203,11 +255,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Увеличить яркость экрана",
         keyboardLight: "Подсветка клавиатуры",
         keyboardLightCaption: "Включает или выключает подсветку клавиатуры.",
+        volumeToggle: "Динамики монитора",
+        volumeCaption: "Мониторы с собственными динамиками получают здесь ползунок громкости, по тому же каналу, что и их кнопки. У экранов без динамиков он не появляется.",
+        volumeLabel: "Громкость",
+        mute: "Выключить звук",
+        unmute: "Включить звук",
+        volumeKeysToggle: "Клавиши громкости управляют динамиками монитора",
+        volumeKeysCaption: "Пока звук идёт через монитор, клавиши громкости меняют именно его уровень, а не тот, который macOS изменить не может.",
         keyboardBrightnessShortcuts: "Использовать сочетания клавиш для подсветки клавиатуры",
         keyboardBrightnessDecrease: "Уменьшить яркость клавиатуры",
         keyboardBrightnessIncrease: "Увеличить яркость клавиатуры",
         softwareDimming: "Затемнять изображение",
-        extendedDimming: "Дополнительное затемнение"
+        extendedDimming: "Дополнительное затемнение",
+        speakersStep: "Шаг громкости",
+        speakersStepStandard: "Стандартный (6,25%)",
+        speakersMinimum: "Минимальная громкость",
+        speakersMinimumCaption: "Уменьшение громкости останавливается здесь. Выключение звука по-прежнему заглушает монитор.",
+        speakersMaximum: "Максимальная громкость",
+        speakersMaximumCaption: "Увеличение громкости останавливается здесь."
     )
 
     static let es = BrightnessFeatureStrings(
@@ -239,11 +304,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Aumentar el brillo de la pantalla",
         keyboardLight: "Luz del teclado",
         keyboardLightCaption: "Enciende o apaga la luz del teclado.",
+        volumeToggle: "Altavoces del monitor",
+        volumeCaption: "Los monitores con altavoces propios reciben aquí un control de volumen, por el mismo canal que usan sus botones. Las pantallas sin altavoces no muestran ninguno.",
+        volumeLabel: "Volumen",
+        mute: "Silenciar",
+        unmute: "Activar el sonido",
+        volumeKeysToggle: "Las teclas de volumen llegan a los altavoces del monitor",
+        volumeKeysCaption: "Mientras el sonido sale por un monitor, las teclas de volumen del teclado ajustan ese monitor en lugar de un nivel que macOS no puede cambiar.",
         keyboardBrightnessShortcuts: "Usar atajos para el brillo del teclado",
         keyboardBrightnessDecrease: "Reducir el brillo del teclado",
         keyboardBrightnessIncrease: "Aumentar el brillo del teclado",
         softwareDimming: "Oscurecer la imagen",
-        extendedDimming: "Atenuación adicional"
+        extendedDimming: "Atenuación adicional",
+        speakersStep: "Paso de volumen",
+        speakersStepStandard: "Estándar (6,25 %)",
+        speakersMinimum: "Volumen mínimo",
+        speakersMinimumCaption: "Bajar el volumen se detiene aquí. Silenciar sigue dejando el monitor mudo.",
+        speakersMaximum: "Volumen máximo",
+        speakersMaximumCaption: "Subir el volumen se detiene aquí."
     )
 
     static let sk = BrightnessFeatureStrings(
@@ -275,11 +353,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Zvýšiť jas displeja",
         keyboardLight: "Podsvietenie klávesnice",
         keyboardLightCaption: "Zapína alebo vypína podsvietenie klávesnice.",
+        volumeToggle: "Reproduktory monitora",
+        volumeCaption: "Monitory s vlastnými reproduktormi tu dostanú posuvník hlasitosti, cez rovnaký kanál, aký používajú ich tlačidlá. Displeje bez reproduktorov žiadny nezobrazujú.",
+        volumeLabel: "Hlasitosť",
+        mute: "Stlmiť",
+        unmute: "Zrušiť stlmenie",
+        volumeKeysToggle: "Klávesy hlasitosti ovládajú reproduktory monitora",
+        volumeKeysCaption: "Kým zvuk ide z monitora, klávesy hlasitosti na klávesnici upravujú tento monitor namiesto úrovne, ktorú macOS nemôže zmeniť.",
         keyboardBrightnessShortcuts: "Používať klávesové skratky pre jas klávesnice",
         keyboardBrightnessDecrease: "Znížiť jas klávesnice",
         keyboardBrightnessIncrease: "Zvýšiť jas klávesnice",
         softwareDimming: "Stmaviť obraz",
-        extendedDimming: "Ďalšie stmievanie"
+        extendedDimming: "Ďalšie stmievanie",
+        speakersStep: "Krok hlasitosti",
+        speakersStepStandard: "Štandardný (6,25 %)",
+        speakersMinimum: "Minimálna hlasitosť",
+        speakersMinimumCaption: "Znižovanie hlasitosti sa zastaví tu. Stlmenie monitor aj tak umlčí.",
+        speakersMaximum: "Maximálna hlasitosť",
+        speakersMaximumCaption: "Zvyšovanie hlasitosti sa zastaví tu."
     )
 
     static let de = BrightnessFeatureStrings(
@@ -311,11 +402,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Bildschirmhelligkeit erhöhen",
         keyboardLight: "Tastaturbeleuchtung",
         keyboardLightCaption: "Schaltet die Tastaturbeleuchtung ein oder aus.",
+        volumeToggle: "Monitorlautsprecher",
+        volumeCaption: "Monitore mit eigenen Lautsprechern bekommen hier einen Lautstärkeregler, über denselben Kanal wie ihre eigenen Tasten. Displays ohne Lautsprecher zeigen keinen.",
+        volumeLabel: "Lautstärke",
+        mute: "Stummschalten",
+        unmute: "Ton einschalten",
+        volumeKeysToggle: "Lautstärketasten erreichen die Monitorlautsprecher",
+        volumeKeysCaption: "Solange der Ton aus einem Monitor kommt, regeln die Lautstärketasten diesen Monitor statt eines Pegels, den macOS nicht ändern kann.",
         keyboardBrightnessShortcuts: "Kurzbefehle für die Tastaturhelligkeit verwenden",
         keyboardBrightnessDecrease: "Tastaturhelligkeit verringern",
         keyboardBrightnessIncrease: "Tastaturhelligkeit erhöhen",
         softwareDimming: "Bild abdunkeln",
-        extendedDimming: "Zusätzliches Abdunkeln"
+        extendedDimming: "Zusätzliches Abdunkeln",
+        speakersStep: "Lautstärkeschritt",
+        speakersStepStandard: "Standard (6,25 %)",
+        speakersMinimum: "Mindestlautstärke",
+        speakersMinimumCaption: "Leiser stoppt hier. Stumm schaltet den Monitor trotzdem stumm.",
+        speakersMaximum: "Höchstlautstärke",
+        speakersMaximumCaption: "Lauter stoppt hier."
     )
 
     static let fr = BrightnessFeatureStrings(
@@ -347,11 +451,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Augmenter la luminosité de l’écran",
         keyboardLight: "Éclairage du clavier",
         keyboardLightCaption: "Allume ou éteint l’éclairage du clavier.",
+        volumeToggle: "Haut-parleurs du moniteur",
+        volumeCaption: "Les moniteurs dotés de haut-parleurs reçoivent ici un curseur de volume, par le même canal que leurs propres boutons. Les écrans sans haut-parleurs n’en affichent aucun.",
+        volumeLabel: "Volume",
+        mute: "Couper le son",
+        unmute: "Rétablir le son",
+        volumeKeysToggle: "Les touches de volume atteignent les haut-parleurs du moniteur",
+        volumeKeysCaption: "Tant que le son sort d’un moniteur, les touches de volume règlent ce moniteur au lieu d’un niveau que macOS ne peut pas changer.",
         keyboardBrightnessShortcuts: "Utiliser les raccourcis de luminosité du clavier",
         keyboardBrightnessDecrease: "Réduire la luminosité du clavier",
         keyboardBrightnessIncrease: "Augmenter la luminosité du clavier",
         softwareDimming: "Assombrir l’image",
-        extendedDimming: "Assombrissement supplémentaire"
+        extendedDimming: "Assombrissement supplémentaire",
+        speakersStep: "Pas du volume",
+        speakersStepStandard: "Standard (6,25 %)",
+        speakersMinimum: "Volume minimal",
+        speakersMinimumCaption: "La baisse du volume s’arrête ici. Le silence coupe toujours le son du moniteur.",
+        speakersMaximum: "Volume maximal",
+        speakersMaximumCaption: "La hausse du volume s’arrête ici."
     )
 
     static let it = BrightnessFeatureStrings(
@@ -383,11 +500,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Aumenta luminosità schermo",
         keyboardLight: "Illuminazione tastiera",
         keyboardLightCaption: "Accende o spegne l’illuminazione della tastiera.",
+        volumeToggle: "Altoparlanti del monitor",
+        volumeCaption: "I monitor con altoparlanti propri ricevono qui un cursore del volume, sullo stesso canale usato dai loro pulsanti. Gli schermi senza altoparlanti non ne mostrano nessuno.",
+        volumeLabel: "Volume",
+        mute: "Silenzia",
+        unmute: "Riattiva l’audio",
+        volumeKeysToggle: "I tasti volume raggiungono gli altoparlanti del monitor",
+        volumeKeysCaption: "Finché l’audio esce da un monitor, i tasti volume regolano quel monitor invece di un livello che macOS non può cambiare.",
         keyboardBrightnessShortcuts: "Usa le scorciatoie per la luminosità della tastiera",
         keyboardBrightnessDecrease: "Riduci luminosità tastiera",
         keyboardBrightnessIncrease: "Aumenta luminosità tastiera",
         softwareDimming: "Scurisci l’immagine",
-        extendedDimming: "Oscuramento extra"
+        extendedDimming: "Oscuramento extra",
+        speakersStep: "Passo del volume",
+        speakersStepStandard: "Standard (6,25%)",
+        speakersMinimum: "Volume minimo",
+        speakersMinimumCaption: "Abbassare il volume si ferma qui. Il silenziamento azzera comunque il monitor.",
+        speakersMaximum: "Volume massimo",
+        speakersMaximumCaption: "Alzare il volume si ferma qui."
     )
 
     static let ja = BrightnessFeatureStrings(
@@ -419,11 +549,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "ディスプレイの明るさを上げる",
         keyboardLight: "キーボードのバックライト",
         keyboardLightCaption: "キーボードのバックライトをオンまたはオフにします。",
+        volumeToggle: "モニタのスピーカー",
+        volumeCaption: "スピーカーを内蔵したモニタには、本体のボタンと同じチャンネルで音量スライダが表示されます。スピーカーのないディスプレイには表示されません。",
+        volumeLabel: "音量",
+        mute: "消音",
+        unmute: "消音を解除",
+        volumeKeysToggle: "音量キーでモニタのスピーカーを操作",
+        volumeKeysCaption: "音がモニタから出ている間、キーボードの音量キーは macOS が変更できない値ではなく、そのモニタを調整します。",
         keyboardBrightnessShortcuts: "キーボードの明るさのショートカットを使用",
         keyboardBrightnessDecrease: "キーボードの明るさを下げる",
         keyboardBrightnessIncrease: "キーボードの明るさを上げる",
         softwareDimming: "画面を暗くする",
-        extendedDimming: "さらに暗くする"
+        extendedDimming: "さらに暗くする",
+        speakersStep: "音量のステップ",
+        speakersStepStandard: "標準（6.25%）",
+        speakersMinimum: "最小音量",
+        speakersMinimumCaption: "音量を下げるとここで止まります。消音キーではモニタを消音できます。",
+        speakersMaximum: "最大音量",
+        speakersMaximumCaption: "音量を上げるとここで止まります。"
     )
 
     static let ko = BrightnessFeatureStrings(
@@ -455,11 +598,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "디스플레이 밝기 높이기",
         keyboardLight: "키보드 백라이트",
         keyboardLightCaption: "키보드 백라이트를 켜거나 끕니다.",
+        volumeToggle: "모니터 스피커",
+        volumeCaption: "자체 스피커가 있는 모니터에는 버튼과 동일한 채널로 음량 슬라이더가 표시됩니다. 스피커가 없는 디스플레이에는 표시되지 않습니다.",
+        volumeLabel: "음량",
+        mute: "음소거",
+        unmute: "음소거 해제",
+        volumeKeysToggle: "음량 키로 모니터 스피커 조절",
+        volumeKeysCaption: "소리가 모니터에서 나오는 동안, 키보드 음량 키는 macOS가 바꿀 수 없는 값 대신 해당 모니터를 조절합니다.",
         keyboardBrightnessShortcuts: "키보드 밝기 단축키 사용",
         keyboardBrightnessDecrease: "키보드 밝기 낮추기",
         keyboardBrightnessIncrease: "키보드 밝기 높이기",
         softwareDimming: "화면을 어둡게",
-        extendedDimming: "추가 어둡게"
+        extendedDimming: "추가 어둡게",
+        speakersStep: "음량 단계",
+        speakersStepStandard: "표준(6.25%)",
+        speakersMinimum: "최소 음량",
+        speakersMinimumCaption: "음량을 줄이면 여기서 멈춥니다. 음소거는 여전히 모니터를 무음으로 만듭니다.",
+        speakersMaximum: "최대 음량",
+        speakersMaximumCaption: "음량을 높이면 여기서 멈춥니다."
     )
 
     static let zhHans = BrightnessFeatureStrings(
@@ -491,11 +647,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "提高显示器亮度",
         keyboardLight: "键盘背光",
         keyboardLightCaption: "打开或关闭键盘背光。",
+        volumeToggle: "显示器扬声器",
+        volumeCaption: "自带扬声器的显示器会在这里获得音量滑块，通过与其按键相同的通道调节。没有扬声器的显示器不会显示滑块。",
+        volumeLabel: "音量",
+        mute: "静音",
+        unmute: "取消静音",
+        volumeKeysToggle: "音量键控制显示器扬声器",
+        volumeKeysCaption: "当声音从显示器发出时，键盘上的音量键调节该显示器，而不是 macOS 无法改变的音量。",
         keyboardBrightnessShortcuts: "使用键盘亮度快捷键",
         keyboardBrightnessDecrease: "降低键盘亮度",
         keyboardBrightnessIncrease: "提高键盘亮度",
         softwareDimming: "调暗画面",
-        extendedDimming: "进一步调暗"
+        extendedDimming: "进一步调暗",
+        speakersStep: "音量步长",
+        speakersStepStandard: "标准（6.25%）",
+        speakersMinimum: "最低音量",
+        speakersMinimumCaption: "降低音量时在此停止。静音仍会让显示器静音。",
+        speakersMaximum: "最高音量",
+        speakersMaximumCaption: "提高音量时在此停止。"
     )
 
     static let zhTW = BrightnessFeatureStrings(
@@ -527,11 +696,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "提高顯示器亮度",
         keyboardLight: "鍵盤背光",
         keyboardLightCaption: "開啟或關閉鍵盤背光。",
+        volumeToggle: "顯示器揚聲器",
+        volumeCaption: "內建揚聲器的顯示器會在這裡出現音量滑桿，透過與其按鍵相同的通道調整。沒有揚聲器的顯示器不會顯示滑桿。",
+        volumeLabel: "音量",
+        mute: "靜音",
+        unmute: "取消靜音",
+        volumeKeysToggle: "音量鍵控制顯示器揚聲器",
+        volumeKeysCaption: "當聲音從顯示器傳出時，鍵盤上的音量鍵會調整該顯示器，而不是 macOS 無法改變的音量。",
         keyboardBrightnessShortcuts: "使用鍵盤亮度快捷鍵",
         keyboardBrightnessDecrease: "降低鍵盤亮度",
         keyboardBrightnessIncrease: "提高鍵盤亮度",
         softwareDimming: "調暗畫面",
-        extendedDimming: "進一步調暗"
+        extendedDimming: "進一步調暗",
+        speakersStep: "音量間距",
+        speakersStepStandard: "標準（6.25%）",
+        speakersMinimum: "最低音量",
+        speakersMinimumCaption: "降低音量時會停在這裡。靜音仍會讓顯示器靜音。",
+        speakersMaximum: "最高音量",
+        speakersMaximumCaption: "提高音量時會停在這裡。"
     )
 
     static let zhHK = BrightnessFeatureStrings(
@@ -563,11 +745,24 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "提高顯示器亮度",
         keyboardLight: "鍵盤背光",
         keyboardLightCaption: "開啟或關閉鍵盤背光。",
+        volumeToggle: "顯示器揚聲器",
+        volumeCaption: "內置揚聲器的顯示器會在這裏出現音量滑桿，透過與其按鍵相同的通道調整。沒有揚聲器的顯示器不會顯示滑桿。",
+        volumeLabel: "音量",
+        mute: "靜音",
+        unmute: "取消靜音",
+        volumeKeysToggle: "音量鍵控制顯示器揚聲器",
+        volumeKeysCaption: "當聲音從顯示器傳出時，鍵盤上的音量鍵會調整該顯示器，而不是 macOS 無法改變的音量。",
         keyboardBrightnessShortcuts: "使用鍵盤亮度快捷鍵",
         keyboardBrightnessDecrease: "降低鍵盤亮度",
         keyboardBrightnessIncrease: "提高鍵盤亮度",
         softwareDimming: "調暗畫面",
-        extendedDimming: "進一步調暗"
+        extendedDimming: "進一步調暗",
+        speakersStep: "音量間距",
+        speakersStepStandard: "標準（6.25%）",
+        speakersMinimum: "最低音量",
+        speakersMinimumCaption: "調低音量時會停在這裡。靜音仍會令顯示器靜音。",
+        speakersMaximum: "最高音量",
+        speakersMaximumCaption: "調高音量時會停在這裡。"
     )
     static let uk = BrightnessFeatureStrings(
         pageTitle: "Дисплеї",
@@ -598,10 +793,23 @@ extension BrightnessFeatureStrings {
         displayBrightnessIncrease: "Збільшити яскравість дисплея",
         keyboardLight: "Підсвічування клавіатури",
         keyboardLightCaption: "Вмикає або вимикає підсвічування клавіатури.",
+        volumeToggle: "Динаміки монітора",
+        volumeCaption: "Монітори з власними динаміками отримують тут повзунок гучності, через той самий канал, що й їхні кнопки. Дисплеї без динаміків жодного не показують.",
+        volumeLabel: "Гучність",
+        mute: "Вимкнути звук",
+        unmute: "Увімкнути звук",
+        volumeKeysToggle: "Клавіші гучності керують динаміками монітора",
+        volumeKeysCaption: "Поки звук виходить через монітор, клавіші гучності на клавіатурі змінюють саме його, а не рівень, який macOS не може змінити.",
         keyboardBrightnessShortcuts: "Клавіатурні скорочення яскравості клавіатури",
         keyboardBrightnessDecrease: "Зменшити яскравість клавіатури",
         keyboardBrightnessIncrease: "Збільшити яскравість клавіатури",
         softwareDimming: "Затемнити зображення",
-        extendedDimming: "Додаткове затемнення"
+        extendedDimming: "Додаткове затемнення",
+        speakersStep: "Крок гучності",
+        speakersStepStandard: "Стандартний (6,25%)",
+        speakersMinimum: "Мінімальна гучність",
+        speakersMinimumCaption: "Зменшення гучності зупиняється тут. Вимкнення звуку все одно глушить монітор.",
+        speakersMaximum: "Максимальна гучність",
+        speakersMaximumCaption: "Збільшення гучності зупиняється тут."
     )
 }

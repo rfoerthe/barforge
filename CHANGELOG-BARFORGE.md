@@ -14,6 +14,36 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [1.0.7-beta.1] - 2026-11-15
+
+Based on Vorssaint 3.4.4.
+
+### Added
+- The volume and mute of a monitor's built-in speakers can be controlled from Displays settings and the menu panel's mixer when macOS cannot set that output's volume itself. The volume keys work on them too, with a step size and lower and upper limits you choose, and the brightness overlay shows the new level. Thanks to @jairuspace, @sambet1997, @morhaf-ko, @ruvelro and @Wahab417.
+- A scrolling screenshot has its own shortcut. You can scroll manually or let Barforge scroll the selected window. Thanks to @EugeneCarldotme.
+- The uninstaller can offer to review leftover files when you move the last copy of an app from an Applications folder to the Trash in Finder. The offer starts off and needs Full Disk Access; cleanup still asks for confirmation. Thanks to @zamai and @ilim-cell.
+- Holding a modifier key scrolls a mouse wheel faster, from 2× to 15×. Settings → Mouse → Scroll faster while holding a key. Thanks to @VlodekH.
+
+### Changed
+- Barforge is based on Vorssaint 3.4.4 and brings the changes Vorssaint made since Barforge 1.0.6, listed here, except those for the Dynamic Island with its AI Agents, which Barforge does not include.
+- Keep Awake resumes a manual session after Barforge restarts, with its original end time. Thanks to @stieludv.
+- Edge snapping restores a window's previous size only after a real drag of its title bar; a click leaves it snapped.
+- Canceling Copy as GIF while it is being prepared leaves the clipboard as it was. Thanks to @oskarsss.
+
+### Fixed
+- If a disabled MacBook display wakes at the lock screen, Barforge waits until you unlock and an external display is active before turning the built-in display off again. Thanks to @jankorbay.
+- When a closed-lid Keep Awake session ends, Barforge skips the sleep request while the Mac is plugged in and using an external display. On battery it requests sleep if macOS allows it. Thanks to @ruvelro.
+- Tapping Caps Lock toggles capitals when that is its Super Key solo action. Super Key no longer crashes when it reapplies the keyboard mapping at startup, and shortcut recording recognizes Super Key combinations while the mapping starts. Thanks to @iva-zhu and @roypadina.
+- Mic Mute remembers each channel's level across upgrades and reconnects. Thanks to @samueljim.
+- Routine mixer checks keep per-app volume levels. Thanks to @meowvan666.
+- Settings search finds more of the controls Settings shows, including low disk space alerts, scrolling screenshots and Trash cleanup, and opens the section that holds them. Thanks to @MaximilianMauroner.
+- Smooth scrolling keeps the normal wheel distance in Barforge's own panels. Thanks to @iva-zhu.
+- The last Homebrew log can be reopened from App Updates, even with the Homebrew page off. It stays until you clear it, run another command or quit. Thanks to @iva-zhu.
+- Command Bar converts mixed feet and inches, such as `5ft 11 in cm`. Thanks to @andy-kelly.
+- The uninstaller's setup controls stay reachable in small windows.
+- A partial settings file in `~/.config/barforge` leaves the local preferences it does not declare untouched.
+- Switching a DDC monitor to software dimming cancels its pending hardware brightness writes.
+
 ## [1.0.6] - 2026-11-09
 
 Based on Vorssaint 3.4.3.
