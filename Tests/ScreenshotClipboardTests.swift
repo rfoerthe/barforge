@@ -19,7 +19,7 @@ enum ScreenshotClipboardTests {
     }
 
     final class Pasteboard {
-        let contents = AppKit.NSPasteboard(name: .init("Vorssaint.ScreenshotClipboardTests.\(UUID().uuidString)"))
+        let contents = AppKit.NSPasteboard(name: .init("Barforge.ScreenshotClipboardTests.\(UUID().uuidString)"))
         var acceptsWrites = true
         func clearContents() { contents.clearContents() }
         func writeObjects(_ objects: [NSPasteboardWriting]) -> Bool {

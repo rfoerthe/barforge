@@ -294,7 +294,9 @@ struct MixerSection: View {
     }
 
     private func setSystemOutputVolume(_ value: Double) {
-        mixer.setCurrentOutputVolume(value)
+        // Shares the volume key queue, so a drag supersedes an older key, and
+        // reaches a monitor's own speakers when they carry the sound.
+        mixer.requestOutputAdjustment(volume: value)
     }
 
     private var systemOutputVolumeBinding: Binding<Double> {

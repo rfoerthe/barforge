@@ -4,31 +4,61 @@
 
 import Foundation
 
+/// Only values that change which controls exist belong in the search cache key.
+struct SettingsSearchState: Equatable {
+    struct Hardware: Equatable {
+        let battery, keyboardLight, bluetoothSleep, brightnessOSD: Bool
+    }
+
+    let hardware: Hardware
+    let bars, groupsMinimizedWindows: Bool
+    private let switches: Set<String>
+
+    init(defaults: UserDefaults, hardware: Hardware) {
+        self.hardware = hardware
+        bars = defaults.string(forKey: DefaultsKey.menuBarMetricAppearance) == "bars"
+        groupsMinimizedWindows = (defaults.string(forKey: DefaultsKey.switcherMinimizedPlacement)
+            ?? WindowSwitchMinimizedPlacement.normal.rawValue) != WindowSwitchMinimizedPlacement.normal.rawValue
+        switches = Set([
+            DefaultsKey.clamshellPreferred, DefaultsKey.keepAwakeMouseJiggleEnabled, DefaultsKey.brightnessControlEnabled,
+            DefaultsKey.displayVolumeEnabled, DefaultsKey.displayVolumeKeysEnabled,
+            DefaultsKey.bluetoothSleepEnabled, DefaultsKey.dockPreviewEnabled, DefaultsKey.switcherSimpleMode,
+            DefaultsKey.switcherIconRowMode, DefaultsKey.monitorAlertCPU,
+            DefaultsKey.monitorAlertCPUTemperature, DefaultsKey.monitorAlertDisk,
+            DefaultsKey.monitorAlertBattery, DefaultsKey.monitorAlertBatteryTemperature,
+        ].filter { defaults.bool(forKey: $0) })
+    }
+
+    func on(_ key: String) -> Bool { switches.contains(key) }
+}
+
+extension SettingsSearchState {
+    static var current: Self {
+        Self(defaults: .standard, hardware: Hardware(
+            battery: PowerSampler.hasInternalBattery, keyboardLight: BrightnessService.keyboardLightIsSupported,
+            bluetoothSleep: BluetoothSleepService.isSupported,
+            brightnessOSD: AppFeature.brightness.isAvailable && UserDefaults.standard.bool(forKey: DefaultsKey.brightnessControlEnabled)
+                && BrightnessService.shared.brightnessOSDSupported))
+    }
+}
+
 /// One Settings page as the sidebar and the command bar present it.
 struct SettingsDirectoryItem: Identifiable {
     let page: SettingsPage
     let title: String
     let icon: String
-    /// Labels of options living inside the page, so a search finds a page by
-    /// what it contains, in the user's language.
-    var keywords: [String] = []
-    /// Feature ownership for keyword rows on shared pages. `nil` means the
-    /// setting belongs to the page itself and remains searchable whenever the
-    /// page is visible.
-    var keywordFeatures: [AppFeature?] = []
+    let terms: [SettingsSearchTerms]
     var id: SettingsPage { page }
 
     init(page: SettingsPage, title: String, icon: String,
          keywords: [String] = [],
-         featureKeywords: [(feature: AppFeature, titles: [String])] = []) {
+         featureKeywords: [(feature: AppFeature, titles: [String])] = [],
+         terms: [SettingsSearchTerms] = []) {
         self.page = page
         self.title = title
         self.icon = icon
-        self.keywords = keywords + featureKeywords.flatMap(\.titles)
-        keywordFeatures = Array(repeating: nil, count: keywords.count)
-            + featureKeywords.flatMap { entry in
-                Array(repeating: Optional(entry.feature), count: entry.titles.count)
-            }
+        self.terms = [SettingsSearchTerms(keywords)]
+            + featureKeywords.map { SettingsSearchTerms($0.titles, feature: $0.feature) } + terms
     }
 }
 
@@ -49,12 +79,13 @@ enum SettingsDirectory {
                                 isAvailable: (AppFeature) -> Bool) -> [SettingsSidebarSection] {
         let hub = FeatureStrings.hub(language)
         let grouped: [SettingsSidebarSection] = sections(
-            s, language: language, superKeySource: superKeySource
+            s, language: language, superKeySource: superKeySource,
+            state: .current
         ).enumerated().compactMap { index, section -> SettingsSidebarSection? in
                 let items = section.items.flatMap { pageItem -> [SettingsSidebarItem] in
                     var rows = SettingsSidebarSupport.items(
                         page: pageItem.page, title: pageItem.title, icon: pageItem.icon,
-                        preferredFeatures: pageItem.keywordFeatures.compactMap { $0 },
+                        preferredFeatures: pageItem.terms.compactMap(\.feature),
                         includePage: !toolOnlyPages.contains(pageItem.page),
                         isAvailable: isAvailable) { feature in
                             if feature == .clipboardHistory {
@@ -62,6 +93,9 @@ enum SettingsDirectory {
                             }
                             return feature.hubTitle(s, hub: hub, language: language)
                         }
+                    if pageItem.page == .screenshot {
+                        rows = SettingsSidebarSupport.screenshotRows(rows, language: language)
+                    }
                     if pageItem.page == .general {
                         rows.insert(SettingsSidebarItem(
                             id: .setting(.panelConfiguration),
@@ -131,15 +165,16 @@ enum SettingsDirectory {
     /// Destination-aware rows for focused Settings and Command Bar search.
     static func searchItems(_ s: Strings,
                             language: AppLanguage,
-                            superKeySource: SuperKeySource = SuperKeyService.shared.source) -> [SettingsSearchItem] {
-        let pageItems = sections(s, language: language, superKeySource: superKeySource)
+                             superKeySource: SuperKeySource = SuperKeyService.shared.source,
+                             state: SettingsSearchState = .current) -> [SettingsSearchItem] {
+        let pageItems = sections(s, language: language, superKeySource: superKeySource,
+                                 state: state)
             .flatMap(\.items).map { item in
                 SettingsSearchItem(id: .page(item.page),
                                    destination: FeatureSettingsDestination(item.page),
                                    title: item.title,
                                    icon: item.icon,
-                                   keywords: item.keywords,
-                                   keywordFeatures: item.keywordFeatures)
+                                   terms: item.terms)
             }
         let hub = FeatureStrings.hub(language)
         let featureItems = SettingsSearchSupport.featureItems(language: language) { feature in
@@ -152,8 +187,26 @@ enum SettingsDirectory {
             destination: FeatureSettingsDestination(
                 .general, sectionAnchor: .panelConfiguration),
             title: s.menuBarSection, icon: "menubar.rectangle",
-            keywords: [s.showMenuBarIcon, FeatureStrings.generalSettings(language).menuBarIconTitle, "SF Symbols"]))
-        if BrightnessService.keyboardLightIsSupported {
+            keywords: [s.showMenuBarIcon, FeatureStrings.generalSettings(language).menuBarIconTitle,
+                       FeatureStrings.generalSettings(language).iconMissingTitle, "SF Symbols"]))
+        items.append(SettingsSearchSupport.scrollingScreenshotItem(language: language))
+        let alerts = FeatureStrings.monitorAlerts(language)
+        items.append(SettingsSearchItem(
+            id: .setting(.monitorAlerts), destination: FeatureSettingsDestination(.monitor, sectionAnchor: .monitorAlerts),
+            title: alerts.section, icon: "bell", keywords: [alerts.cooldown], terms: [
+                .init([alerts.cpu, alerts.cpuTemperature], feature: .monitorCPU),
+                .init([alerts.cpuThreshold], feature: .monitorCPU, when: state.on(DefaultsKey.monitorAlertCPU)),
+                .init([alerts.cpuTemperatureThreshold], feature: .monitorCPU, when: state.on(DefaultsKey.monitorAlertCPUTemperature)),
+                .init([alerts.memory], feature: .monitorMemory),
+                .init([alerts.disk], feature: .monitorDisk),
+                .init([alerts.diskThreshold], feature: .monitorDisk, when: state.on(DefaultsKey.monitorAlertDisk)),
+                .init([alerts.battery, alerts.batteryTemperature], feature: .monitorPower, when: state.hardware.battery),
+                .init([alerts.batteryThreshold], feature: .monitorPower,
+                      when: state.hardware.battery && state.on(DefaultsKey.monitorAlertBattery)),
+                .init([alerts.batteryTemperatureThreshold], feature: .monitorPower,
+                      when: state.hardware.battery && state.on(DefaultsKey.monitorAlertBatteryTemperature)),
+            ]))
+        if state.hardware.keyboardLight {
             items.append(SettingsSearchSupport.keyboardBrightnessShortcutItem(language: language))
         }
         return items
@@ -161,18 +214,36 @@ enum SettingsDirectory {
 
     static func sections(_ s: Strings,
                          language: AppLanguage,
-                         superKeySource: SuperKeySource = SuperKeyService.shared.source)
+                         superKeySource: SuperKeySource = SuperKeyService.shared.source,
+                         state: SettingsSearchState)
         -> [(title: String, items: [SettingsDirectoryItem])] {
         let categories = FeatureStrings.settingsCategories(language)
         let quitProtection = FeatureStrings.quitProtection(language)
+        let brightness = FeatureStrings.brightness(language)
+        let bluetooth = FeatureStrings.bluetoothSleep(language)
+        let barStyle = FeatureStrings.menuBarAppearance(language)
+        let previews = FeatureStrings.windowPreviewExclusions(language)
+        var liquidGlass: [String] = []
+#if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            liquidGlass = [FeatureStrings.appearance(language).liquidGlass]
+        }
+#endif
         return [
             (categories.essentials, [
                 SettingsDirectoryItem(page: .general, title: s.tabGeneral, icon: "gearshape",
                                        keywords: [s.launchAtLogin, s.languageLabel,
                                                   FeatureStrings.appearance(language).label,
-                                                  FeatureStrings.appearance(language).dark],
+                                                  FeatureStrings.appearance(language).dark,
+                                                  FeatureStrings.feedback(language).sectionTitle] + liquidGlass,
+                                       // The first title of each feature places its sidebar row,
+                                       // so these follow the sidebar's order.
                                        featureKeywords: [
                                         (.musicBlock, [s.musicBlockTitle, s.musicBlockSection]),
+                                        (.mixer, [s.mixerSection]),
+                                        (.soundOutputSwitcher, [s.soundOutputSwitcherTitle]),
+                                        (.audioPriority, [s.audioPrioritySection]),
+                                        (.keepAwake, [s.globalHotkeySection, s.hotkeyToggle]),
                                        ]),
                 // Searching any feature name lands here even when the feature
                 // is hidden, so the hub is always the way back.
@@ -195,46 +266,72 @@ enum SettingsDirectory {
                                                       FeatureStrings.keepAwakeAutomation(language)
                                                         .pauseWhenLockedToggle,
                                                       FeatureStrings.keepAwakeDisplaySleep(language)
-                                                        .allowDisplaySleep]),
-                                        (.brightness, [FeatureStrings.brightness(language).pageTitle,
-                                                       FeatureStrings.brightness(language).osdToggle,
-                                                       FeatureStrings.brightness(language).keyStep,
-                                                       FeatureStrings.brightness(language).keyStepHalf,
-                                                       FeatureStrings.brightness(language).keyStepQuarter]),
+                                                        .allowDisplaySleep,
+                                                      s.keepAwakeOptions, s.keepAwakeAutoStart,
+                                                      s.keepAwakeRightClickToggle, s.keepAwakeMouseJiggle]),
+                                        (.brightness, [brightness.pageTitle, brightness.enable]),
                                         (.extraBrightness, [s.extraBrightnessName]),
-                                        (.bluetoothSleep, [FeatureStrings.bluetoothSleep(language).pageTitle,
-                                                           FeatureStrings.bluetoothSleep(language).enable]),
+                                        (.bluetoothSleep, [bluetooth.pageTitle]),
+                                       ], terms: [
+                                        .init([s.dimScreenOnLidCloseTitle], feature: .keepAwake,
+                                              when: state.on(DefaultsKey.clamshellPreferred)),
+                                        .init([s.keepAwakeMouseJiggleInterval], feature: .keepAwake,
+                                              when: state.on(DefaultsKey.keepAwakeMouseJiggleEnabled)),
+                                        .init([s.batteryDisableBelow], feature: .keepAwake, when: state.hardware.battery),
+                                        .init([brightness.keyStep, brightness.keyStepHalf, brightness.keyStepQuarter,
+                                               brightness.keysToggle, brightness.displayBrightnessShortcuts, brightness.volumeToggle],
+                                              feature: .brightness, when: state.on(DefaultsKey.brightnessControlEnabled)),
+                                        .init([brightness.volumeKeysToggle], feature: .brightness,
+                                              when: state.on(DefaultsKey.brightnessControlEnabled) && state.on(DefaultsKey.displayVolumeEnabled)),
+                                        .init([brightness.speakersStep, brightness.speakersMinimum, brightness.speakersMaximum],
+                                              feature: .brightness, when: state.on(DefaultsKey.brightnessControlEnabled)
+                                                && state.on(DefaultsKey.displayVolumeEnabled) && state.on(DefaultsKey.displayVolumeKeysEnabled)),
+                                        .init([brightness.osdToggle], feature: .brightness,
+                                              when: state.hardware.brightnessOSD && state.on(DefaultsKey.brightnessControlEnabled)),
+                                        .init([bluetooth.enable], feature: .bluetoothSleep, when: state.hardware.bluetoothSleep),
+                                        .init([bluetooth.restoreToggle], feature: .bluetoothSleep,
+                                              when: state.hardware.bluetoothSleep && state.on(DefaultsKey.bluetoothSleepEnabled)),
                                        ]),
                 SettingsDirectoryItem(page: .monitor, title: s.tabMonitor, icon: "chart.line.uptrend.xyaxis",
-                                       keywords: [s.menuBarSpacingLabel, s.menuBarHideIconToggle],
+                                       keywords: [s.menuBarSpacingLabel, s.menuBarHideIconToggle, barStyle.label,
+                                                  barStyle.bars, barStyle.values, s.monitorSeparateMenuBarMetrics,
+                                                  s.monitorIntervalLabel, s.temperatures, GraphScaleStrings.localized(language).title],
                                        featureKeywords: [
-                                        (.monitorMemory, [s.monitorMemoryPressureDot]),
+                                        (.monitorMemory, [s.monitorMemoryPressureDot, s.monitorMemoryMetricLabel]),
                                         (.monitorNetwork, [FeatureStrings.monitorLayout(language).networkSpeedUnit]),
                                         (.monitorCPU, [FeatureStrings.fanSpeed(language).title]),
+                                       ], terms: [
+                                        .init([s.monitorCombineTemperatures], when: !state.bars),
+                                        .init([barStyle.customize, barStyle.normalColor, barStyle.mediumColor, barStyle.highColor,
+                                               barStyle.mediumFrom, barStyle.highFrom], when: state.bars),
                                        ]),
             ]),
             (categories.windowsControls, [
                 SettingsDirectoryItem(page: .mouse, title: s.tabMouse, icon: "computermouse",
                                        featureKeywords: [
+                                        // The scrolling card shows while either of its features is on.
                                         (.scrollInverter, [s.invertMouseScroll, s.invertVerticalScroll,
-                                                           s.invertHorizontalScroll]),
+                                                           s.invertHorizontalScroll, s.scrollSection]),
                                         (.scrollHorizontal, [s.scrollHorizontalName,
-                                                            s.scrollHorizontalModifierLabel]),
+                                                            s.scrollHorizontalModifierLabel, s.scrollSection]),
                                         (.scrollZoom, [s.zoomSection, s.pinchZoom]),
-                                        (.middleClick, [s.middleClickTapPicker]),
+                                        (.middleClick, [s.middleClickTapPicker, s.middleClickEnable]),
                                         (.focusFollowsMouse, [s.focusFollowsMouseName,
                                                               s.focusFollowsMouseDelay,
                                                               s.focusFollowsMouseRaise,
                                                               s.focusFollowsMouseWaitForStop]),
                                         (.smoothScroll, [s.smoothScrollName]),
                                         (.linearScroll, [s.linearScrollName, s.linearScrollLinesLabel]),
+                                        (.scrollSpeed, [s.scrollSpeedName, s.scrollSpeedMultiplierLabel]),
                                         (.mouseAcceleration, [s.mouseAccelerationName]),
-                                        (.mouseNavigation, [s.mouseNavigationEnable]),
+                                        (.mouseNavigation, [s.mouseNavigationEnable, s.mouseNavigationSection]),
                                         (.mouseButtonShortcuts,
                                          [FeatureStrings.mouseButtons(language).pageTitle,
                                           FeatureStrings.mouseButtons(language).sideWheelLeftName,
                                           FeatureStrings.mouseButtons(language).sideWheelRightName,
-                                          FeatureStrings.mouseExceptions(language).listTitle]),
+                                          FeatureStrings.mouseExceptions(language).listTitle,
+                                          FeatureStrings.mouseButtons(language).enableLabel,
+                                          FeatureStrings.mouseButtons(language).spacesEnableLabel]),
                                         (.mouseClickDebounce,
                                          [FeatureStrings.mouseClickDebounce(language).title,
                                           FeatureStrings.mouseClickDebounce(language).windowLabel,
@@ -256,28 +353,40 @@ enum SettingsDirectory {
                                                      s.switcherIgnoreHoverSelection,
                                                      FeatureStrings.switcherShortcuts(language).allWindows,
                                                      s.switcherWindowlessApps,
-                                                     s.switcherShowShortcutHints, s.switcherMaxColumns,
+                                                     s.switcherMaxColumns,
                                                      FeatureStrings.switcherAppRules(language).listTitle,
                                                      FeatureStrings.switcherAppRules(language)
                                                         .showWithoutWindows,
                                                      FeatureStrings.switcherAppRules(language).windowsOnly,
                                                      FeatureStrings.switcherAppRules(language).hidden,
-                                                     FeatureStrings.windowPreviewExclusions(language).listTitle]),
+                                                     s.switcherTakeOverSystemShortcuts, s.keepAwakeOptions,
+                                                     s.switcherAppearanceDelay, s.switcherSearchPin,
+                                                     s.switcherMergeTabs, s.switcherShowFullscreenWindows,
+                                                     s.switcherMinimizedPlacementLabel,
+                                                     s.switcherScreenPlacementLabel, s.switcherCurrentDisplayOnly,
+                                                     s.switcherCurrentSpaceOnly,
+                                                     previews.sectionTitle, s.minimalWindowPreviews,
+                                                     previews.listTitle]),
+                                       ], terms: [
+                                        .init([s.switcherTreatHiddenAppsLikeMinimized], feature: .switcher,
+                                              when: state.groupsMinimizedWindows),
+                                        .init([s.switcherShowShortcutHints], feature: .switcher,
+                                              when: state.on(DefaultsKey.switcherSimpleMode) || state.on(DefaultsKey.switcherIconRowMode)),
                                        ]),
                 SettingsDirectoryItem(page: .dock, title: FeatureStrings.settingsPages(language).dockTitle,
                                        icon: "dock.rectangle",
                                        featureKeywords: [
-                                        (.dockPreview, [s.dockPreviewName, s.dockPreviewEnable,
-                                                        s.dockPreviewOpenDelay,
-                                                        s.dockPreviewBackgroundOpacity,
-                                                        s.dockPreviewQuitAppOnClose,
-                                                        s.dockPreviewKeepDockVisible,
-                                                        s.dockPreviewOrderByCreation,
-                                                        FeatureStrings.windowPreviewExclusions(language).listTitle]),
+                                        (.dockPreview, [s.dockPreviewName, s.dockPreviewEnable, previews.sectionTitle,
+                                                        s.minimalWindowPreviews, previews.listTitle]),
                                         (.dockClick, [FeatureStrings.hub(language).titleDockClick,
                                                       s.dockClickMinimize, s.dockClickHide,
                                                       s.dockClickCycleWindows]),
                                         (.spacesOrder, [s.spacesOrderName]),
+                                       ], terms: [
+                                        .init([s.dockPreviewOpenDelay, s.dockPreviewBackgroundOpacity,
+                                               s.dockPreviewQuitAppOnClose, s.dockPreviewKeepDockVisible,
+                                               s.dockPreviewOrderByCreation, s.switcherCurrentSpaceOnly], feature: .dockPreview,
+                                              when: state.on(DefaultsKey.dockPreviewEnabled)),
                                        ]),
                 SettingsDirectoryItem(page: .windowLayout,
                                       title: FeatureStrings.windowLayout(language).title,
@@ -356,7 +465,8 @@ enum SettingsDirectory {
                                                  FeatureStrings.whatsAppDownloads(language).automatic,
                                                  FeatureStrings.whatsAppDownloads(language).fileTypes]),
                 SettingsDirectoryItem(page: .homebrew, title: s.homebrewName, icon: "shippingbox"),
-                SettingsDirectoryItem(page: .uninstaller, title: s.uninstallerName, icon: "trash"),
+                SettingsDirectoryItem(page: .uninstaller, title: s.uninstallerName, icon: "trash",
+                                      keywords: [s.uninstallerCommandBarToggle, s.uninstallerWatchTrashToggle]),
                 SettingsDirectoryItem(page: .killProcess,
                                       title: FeatureStrings.killProcess(language).pageTitle,
                                       icon: "xmark.octagon",
@@ -427,8 +537,7 @@ enum SettingsDirectory {
                                                  FeatureStrings.radialMenu(language).mouseTriggerRequirement]),
             ]),
             (categories.app, [
-                SettingsDirectoryItem(page: .shortcuts, title: s.shortcutsPageTitle, icon: "command",
-                                      keywords: [s.hotkeyToggle]),
+                SettingsDirectoryItem(page: .shortcuts, title: s.shortcutsPageTitle, icon: "command"),
                 SettingsDirectoryItem(page: .advanced, title: s.tabAdvanced, icon: "wrench.and.screwdriver"),
                 SettingsDirectoryItem(page: .about, title: s.tabAbout, icon: "info.circle",
                                       keywords: [s.reviewIntro]),
