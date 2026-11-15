@@ -26,10 +26,10 @@
 > **Barforge is an unofficial fork of [Vorssaint](https://github.com/vorssaint/vorssaint-utils).** It adds Logitech MX mouse support, a reworked speed test and the other changes in the [Barforge changelog](CHANGELOG-BARFORGE.md). It is not affiliated with or endorsed by the Vorssaint project, so please report problems with Barforge [here](https://github.com/rfoerthe/barforge/issues), not upstream.
 
 <p align="center">
-  <img src="docs/assets/readme/panel-mixer.png" width="196" alt="Volume mixer with per app sliders, one app boosted past 100 percent">
-  <img src="docs/assets/readme/panel-system.png" width="196" alt="System tab with temperatures, usage graphs and memory pressure">
-  <img src="docs/assets/readme/panel-controls.png" width="196" alt="Window controls with the app switcher and Dock features">
-  <img src="docs/assets/readme/panel-utilities.png" width="196" alt="Utilities with cleaner, Homebrew, media tools and clipboard">
+  <img src="docs/assets/readme/panel-mixer.png" width="196" alt="Volume mixer with output, system sound and microphone levels plus per app sliders">
+  <img src="docs/assets/readme/panel-system.png" width="196" alt="System tab with temperatures, fan speed, usage graphs and memory pressure">
+  <img src="docs/assets/readme/panel-network.png" width="196" alt="Network tab with live throughput, session totals, local addresses and a speed test">
+  <img src="docs/assets/readme/panel-utilities.png" width="196" alt="Utilities with app updates, cleaner, Homebrew, clipboard and more">
 </p>
 
 Per app volume, a real system monitor, a better app switcher, window snapping, Dock previews, clipboard history, text snippets, a file shelf, an uninstaller. The utilities Mac users usually buy one by one, together behind a single menu bar icon, with no account, no telemetry and no subscription.
