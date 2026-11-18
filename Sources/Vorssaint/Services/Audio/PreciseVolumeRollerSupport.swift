@@ -72,6 +72,12 @@ enum PreciseVolumeKeyEvents {
         event.getIntegerValueField(.eventSourceUserData) == postedMarker
     }
 
+    /// Matches macOS: Shift inverts "Play feedback when volume is changed",
+    /// except with Option, where Option-Shift only selects fine steps.
+    static func playsFeedback(setting: Bool, option: Bool, shift: Bool) -> Bool {
+        shift && !option ? !setting : setting
+    }
+
     static func fineStep(_ keyCode: Int32) -> [CGEvent] {
         let fineFlags: UInt = 0x80000 | 0x20000
         return [0x0a, 0x0b].compactMap { state in

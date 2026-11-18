@@ -10,6 +10,7 @@ struct PanelClipboardView: View {
     @AppStorage(DefaultsKey.clipboardHistoryEnabled) private var enabled = false
     @AppStorage(DefaultsKey.clipboardHistoryShortcutEnabled) private var shortcutEnabled = true
     @State private var query = ""
+    @State private var searchSurface = ClipboardHistorySearchSurface.view(UUID())
     @State private var copiedID: UUID?
     /// Counts copies, so the list also follows an entry copied again while
     /// it still carries the tick.
@@ -24,7 +25,7 @@ struct PanelClipboardView: View {
     }
 
     private var filteredEntries: [ClipboardHistoryEntry] {
-        history.filteredEntries(matching: query)
+        history.filteredEntries(matching: query, surface: searchSurface)
     }
 
     private var canReorderEntries: Bool {
@@ -42,7 +43,10 @@ struct PanelClipboardView: View {
             entriesList
         }
         .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
-        .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
+        .onDisappear {
+            history.cancelSearch(on: searchSurface)
+            PanelInteractionState.shared.viewKeepsPopoverOpen = false
+        }
     }
 
     private var header: some View {

@@ -38,6 +38,14 @@ enum MonitorVolumeRoutingTests {
     class State {
         var monitorVolumeKeysHeld: [BrightnessSupport.VolumeKeyAction: BrightnessSupport.SpeakerTarget] = [:]
         var gate = PreciseVolumeRollerGate()
+        var feedbackStep = 0
+        var feedback: (key: Int32, step: Int, applied: Bool, released: Bool)?
+        var clicks = 0
+        func playFeedbackIfReady() {
+            guard let feedback, feedback.applied, feedback.released else { return }
+            self.feedback = nil
+            clicks += 1
+        }
         static func showMonitorFeedback() {
             let mixer = AppVolumeMixer.shared
             guard let level = mixer.systemOutputVolume else { return }

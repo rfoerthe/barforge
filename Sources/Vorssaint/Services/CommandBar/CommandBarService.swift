@@ -4,6 +4,7 @@
 
 import AppKit
 import Carbon.HIToolbox
+import Combine
 import SwiftUI
 
 /// The command bar: one floating field, summoned by a global shortcut, that
@@ -69,6 +70,7 @@ final class CommandBarService: ObservableObject {
     @Published var query = "" {
         didSet {
             guard query != oldValue else { return }
+            stopClipboardSearch()
             uninstallWarning = nil
             uninstallFinderRequestID = nil
             if mode.isUninstallFlow {
@@ -452,6 +454,7 @@ final class CommandBarService: ObservableObject {
     }
 
     func hide() {
+        stopClipboardSearch()
         if AppFeature.textSnippets.isAvailable {
             TextSnippetService.shared.setCommandBarVisible(false)
         }
@@ -1345,6 +1348,10 @@ final class CommandBarService: ObservableObject {
 
     private func refreshResults() {
         guard !isTearingDown else { return }
+        if searchedClipboardHistory != nil,
+           !isEnabled(.clipboard) || mode != .search || (activeCategory != nil && activeCategory != .clipboard) {
+            stopClipboardSearch()
+        }
         if presentationLifecycle.isLoadingHome {
             rows = []
             sectionTitles = [:]
@@ -1605,6 +1612,41 @@ final class CommandBarService: ObservableObject {
             CommandBarLinks.rankingTitle(name: entry.title, query: query))
     }
 
+    private weak var searchedClipboardHistory: ClipboardHistoryService?
+    private var clipboardHistoryChanges: AnyCancellable?
+
+    private func observeClipboardSearch(_ history: ClipboardHistoryService) {
+        guard clipboardHistoryChanges == nil else { return }
+        searchedClipboardHistory = history
+        // Published entries change before didSet invalidates the result caches.
+        // Deliver on the next turn and coalesce changes from the same copy or edit.
+        clipboardHistoryChanges = history.$entries.dropFirst().map { _ in () }
+            .debounce(for: .milliseconds(15), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.refreshClipboardSearch() }
+    }
+
+    private func refreshClipboardSearch() {
+        guard searchedClipboardHistory != nil, isVisible, mode == .search, isEnabled(.clipboard),
+              activeCategory == nil || activeCategory == .clipboard else { return }
+        refreshResults()
+    }
+
+    private func stopClipboardSearch() {
+        clipboardHistoryChanges = nil
+        searchedClipboardHistory?.cancelSearch(on: .commandBar)
+        searchedClipboardHistory = nil
+    }
+
+
+    private func clipboardRows(matching query: String, bar: CommandBarFeatureStrings,
+                               limit: Int = 4) -> [CommandBarEntry] {
+        guard isEnabled(.clipboard), AppFeature.clipboardHistory.isAvailable else { return [] }
+        observeClipboardSearch(ClipboardHistoryService.shared)
+        return CommandBarCatalog.clipboardEntries(matching: query, bar: bar, limit: limit,
+            onDeferredResults: { [weak self] in self?.refreshClipboardSearch() },
+            paste: { [weak self] in self?.paste($0) })
+    }
+
     private func searchRows(for trimmed: String) -> [CommandBarEntry] {
         let bar = FeatureStrings.commandBar(L10n.shared.language)
         // Inside a category, typing filters that category and nothing else:
@@ -1617,9 +1659,7 @@ final class CommandBarService: ObservableObject {
             fileSearch.cancelPending()
             let hidden = hiddenCache
             let pool = category == .clipboard
-                ? CommandBarCatalog.clipboardEntries(matching: trimmed, bar: bar, limit: 40) {
-                    [weak self] entry in self?.paste(entry)
-                }
+                ? clipboardRows(matching: trimmed, bar: bar, limit: 40)
                 // A row the person hid stays hidden here too; the browse path
                 // filters it and searching inside the category must agree.
                 .filter { !hidden.contains($0.stableKey) }
@@ -1742,10 +1782,7 @@ final class CommandBarService: ObservableObject {
 
         // The clipboard is searched with everything that was typed: digits
         // are part of what people look for.
-        let clipboard = CommandBarCatalog.clipboardEntries(matching: trimmed,
-                                                           bar: bar) { [weak self] entry in
-            self?.paste(entry)
-        }
+        let clipboard = clipboardRows(matching: trimmed, bar: bar)
 
         let names = aliasCache
         let pinnedKeys = pinCache
