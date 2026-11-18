@@ -19,6 +19,7 @@ struct AdvancedSettings: View {
     @State private var importFailed = false
     @State private var pendingImport: [String: Any]?
     @State private var showImportConfirm = false
+    @State private var showConfigFileConfirm = false
 
     private var backup: BackupFeatureStrings {
         FeatureStrings.backup(l10n.language)
@@ -31,7 +32,7 @@ struct AdvancedSettings: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 10) {
+                FlowLayoutLite(spacing: 10) {
                     Button {
                         importFailed = false
                         exported = SettingsBackup.runExportPanel()
@@ -50,6 +51,13 @@ struct AdvancedSettings: View {
                         }
                     } label: {
                         Label(backup.importButton, systemImage: "square.and.arrow.down")
+                    }
+                    Button {
+                        exported = nil
+                        importFailed = false
+                        showConfigFileConfirm = true
+                    } label: {
+                        Label(backup.configFileButton, systemImage: "doc.badge.gearshape")
                     }
                 }
                 if exported == true {
@@ -148,7 +156,23 @@ struct AdvancedSettings: View {
                 }
             }
         } message: {
-            Text(backup.importConfirmBody)
+            let body = backup.importConfirmBody
+            if FileManager.default.fileExists(atPath: SettingsBackup.configFileURL.path) {
+                Text(body + "\n\n" + backup.importConfigFileNotice)
+            } else {
+                Text(body)
+            }
+        }
+        .alert(backup.configFileConfirmTitle, isPresented: $showConfigFileConfirm) {
+            Button(l10n.s.uninstallerCancel, role: .cancel) {}
+            Button(backup.configFileAction) {
+                exported = SettingsBackup.writeConfigFile()
+            }
+        } message: {
+            // The path names the folder XDG_CONFIG_HOME selected, so a user
+            // can tell which file a dotfiles manager will see change.
+            Text(String(format: backup.configFileConfirmFormat,
+                        (SettingsBackup.configFileURL.path as NSString).abbreviatingWithTildeInPath))
         }
     }
 }

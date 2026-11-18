@@ -16,8 +16,13 @@ struct BackupFeatureStrings {
     let exportFailed: String
     let importConfirmTitle: String
     let importConfirmBody: String
+    let importConfigFileNotice: String
     let importAction: String
     let invalidFile: String
+    let configFileButton: String
+    let configFileConfirmTitle: String
+    let configFileConfirmFormat: String
+    let configFileAction: String
 }
 
 extension FeatureStrings {
@@ -52,8 +57,13 @@ extension BackupFeatureStrings {
         exportFailed: "백업을 저장하지 못했습니다.",
         importConfirmTitle: "이 설정을 가져올까요?",
         importConfirmBody: "현재 설정이 파일의 설정으로 바뀌고 앱이 다시 시작됩니다. 이 Mac의 다른 항목은 변경되지 않습니다.",
+        importConfigFileNotice: "다시 실행하면 XDG 파일의 설정이 가져온 값보다 우선합니다.",
         importAction: "가져오고 다시 시작",
-        invalidFile: "이 파일은 유효한 Barforge 백업이 아닙니다."
+        invalidFile: "이 파일은 유효한 Barforge 백업이 아닙니다.",
+        configFileButton: "설정 파일에 저장…",
+        configFileConfirmTitle: "설정 파일에 저장할까요?",
+        configFileConfirmFormat: "현재 설정 전체가 %@에 기록되며, 파일이 이미 있으면 대체됩니다. Barforge는 실행할 때마다 이 파일을 적용하므로 여기에서 설정을 변경한 후에는 다시 저장하세요.",
+        configFileAction: "저장"
     )
     static let uk = BackupFeatureStrings(
         title: "Резервна копія",
@@ -64,8 +74,13 @@ extension BackupFeatureStrings {
         exportFailed: "Не вдалося зберегти резервну копію.",
         importConfirmTitle: "Імпортувати ці налаштування?",
         importConfirmBody: "Ваші поточні налаштування замінюються файлом, і програма перезапускається. Нічого іншого на цьому Mac не зачіпається.",
+        importConfigFileNotice: "Після перезапуску налаштування з файлу XDG матимуть перевагу над імпортованими значеннями.",
         importAction: "Імпортувати та перезапустити",
-        invalidFile: "Цей файл не є коректною резервною копією Barforge."
+        invalidFile: "Цей файл не є коректною резервною копією Barforge.",
+        configFileButton: "Зберегти у файл налаштувань…",
+        configFileConfirmTitle: "Зберегти у файл налаштувань?",
+        configFileConfirmFormat: "Усі поточні налаштування буде записано в %@; якщо файл уже є, його буде замінено. Barforge застосовує його під час кожного запуску, тож після зміни налаштувань тут збережіть знову.",
+        configFileAction: "Зберегти"
     )
 }
 
@@ -79,8 +94,13 @@ extension BackupFeatureStrings {
         exportFailed: "Could not save the backup.",
         importConfirmTitle: "Import these settings?",
         importConfirmBody: "Your current settings are replaced by the file’s and the app restarts. Nothing else on this Mac is touched.",
+        importConfigFileNotice: "On relaunch, settings in your XDG file take precedence over the imported values.",
         importAction: "Import and restart",
-        invalidFile: "This file is not a valid Barforge backup."
+        invalidFile: "This file is not a valid Barforge backup.",
+        configFileButton: "Save to settings file…",
+        configFileConfirmTitle: "Save to the settings file?",
+        configFileConfirmFormat: "Your current settings are written to %@ as a complete snapshot, replacing that file if it exists. Barforge applies it at each launch, so save again after changing settings here.",
+        configFileAction: "Save"
     )
 
     static let ptBR = BackupFeatureStrings(
@@ -92,8 +112,13 @@ extension BackupFeatureStrings {
         exportFailed: "Não foi possível salvar o backup.",
         importConfirmTitle: "Importar estas configurações?",
         importConfirmBody: "As configurações atuais são substituídas pelas do arquivo e o app reinicia. Nada mais neste Mac é alterado.",
+        importConfigFileNotice: "Ao reiniciar, as configurações do arquivo XDG têm prioridade sobre os valores importados.",
         importAction: "Importar e reiniciar",
-        invalidFile: "Este arquivo não é um backup válido do Barforge."
+        invalidFile: "Este arquivo não é um backup válido do Barforge.",
+        configFileButton: "Salvar no arquivo de configurações…",
+        configFileConfirmTitle: "Salvar no arquivo de configurações?",
+        configFileConfirmFormat: "Suas configurações atuais são gravadas por completo em %@, substituindo esse arquivo se ele existir. O Barforge aplica esse arquivo sempre que é aberto, então salve de novo depois de alterar as configurações aqui.",
+        configFileAction: "Salvar"
     )
 
     static let tr = BackupFeatureStrings(
@@ -105,8 +130,13 @@ extension BackupFeatureStrings {
         exportFailed: "Yedek kaydedilemedi.",
         importConfirmTitle: "Bu ayarlar içe aktarılsın mı?",
         importConfirmBody: "Mevcut ayarlar dosyadakilerle değiştirilir ve uygulama yeniden başlar. Bu Mac’te başka hiçbir şeye dokunulmaz.",
+        importConfigFileNotice: "Yeniden başlatıldığında XDG dosyasındaki ayarlar, içe aktarılan değerlere göre önceliklidir.",
         importAction: "İçe aktar ve yeniden başlat",
-        invalidFile: "Bu dosya geçerli bir Barforge yedeği değil."
+        invalidFile: "Bu dosya geçerli bir Barforge yedeği değil.",
+        configFileButton: "Ayar dosyasına kaydet…",
+        configFileConfirmTitle: "Ayar dosyasına kaydedilsin mi?",
+        configFileConfirmFormat: "Geçerli ayarlarınızın tamamı %@ dosyasına yazılır; dosya varsa değiştirilir. Barforge bu dosyayı her açılışta uygular; burada ayar değiştirdikten sonra yeniden kaydedin.",
+        configFileAction: "Kaydet"
     )
 
     static let ru = BackupFeatureStrings(
@@ -118,8 +148,13 @@ extension BackupFeatureStrings {
         exportFailed: "Не удалось сохранить копию.",
         importConfirmTitle: "Импортировать эти настройки?",
         importConfirmBody: "Текущие настройки заменяются настройками из файла, и приложение перезапускается. Больше ничего на этом Mac не меняется.",
+        importConfigFileNotice: "После перезапуска настройки из файла XDG имеют приоритет над импортированными значениями.",
         importAction: "Импортировать и перезапустить",
-        invalidFile: "Этот файл не является корректной резервной копией Barforge."
+        invalidFile: "Этот файл не является корректной резервной копией Barforge.",
+        configFileButton: "Сохранить в файл настроек…",
+        configFileConfirmTitle: "Сохранить в файл настроек?",
+        configFileConfirmFormat: "Все текущие настройки будут записаны в %@; если файл уже есть, он будет заменён. Barforge применяет его при каждом запуске, поэтому после изменения настроек здесь сохраните снова.",
+        configFileAction: "Сохранить"
     )
 
     static let es = BackupFeatureStrings(
@@ -131,8 +166,13 @@ extension BackupFeatureStrings {
         exportFailed: "No se pudo guardar la copia.",
         importConfirmTitle: "¿Importar estos ajustes?",
         importConfirmBody: "Los ajustes actuales se sustituyen por los del archivo y la app se reinicia. Nada más cambia en este Mac.",
+        importConfigFileNotice: "Al reiniciar, los ajustes del archivo XDG tienen prioridad sobre los valores importados.",
         importAction: "Importar y reiniciar",
-        invalidFile: "Este archivo no es una copia de seguridad válida de Barforge."
+        invalidFile: "Este archivo no es una copia de seguridad válida de Barforge.",
+        configFileButton: "Guardar en el archivo de ajustes…",
+        configFileConfirmTitle: "¿Guardar en el archivo de ajustes?",
+        configFileConfirmFormat: "Todos tus ajustes actuales se escriben en %@ y reemplazan ese archivo si ya existe. Barforge lo aplica cada vez que se abre, así que vuelve a guardar después de cambiar los ajustes aquí.",
+        configFileAction: "Guardar"
     )
 
     static let sk = BackupFeatureStrings(
@@ -144,8 +184,13 @@ extension BackupFeatureStrings {
         exportFailed: "Zálohu sa nepodarilo uložiť.",
         importConfirmTitle: "Importovať tieto nastavenia?",
         importConfirmBody: "Vaše aktuálne nastavenia sa nahradia nastaveniami zo súboru a aplikácia sa reštartuje. Nič iné na tomto Macu sa nezmení.",
+        importConfigFileNotice: "Po opätovnom spustení majú nastavenia zo súboru XDG prednosť pred importovanými hodnotami.",
         importAction: "Importovať a reštartovať",
-        invalidFile: "Tento súbor nie je platná záloha Barforge."
+        invalidFile: "Tento súbor nie je platná záloha Barforge.",
+        configFileButton: "Uložiť do súboru nastavení…",
+        configFileConfirmTitle: "Uložiť do súboru nastavení?",
+        configFileConfirmFormat: "Všetky aktuálne nastavenia sa zapíšu do %@ a nahradia tento súbor, ak už existuje. Barforge ho použije pri každom spustení, preto po zmene nastavení tu uložte znova.",
+        configFileAction: "Uložiť"
     )
 
     static let de = BackupFeatureStrings(
@@ -157,8 +202,13 @@ extension BackupFeatureStrings {
         exportFailed: "Backup konnte nicht gesichert werden.",
         importConfirmTitle: "Diese Einstellungen importieren?",
         importConfirmBody: "Die aktuellen Einstellungen werden durch die der Datei ersetzt und die App startet neu. Sonst ändert sich auf diesem Mac nichts.",
+        importConfigFileNotice: "Beim Neustart haben die Einstellungen aus der XDG-Datei Vorrang vor den importierten Werten.",
         importAction: "Importieren und neu starten",
-        invalidFile: "Diese Datei ist kein gültiges Barforge-Backup."
+        invalidFile: "Diese Datei ist kein gültiges Barforge-Backup.",
+        configFileButton: "In Einstellungsdatei sichern…",
+        configFileConfirmTitle: "In der Einstellungsdatei sichern?",
+        configFileConfirmFormat: "Alle aktuellen Einstellungen werden in %@ geschrieben und ersetzen diese Datei, falls sie existiert. Barforge wendet sie bei jedem Start an, sichere daher erneut, nachdem du hier Einstellungen änderst.",
+        configFileAction: "Sichern"
     )
 
     static let fr = BackupFeatureStrings(
@@ -170,8 +220,13 @@ extension BackupFeatureStrings {
         exportFailed: "Impossible d’enregistrer la sauvegarde.",
         importConfirmTitle: "Importer ces réglages\u{00A0}?",
         importConfirmBody: "Les réglages actuels sont remplacés par ceux du fichier et l’app redémarre. Rien d’autre ne change sur ce Mac.",
+        importConfigFileNotice: "Au prochain lancement, les réglages du fichier XDG auront priorité sur les valeurs importées.",
         importAction: "Importer et redémarrer",
-        invalidFile: "Ce fichier n’est pas une sauvegarde Barforge valide."
+        invalidFile: "Ce fichier n’est pas une sauvegarde Barforge valide.",
+        configFileButton: "Enregistrer dans le fichier de réglages…",
+        configFileConfirmTitle: "Enregistrer dans le fichier de réglages\u{00A0}?",
+        configFileConfirmFormat: "Tous vos réglages actuels sont écrits dans %@ et remplacent ce fichier s’il existe. Barforge l’applique à chaque ouverture\u{00A0}: enregistrez de nouveau après avoir modifié les réglages ici.",
+        configFileAction: "Enregistrer"
     )
 
     static let it = BackupFeatureStrings(
@@ -183,8 +238,13 @@ extension BackupFeatureStrings {
         exportFailed: "Impossibile salvare il backup.",
         importConfirmTitle: "Importare queste impostazioni?",
         importConfirmBody: "Le impostazioni attuali vengono sostituite da quelle del file e l’app si riavvia. Nient’altro cambia su questo Mac.",
+        importConfigFileNotice: "Al riavvio, le impostazioni del file XDG hanno la precedenza sui valori importati.",
         importAction: "Importa e riavvia",
-        invalidFile: "Questo file non è un backup Barforge valido."
+        invalidFile: "Questo file non è un backup Barforge valido.",
+        configFileButton: "Salva nel file delle impostazioni…",
+        configFileConfirmTitle: "Salvare nel file delle impostazioni?",
+        configFileConfirmFormat: "Tutte le impostazioni attuali vengono scritte in %@, sostituendo il file se esiste già. Barforge lo applica a ogni avvio, quindi salva di nuovo dopo aver modificato le impostazioni qui.",
+        configFileAction: "Salva"
     )
 
     static let ja = BackupFeatureStrings(
@@ -196,8 +256,13 @@ extension BackupFeatureStrings {
         exportFailed: "バックアップを保存できませんでした。",
         importConfirmTitle: "この設定を読み込みますか?",
         importConfirmBody: "現在の設定はファイルの内容に置き換えられ、アプリが再起動します。このMacのほかの部分は変わりません。",
+        importConfigFileNotice: "再起動時には、読み込んだ値よりも XDG ファイルの設定が優先されます。",
         importAction: "読み込んで再起動",
-        invalidFile: "このファイルは有効なBarforgeのバックアップではありません。"
+        invalidFile: "このファイルは有効なBarforgeのバックアップではありません。",
+        configFileButton: "設定ファイルに保存…",
+        configFileConfirmTitle: "設定ファイルに保存しますか?",
+        configFileConfirmFormat: "現在のすべての設定が%@に書き込まれます。ファイルがすでにある場合は置き換えられます。Barforgeは起動するたびにこのファイルを適用するため、ここで設定を変更したら再度保存してください。",
+        configFileAction: "保存"
     )
 
     static let zhHans = BackupFeatureStrings(
@@ -209,8 +274,13 @@ extension BackupFeatureStrings {
         exportFailed: "无法存储备份。",
         importConfirmTitle: "导入这些设置？",
         importConfirmBody: "当前设置将被文件中的设置替换，App 会重启。这台 Mac 上的其他内容不受影响。",
+        importConfigFileNotice: "重新启动后，XDG 文件中的设置优先于导入的值。",
         importAction: "导入并重启",
-        invalidFile: "该文件不是有效的 Barforge 备份。"
+        invalidFile: "该文件不是有效的 Barforge 备份。",
+        configFileButton: "存储到设置文件…",
+        configFileConfirmTitle: "要存储到设置文件吗？",
+        configFileConfirmFormat: "当前的全部设置将写入 %@，如果该文件已存在则会被替换。Barforge 每次启动时都会应用该文件，因此在这里更改设置后请重新存储。",
+        configFileAction: "存储"
     )
 
     static let zhTW = BackupFeatureStrings(
@@ -222,8 +292,13 @@ extension BackupFeatureStrings {
         exportFailed: "無法儲存備份。",
         importConfirmTitle: "匯入這些設定?",
         importConfirmBody: "目前設定將被檔案中的設定取代,App 會重新啟動。這台 Mac 上的其他內容不受影響。",
+        importConfigFileNotice: "重新啟動後，XDG 檔案中的設定會優先於匯入的值。",
         importAction: "匯入並重新啟動",
-        invalidFile: "此檔案不是有效的 Barforge 備份。"
+        invalidFile: "此檔案不是有效的 Barforge 備份。",
+        configFileButton: "儲存到設定檔…",
+        configFileConfirmTitle: "要儲存到設定檔嗎?",
+        configFileConfirmFormat: "目前的所有設定會寫入 %@,若該檔案已存在則會被取代。Barforge 每次啟動時都會套用此檔案,因此在這裡更改設定後請再次儲存。",
+        configFileAction: "儲存"
     )
 
     static let zhHK = BackupFeatureStrings(
@@ -235,7 +310,12 @@ extension BackupFeatureStrings {
         exportFailed: "儲存唔到備份。",
         importConfirmTitle: "匯入這些設定?",
         importConfirmBody: "目前設定將被檔案中的設定取代,App 會重新啟動。這台 Mac 上的其他內容不受影響。",
+        importConfigFileNotice: "重新啟動後，XDG 檔案中的設定會優先於匯入的值。",
         importAction: "匯入並重新啟動",
-        invalidFile: "此檔案不是有效嘅 Barforge 備份。"
+        invalidFile: "此檔案不是有效嘅 Barforge 備份。",
+        configFileButton: "儲存到設定檔…",
+        configFileConfirmTitle: "要儲存到設定檔嗎?",
+        configFileConfirmFormat: "而家所有設定會寫入 %@,如果檔案已經存在就會被取代。Barforge 每次啟動都會套用呢個檔案,所以喺呢度改完設定之後要再儲存一次。",
+        configFileAction: "儲存"
     )
 }
