@@ -14,6 +14,51 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [1.0.7] - 2026-11-19
+
+Based on Vorssaint 3.4.4.
+
+### Added
+- Your current settings can be saved to the XDG settings file from Settings → Advanced → Backup. The confirmation shows where the file is saved. Barforge applies the file at each launch, so save again after changing settings in the app. Thanks to @whizzzkid.
+- The volume and mute of a monitor's built-in speakers can be controlled from Displays settings and the menu panel's mixer when macOS cannot set that output's volume itself. The volume keys work on them too, with a step size and lower and upper limits you choose, and the brightness overlay shows the new level. Thanks to @jairuspace, @sambet1997, @morhaf-ko, @ruvelro and @Wahab417.
+- A scrolling screenshot has its own shortcut. You can scroll manually or let Barforge scroll the selected window. Thanks to @EugeneCarldotme.
+- The uninstaller can offer to review leftover files when you move the last copy of an app from an Applications folder to the Trash in Finder. The offer starts off and needs Full Disk Access; cleanup still asks for confirmation. Thanks to @zamai and @ilim-cell.
+- Holding a modifier key scrolls a mouse wheel faster, from 2× to 15×. Settings → Mouse → Scroll faster while holding a key. Thanks to @VlodekH.
+
+### Changed
+- Barforge is based on Vorssaint 3.4.4 and brings the changes Vorssaint made since Barforge 1.0.6, listed here, except those for the Dynamic Island with its AI Agents and for Fan Control, which Barforge does not include.
+- Clipboard history searches index the start of long entries and search the remaining text in the background. Searches in different panels keep their own results. Thanks to @iva-zhu.
+- The window switcher keeps a list of windows in the background so repeated shortcuts can open it sooner. Current Space filtering and windowless Finder selections are preserved. Thanks to @LeLocTai.
+- Keep Awake resumes a manual session after Barforge restarts, with its original end time. Thanks to @stieludv.
+- Edge snapping restores a window's previous size only after a real drag of its title bar; a click leaves it snapped.
+- Canceling Copy as GIF while it is being prepared leaves the clipboard as it was. Thanks to @oskarsss.
+
+### Fixed
+- Monitor speakers that stay silent at zero volume can play again when you turn the volume up. Restoring sound respects the configured volume limit, and the volume keys play the macOS volume click on them. Thanks to @trenaryja.
+- Brightness and speaker controls can reach compatible monitors connected through the built-in HDMI converter on certain Macs. Thanks to @davidmessem.
+- The uninstaller and cleaner count files next to symbolic links. Nested app components are detected, and wallpaper scans still skip packages. Thanks to @retomi and @salvatoremiceli.
+- The disk image installer skips hidden mounts, temporary build images and folders marked with `.vorssaint-no-install`. For images outside Downloads that have no quarantine flag, the option to move the image to the Trash starts unchecked. Thanks to @Zekuath.
+- Mic Mute limits repeated writes to unresponsive virtual inputs, including the Teams loopback driver. Bursts of device notifications still trigger an immediate mute check, and a failed manual unmute is reported. Thanks to @JosueM1109.
+- The volume mixer gives regular apps launched by another app their own controls and saved levels, including Steam games. Thanks to @binjamshid.
+- Clicking a control in the menu bar panel from another app activates the control and keeps the panel open. Thanks to @nodegan.
+- Window Layout still snaps a normal drag when macOS Option-drag tiling is enabled. Holding Option hands that drag to macOS. Thanks to @iva-zhu.
+- Shelf stays responsive while it prepares a file drag from iCloud or another slow volume. Files inside a package remain protected from moves. Thanks to @iva-zhu.
+- Click a window in the frozen screenshot picker to capture its current contents, including visible video, without capturing overlapping apps. Dragging a region still uses the frozen image. Thanks to @iva-zhu.
+- The screenshot editor limits image memory across undo and redo, preserves history after a canceled drawing, and avoids keeping a full capture for a small crop. Thanks to @iva-zhu.
+- Audio device priority recognizes a returning AirPlay receiver when its session identifier changes and merges its existing duplicates. Other audio devices keep their saved priorities, including devices with the same name. Unavailable entries can be removed from either list. Thanks to @EugeneCarldotme and @TC-Virtuoso.
+- If a disabled MacBook display wakes at the lock screen, Barforge waits until you unlock and an external display is active before turning the built-in display off again. Thanks to @jankorbay.
+- When a closed-lid Keep Awake session ends, Barforge skips the sleep request while the Mac is plugged in and using an external display. On battery it requests sleep if macOS allows it. Thanks to @ruvelro.
+- Tapping Caps Lock toggles capitals when that is its Super Key solo action. Super Key no longer crashes when it reapplies the keyboard mapping at startup, and shortcut recording recognizes Super Key combinations while the mapping starts. Thanks to @iva-zhu and @roypadina.
+- Mic Mute remembers each channel's level across upgrades and reconnects. Thanks to @samueljim.
+- Routine mixer checks keep per-app volume levels. Thanks to @meowvan666.
+- Settings search finds more of the controls Settings shows, including low disk space alerts, scrolling screenshots and Trash cleanup, and opens the section that holds them. Thanks to @MaximilianMauroner.
+- Smooth scrolling keeps the normal wheel distance in Barforge's own panels. Thanks to @iva-zhu.
+- The last Homebrew log can be reopened from App Updates, even with the Homebrew page off. It stays until you clear it, run another command or quit. Thanks to @iva-zhu.
+- Command Bar converts mixed feet and inches, such as `5ft 11 in cm`. Thanks to @andy-kelly.
+- The uninstaller's setup controls stay reachable in small windows.
+- A partial settings file in `~/.config/barforge` leaves the local preferences it does not declare untouched.
+- Switching a DDC monitor to software dimming cancels its pending hardware brightness writes.
+
 ## [1.0.7-beta.2] - 2026-11-18
 
 Based on Vorssaint 3.4.4.
