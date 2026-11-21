@@ -477,6 +477,11 @@ enum SettingsDirectory {
                                       keywords: ["port", "ports", "listening", "socket", "PID", "kill port"]),
             ]),
             (categories.utilities, [
+                SettingsDirectoryItem(page: .timeTracking,
+                                      title: FeatureStrings.timeTracking(language).title,
+                                      icon: AppFeature.timeTracking.symbolName,
+                                      keywords: [FeatureStrings.timeTracking(language).recordToggle,
+                                                 "time tracking", "working time", "timesheet"]),
                 SettingsDirectoryItem(page: .commandBar,
                                       title: FeatureStrings.commandBar(language).pageTitle,
                                       icon: "command",

@@ -29,7 +29,7 @@ enum AppFeature: String, CaseIterable {
     // Tools
     case quickLauncher, quickToggles, quitApps, colorPicker, screenOCR, cleaningMode, mediaTools,
          cleaner, uninstaller, homebrew, appUpdates, screenshot, cameraPreview, radialMenu, scratchpad,
-         commandBar, screenRecorder, wallpaper, killProcess, portManager, diskAnalyzer
+         commandBar, screenRecorder, wallpaper, killProcess, portManager, diskAnalyzer, timeTracking
     // System monitor, one entry per metric family (temperatures live with
     // their parent metric: CPU temp with CPU, battery temp with power).
     case monitorCPU, monitorGPU, monitorMemory, monitorNetwork, monitorDisk, monitorPower, connectedDevices
@@ -111,7 +111,7 @@ extension AppFeature {
         case .quickLauncher, .quickToggles, .quitApps, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
              .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
-             .diskAnalyzer:
+             .diskAnalyzer, .timeTracking:
             return .tools
         case .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
              .connectedDevices:
@@ -185,6 +185,7 @@ extension AppFeature {
         case .killProcess: return "xmark.octagon"
         case .portManager: return "network"
         case .diskAnalyzer: return "chart.pie"
+        case .timeTracking: return "clock.badge.checkmark"
         case .monitorCPU: return "cpu"
         case .monitorGPU: return "rectangle.connected.to.line.below"
         case .monitorMemory: return "memorychip"
@@ -197,7 +198,7 @@ extension AppFeature {
 
     var availabilityKey: String { DefaultsKey.featureAvailable(rawValue) }
 
-    var isBeta: Bool { self == .killProcess }
+    var isBeta: Bool { self == .killProcess || self == .timeTracking }
 
     /// Availability read straight from defaults. Existing features stay
     /// available on update; explicit beta opt-ins may start unavailable.
@@ -258,6 +259,7 @@ extension AppFeature {
         case .brightness: return [DefaultsKey.brightnessControlEnabled]
         case .extraBrightness: return [DefaultsKey.extraBrightnessEnabled]
         case .bluetoothSleep: return [DefaultsKey.bluetoothSleepEnabled]
+        case .timeTracking: return [DefaultsKey.timeTrackingEnabled]
         case .windowLayout, .diskImageInstaller, .mixer, .micMute, .keepAwake,
              .quickLauncher, .quickToggles, .quitApps, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .scratchpad,
@@ -335,6 +337,9 @@ extension AppFeature {
         case .mixer: return [.audioCapture, .accessibility]
         case .musicBlock: return [.accessibility]
         case .monitorCPU, .monitorMemory, .monitorDisk, .monitorPower: return [.notifications]
+        // Reminders about breaks and maximum hours, and the question after a
+        // long lock. Recording itself needs no permission.
+        case .timeTracking: return [.notifications]
         case .clipboardHistory, .shelf, .urlCleaner,
              .soundOutputSwitcher, .audioPriority,
              .extraBrightness, .bluetoothSleep, .quickLauncher, .colorPicker, .micMute, .mediaTools,
@@ -420,7 +425,8 @@ extension AppFeature {
              .connectedDevices:
             return true
         case .focusFollowsMouse, .scrollHorizontal, .scrollZoom, .linearScroll, .scrollSpeed, .diskImageInstaller, .audioPriority,
-             .wallpaper, .killProcess, .portManager, .spacesOrder, .logitechMX, .quitApps, .diskAnalyzer:
+             .wallpaper, .killProcess, .portManager, .spacesOrder, .logitechMX, .quitApps, .diskAnalyzer,
+             .timeTracking:
             return false
         }
     }
@@ -486,6 +492,10 @@ extension AppFeature {
                         || boolFor(DefaultsKey.whatsAppOrganizerEnabled))
                     && boolFor(DefaultsKey.whatsAppDownloadsNotify)
                 return cleanerNotifies || whatsAppNotifies
+            case (.timeTracking, .notifications):
+                return boolFor(DefaultsKey.timeTrackingNotifyLimit)
+                    || boolFor(DefaultsKey.timeTrackingNotifyBreak)
+                    || boolFor(DefaultsKey.timeTrackingAskAfterLock)
             case (.screenRecorder, .audioCapture):
                 return boolFor(DefaultsKey.recorderSystemAudio)
             case (.screenRecorder, .microphone):

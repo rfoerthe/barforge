@@ -328,6 +328,7 @@ final class FeatureRuntime: ObservableObject {
         .radialMenu: { RadialMenuService.shared.syncWithPreferences() },
         .scratchpad: { ScratchpadService.shared.syncWithPreferences() },
         .diskAnalyzer: { DiskAnalyzerService.shared.syncWithPreferences() },
+        .timeTracking: { TimeTrackingService.shared.syncWithPreferences() },
         .commandBar: { CommandBarService.shared.syncWithPreferences() },
         .cleaner: {
             CleanerScheduler.shared.syncWithPreferences()

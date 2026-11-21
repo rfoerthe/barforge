@@ -780,6 +780,13 @@ enum DefaultsKey {
     /// unregistered and out of backups: the paths belong to this Mac.
     static let diskAnalyzerKeptFolders = "diskAnalyzerKeptFolders"
 
+    // Time Tracking. Recorded days and the dated working time rules live in
+    // the feature's own database, never here.
+    static let timeTrackingEnabled = "timeTrackingEnabled"
+    static let timeTrackingNotifyLimit = "timeTrackingNotifyLimit"     // reminders at 9:45 and 10 h of work
+    static let timeTrackingNotifyBreak = "timeTrackingNotifyBreak"     // reminders at 5:45 and 6 h without a break
+    static let timeTrackingAskAfterLock = "timeTrackingAskAfterLock"   // ask what a long lock was
+
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"
     static let windowDirectionalEnabled = "windowDirectionalEnabled"
@@ -1584,6 +1591,10 @@ enum Defaults {
         DefaultsKey.panelUtilityPortManager: true,
         DefaultsKey.panelUtilityDiskAnalyzer: true,
         DefaultsKey.diskAnalyzerViewMode: "rings",
+        DefaultsKey.timeTrackingEnabled: false,
+        DefaultsKey.timeTrackingNotifyLimit: true,
+        DefaultsKey.timeTrackingNotifyBreak: true,
+        DefaultsKey.timeTrackingAskAfterLock: false,
         DefaultsKey.screenshotShowCaptureMenuOnShortcut: true,
         DefaultsKey.recorderShowCaptureMenuOnShortcut: true,
         DefaultsKey.screenOCRShowCaptureMenuOnShortcut: true,
