@@ -118,6 +118,15 @@ struct TimeTrackingDatabaseFault: Hashable, Sendable {
 
     let kind: Kind
     let message: String
+
+    /// The same for the pure texts of `TTMenu`.
+    var failure: TTDatabaseFailure {
+        switch kind {
+        case .open: return .open
+        case .read: return .read
+        case .write: return .write
+        }
+    }
 }
 
 // MARK: Events and state
@@ -147,6 +156,8 @@ enum TimeTrackingEvent: Equatable {
 
 /// What the menu bar section shows (state after the last event or tick).
 struct TimeTrackingSnapshot: Equatable {
+    /// Today.
+    var date: TTDate
     var status: TTStatus
     var today: TTTodayInfo
     /// Today's breaks, for "Count a break as working time".
@@ -158,6 +169,8 @@ struct TimeTrackingSnapshot: Equatable {
     /// Free day: does the recorded time count (`nil`: no free day)?
     var counting: Bool?
     var settings: TTSettings
+    /// Status line, actions and time choices of the menu bar section.
+    var menu: TTMenuModel
 }
 
 // MARK: Engine
@@ -180,6 +193,7 @@ final class TimeTrackingEngine {
     private let clock: TimeTrackingClock
     private let probe: TimeTrackingSystemProbe
     private let texts: () -> TimeTrackingTexts
+    private let menuTexts: () -> TimeTrackingMenuTexts
     private let onEvent: (TimeTrackingEvent) -> Void
     private var lastSave: TimeInterval
 
@@ -188,12 +202,14 @@ final class TimeTrackingEngine {
     /// the fault, as in Tagwerk.
     init(store: TimeTrackingStore, defaults: UserDefaults, clock: TimeTrackingClock,
          probe: TimeTrackingSystemProbe, texts: @escaping () -> TimeTrackingTexts,
+         menuTexts: @escaping () -> TimeTrackingMenuTexts = { .enUS },
          onEvent: @escaping (TimeTrackingEvent) -> Void = { _ in }) {
         self.store = store
         self.defaults = defaults
         self.clock = clock
         self.probe = probe
         self.texts = texts
+        self.menuTexts = menuTexts
         self.onEvent = onEvent
         var fault: TimeTrackingDatabaseFault?
         let days: [TTDay]
@@ -241,10 +257,20 @@ final class TimeTrackingEngine {
     /// The state for the display.
     func snapshot() -> TimeTrackingSnapshot {
         let t = begin()
-        return TimeTrackingSnapshot(status: tracker.status(t), today: tracker.today(t),
-                                    pausesToday: tracker.pausesToday(t), isRunning: tracker.isRunning,
+        let today = tracker.today(t)
+        let pauses = tracker.pausesToday(t)
+        return TimeTrackingSnapshot(date: t.date, status: tracker.status(t), today: today,
+                                    pausesToday: pauses, isRunning: tracker.isRunning,
                                     onBreak: tracker.onBreak, onAway: tracker.onAway, onIdle: tracker.onIdle,
-                                    counting: tracker.counting(t.date), settings: tracker.settings)
+                                    counting: tracker.counting(t.date), settings: tracker.settings,
+                                    menu: TTMenu.model(tracker, now: t, info: today, pauses: pauses,
+                                                       texts: tracker.texts, menu: menuTexts()))
+    }
+
+    /// The question after the lock from `from` to `to`, if one is due
+    /// (`menubar.rs` `ask_about_lock`); asked right after recording resumed.
+    func lockQuestion(from: TTDateTime, to: TTDateTime) -> TTLockQuestion? {
+        TTLockQuestion.ask(tracker, from: from, to: to)
     }
 
     func now() -> TTDateTime { clock.now() }

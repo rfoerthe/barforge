@@ -792,6 +792,10 @@ enum DefaultsKey {
     static let timeTrackingHotkeys = "timeTrackingHotkeys"                 // global shortcuts on
     static let timeTrackingAutoWorkdaysOnly = "timeTrackingAutoWorkdaysOnly" // recording counts by itself only on workdays
     static let timeTrackingIdleSeconds = "timeTrackingIdleSeconds"         // idle time that pauses recording (0 = off)
+    static let timeTrackingStatusItem = "timeTrackingStatusItem"           // own menu bar icon with the state
+    static let timeTrackingPauseShortcut = "timeTrackingPauseShortcut"     // "Pause work" / "Resume work"
+    static let timeTrackingRecordsShortcut = "timeTrackingRecordsShortcut" // opens the records
+    static let panelShowTimeTracking = "panelShowTimeTracking"
     /// Machine state, unregistered and never exported: what recording was
     /// doing when the app last saved (`TTStatus.line`), so a restart resumes
     /// an open break or work away from the Mac (Tagwerk's `.status` file).
@@ -1611,6 +1615,10 @@ enum Defaults {
         DefaultsKey.timeTrackingHotkeys: false,
         DefaultsKey.timeTrackingAutoWorkdaysOnly: true,
         DefaultsKey.timeTrackingIdleSeconds: 0,
+        DefaultsKey.timeTrackingStatusItem: true,
+        DefaultsKey.timeTrackingPauseShortcut: GlobalShortcut.timeTrackingPauseDefault.storageValue,
+        DefaultsKey.timeTrackingRecordsShortcut: GlobalShortcut.timeTrackingRecordsDefault.storageValue,
+        DefaultsKey.panelShowTimeTracking: true,
         DefaultsKey.screenshotShowCaptureMenuOnShortcut: true,
         DefaultsKey.recorderShowCaptureMenuOnShortcut: true,
         DefaultsKey.screenOCRShowCaptureMenuOnShortcut: true,

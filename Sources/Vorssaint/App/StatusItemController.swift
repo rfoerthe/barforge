@@ -14,6 +14,8 @@ final class StatusItemController {
     var onRightClick: ((NSStatusBarButton?) -> Void)?
     var onMetricClick: ((MenuBarMetric, NSStatusBarButton) -> Void)?
     var onClipboardPreviewClick: (() -> Void)?
+    /// Time Tracking's own item was clicked (it opens the panel on its section).
+    var onTimeTrackingClick: ((NSStatusBarButton) -> Void)?
 
     private(set) var statusItem: NSStatusItem!
     /// The optional "show latest copy" item: same shape as a metric item —
@@ -21,6 +23,8 @@ final class StatusItemController {
     /// MenuBarMetric, since its content comes from ClipboardHistoryService
     /// rather than a SystemSnapshot reading.
     private var clipboardPreviewStatusItem: NSStatusItem?
+    /// Time Tracking's optional item with its glyph and today's working time.
+    private let timeTrackingItem = TimeTrackingStatusItem()
     private var metricStatusItems: [String: NSStatusItem] = [:]
     private var metricStatusItemFocus: [String: MenuBarMetric] = [:]
     private var cancellables = Set<AnyCancellable>()
@@ -80,7 +84,8 @@ final class StatusItemController {
     var button: NSStatusBarButton? { statusItem.button }
 
     func containsStatusItem(at screenPoint: NSPoint) -> Bool {
-        let items = [statusItem, clipboardPreviewStatusItem].compactMap { $0 } + Array(metricStatusItems.values)
+        let items = [statusItem, clipboardPreviewStatusItem, timeTrackingItem.item].compactMap { $0 }
+            + Array(metricStatusItems.values)
         // A hidden item keeps its last frame, which another app's item may
         // occupy by now.
         let buttons = items.filter(\.isVisible).compactMap(\.button)
@@ -98,6 +103,9 @@ final class StatusItemController {
     init() {
         installStatusItem()
         bind()
+        timeTrackingItem.onClick = { [weak self] button in self?.onTimeTrackingClick?(button) }
+        timeTrackingItem.onRightClick = { [weak self] button in self?.onRightClick?(button) }
+        timeTrackingItem.sync()
     }
 
     /// Creates the status item and configures its button. The menu bar item is the
@@ -224,6 +232,7 @@ final class StatusItemController {
             self.refresh()
             self.bindClipboardPreviewIfAvailable()
             self.syncClipboardPreviewItem()
+            self.timeTrackingItem.sync()
         }
     }
 
@@ -409,7 +418,8 @@ final class StatusItemController {
     /// that is out of the bar has nowhere on screen to open from.
     func menuHost(for button: NSStatusBarButton?) -> NSStatusItem {
         guard !statusItem.isVisible, let button else { return statusItem }
-        let others = [clipboardPreviewStatusItem].compactMap { $0 } + Array(metricStatusItems.values)
+        let others = [clipboardPreviewStatusItem, timeTrackingItem.item].compactMap { $0 }
+            + Array(metricStatusItems.values)
         return others.first { $0.button === button } ?? statusItem
     }
 

@@ -143,6 +143,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             // any status item.
             ClipboardHistoryService.shared.toggleHistoryWindow()
         }
+        statusController.onTimeTrackingClick = { [weak self] button in
+            self?.captureStatusClick()
+            self?.showSectionPanel(.timeTracking, anchoredTo: button)
+        }
         // The shelf drop zone chip anchors itself under the menu bar icon.
         ShelfService.shared.statusItemFrameProvider = { [weak self] in
             guard let item = self?.statusController.statusItem, item.isVisible,
@@ -534,6 +538,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             return
         }
         MenuPanelFocus.shared.focus(detailKind)
+        showPopover(anchor: button)
+    }
+
+    /// A feature's own menu bar item opens the panel on its section, under
+    /// that item; a second click closes it.
+    private func showSectionPanel(_ section: PanelSectionID, anchoredTo button: NSStatusBarButton) {
+        if popoverIsOpen {
+            closePopover(reason: .statusItem)
+            return
+        }
+        MenuPanelFocus.shared.focus(section)
         showPopover(anchor: button)
     }
 
@@ -2792,6 +2807,29 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 WhatsAppDownloadOrganizer.shared.undoLastRun(transactionID: transactionID)
             }
         }
+        // A button of Time Tracking's question after a long lock; a click on
+        // the notification itself changes nothing (the lock stays a break).
+        let content = response.notification.request.content
+        if content.categoryIdentifier == TTLockQuestion.categoryIdentifier,
+           let answer = TTLockAnswer(actionIdentifier: response.actionIdentifier),
+           let question = TTLockQuestion(userInfo: content.userInfo) {
+            DispatchQueue.main.async {
+                guard AppFeature.timeTracking.isAvailable else { return }
+                TimeTrackingService.shared.answerLock(question, answer)
+            }
+        }
         completionHandler()
+    }
+
+    /// Only Time Tracking's notifications show while Barforge is in front
+    /// (its reminders and the lock question must not wait until another app
+    /// is). Every other notification keeps the system's default, which stays
+    /// silent then, exactly as before this method existed.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler:
+                                    @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(TTNotice.isTimeTracking(notification.request.identifier)
+                          ? [.banner, .list, .sound] : [])
     }
 }

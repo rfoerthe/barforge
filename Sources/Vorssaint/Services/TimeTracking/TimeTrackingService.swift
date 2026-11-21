@@ -30,9 +30,13 @@ final class TimeTrackingService: ObservableObject {
     /// keeps counting and is saved once it works again.
     @Published private(set) var databaseFault: TimeTrackingDatabaseFault?
 
+    /// The global shortcuts are on but macOS refused one of them (taken by
+    /// another app).
+    @Published private(set) var shortcutRegistrationFailed = false
+
     /// Forgotten "Back at the Mac", cut work away from the Mac, refused
-    /// entries, the end of a lock and database errors, for the notifications
-    /// of M4. Delivered on the main thread.
+    /// entries, the end of a lock and database errors. Delivered on the main
+    /// thread, after the notification for it went out.
     let events = PassthroughSubject<TimeTrackingEvent, Never>()
 
     var status: TTStatus? { snapshot?.status }
@@ -46,8 +50,19 @@ final class TimeTrackingService: ObservableObject {
     private var engine: TimeTrackingEngine?
     private var observers: [(center: NotificationCenter, token: NSObjectProtocol)] = []
     private var timer: Timer?
+    private var notifications: TimeTrackingNotifications?
+    /// Global shortcuts (ids from the free range 30–56 of `QuickToolHotkey`).
+    private let pauseHotkey = QuickToolHotkey(id: 30)
+    private let recordsHotkey = QuickToolHotkey(id: 31)
 
-    private init() {}
+    private init() {
+        pauseHotkey.onPress = { [weak self] in self?.togglePause() }
+        recordsHotkey.onPress = { [weak self] in self?.showRecords() }
+    }
+
+    private var language: AppLanguage { L10n.shared.language }
+    private var texts: TimeTrackingTexts { FeatureStrings.timeTrackingTexts(language) }
+    private var menuTexts: TimeTrackingMenuTexts { FeatureStrings.timeTrackingMenu(language) }
 
     /// Called by the hub, by the settings switch and at launch. Active iff
     /// the feature is installed and its switch is on.
@@ -55,10 +70,40 @@ final class TimeTrackingService: ObservableObject {
         let active = AppFeature.timeTracking.isAvailable
             && UserDefaults.standard.bool(forKey: DefaultsKey.timeTrackingEnabled)
         if active {
-            if engine == nil { activate() }
+            if engine == nil {
+                activate()
+                if engine != nil, Self.wantsNotifications(.standard) { Notifier.requestPermission() }
+            }
         } else if engine != nil || databaseFault != nil {
             deactivate()
         }
+        syncHotkeys()
+    }
+
+    /// A reminder or the lock question is on: asked for the permission when
+    /// recording starts with one of them (the Settings page of M5 asks when
+    /// one is switched on).
+    static func wantsNotifications(_ defaults: UserDefaults) -> Bool {
+        defaults.bool(forKey: DefaultsKey.timeTrackingNotifyLimit)
+            || defaults.bool(forKey: DefaultsKey.timeTrackingNotifyBreak)
+            || defaults.bool(forKey: DefaultsKey.timeTrackingAskAfterLock)
+    }
+
+    /// ⌃⌥⌘B (pause) and ⌃⌥⌘A (records) by default, while recording runs and
+    /// "Global shortcuts" is on. Also re-registers after a shortcut field
+    /// released every key.
+    private func syncHotkeys() {
+        let defaults = UserDefaults.standard
+        let on = engine != nil
+        var failed = false
+        for (role, hotkey) in [(GlobalShortcutRole.timeTrackingPause, pauseHotkey),
+                               (.timeTrackingRecords, recordsHotkey)] {
+            let enabled = on && role.requiredEnableKeys.allSatisfy { defaults.bool(forKey: $0) }
+            if !hotkey.sync(enabled: enabled, shortcut: role.savedShortcut, storageKey: role.storageKey) {
+                failed = true
+            }
+        }
+        if shortcutRegistrationFailed != failed { shortcutRegistrationFailed = failed }
     }
 
     /// Saves what is running before the app quits. A break and work away from
@@ -124,6 +169,36 @@ final class TimeTrackingService: ObservableObject {
     /// Takes changed settings over (workdays, free days, idle time …).
     func reloadSettings() { perform { $0.reload() } }
 
+    /// The state as of now, when the panel opens (`menuWillOpen`): the tick
+    /// may be up to 15 s old.
+    func refreshDisplay() { refresh() }
+
+    /// "Records…" in the panel and its shortcut. The Records window arrives
+    /// with M6; until then the panel hides the entry and the shortcut does
+    /// nothing visible.
+    func showRecords() {
+        guard engine != nil else { return }
+        Self.log.info("Time Tracking: the Records window is not available yet")
+    }
+
+    /// Whether "Records…" has a window to open (M6).
+    static let recordsAvailable = false
+
+    /// The answer to the question after a long lock (`menubar.rs`
+    /// `lock_answered`): the lock was work away from the Mac, or the end of
+    /// work came with it (only for a lock of today; then recording stops
+    /// counting). Without recording the answer has nowhere to go.
+    func answerLock(_ question: TTLockQuestion, _ answer: TTLockAnswer) {
+        guard engine != nil else { return }
+        switch answer {
+        case let .work(activity):
+            addWork(date: question.date, from: question.from, to: question.to, activity: activity)
+        case .closeDay:
+            guard question.date == now().date else { return }
+            closeDay(at: question.from)
+        }
+    }
+
     // MARK: Lifecycle
 
     private func activate() {
@@ -134,13 +209,16 @@ final class TimeTrackingService: ObservableObject {
             let fault = TimeTrackingDatabaseFault(kind: .open, message: String(describing: error))
             Self.log.error("Time Tracking cannot open its database: \(fault.message, privacy: .public)")
             databaseFault = fault
-            events.send(.databaseError(fault, first: true))
+            handle(.databaseError(fault, first: true))
             return
         }
         self.database = database
+        notifications = TimeTrackingNotifications()
+        TimeTrackingNotifications.registerCategory(texts: texts, menu: menuTexts)
         engine = TimeTrackingEngine(store: database, defaults: .standard, clock: clock, probe: probe,
                                     texts: { FeatureStrings.timeTrackingTexts(L10n.shared.language) },
-                                    onEvent: { [weak self] in self?.events.send($0) })
+                                    menuTexts: { FeatureStrings.timeTrackingMenu(L10n.shared.language) },
+                                    onEvent: { [weak self] in self?.handle($0) })
         startObservers()
         startTimer()
         isActive = true
@@ -155,6 +233,7 @@ final class TimeTrackingService: ObservableObject {
         timer = nil
         engine = nil
         database = nil
+        notifications = nil
         isActive = false
         snapshot = nil
         databaseFault = nil
@@ -207,8 +286,23 @@ final class TimeTrackingService: ObservableObject {
     private func refresh() {
         guard let engine else { return }
         let snapshot = engine.snapshot()
+        notifications?.update(snapshot, texts: texts)
         if snapshot != self.snapshot { self.snapshot = snapshot }
         if engine.databaseFault != databaseFault { databaseFault = engine.databaseFault }
+    }
+
+    /// An event of the engine: its notification first (the lock question is
+    /// decided now, right after recording resumed, like Tagwerk), then the
+    /// event for whoever listens.
+    private func handle(_ event: TimeTrackingEvent) {
+        var question: TTLockQuestion?
+        if case let .resumedAfterLock(from, to) = event {
+            question = engine?.lockQuestion(from: from, to: to)
+        }
+        let notifications = self.notifications ?? TimeTrackingNotifications()
+        notifications.handle(event, question: question, texts: texts, menu: menuTexts,
+                             title: FeatureStrings.timeTracking(language).title)
+        events.send(event)
     }
 }
 

@@ -200,7 +200,9 @@ hinter `isBeta`.
 - **Mitteilungen:** `max-hours-soon/reached`, `break-soon/reached`, `entry-refused`, `work-cut`, `away-forgotten`,
   `db-error`, außerdem die Kategorie `time-tracking.lock-ask` mit fünf Aktionen. Die Antwort trägt Arbeit ohne Mac über
   die Sperre ein oder setzt den Feierabend auf den Beginn der Sperre. Die Bedingungen stehen in `menubar.rs:639-655`.
-- **Kurzbefehle:** die beiden `GlobalShortcutRole`s aus §4, abgeschaltet als Standard.
+- **Kurzbefehle:** die beiden `GlobalShortcutRole`s aus §4, abgeschaltet als Standard. Weil ⌃⌥⌘P in Barforge schon
+  „Bild aus der Zwischenablage bearbeiten“ ist und keine zwei Rollen denselben Standard haben dürfen, ist der Standard
+  für „Arbeit unterbrechen“ ⌃⌥⌘B (für „break“); ⌃⌥⌘A bleibt. `QuickToolHotkey`-IDs 30 und 31.
 - Fehler der DB erscheinen rot in der Sektion und im Tooltip, beim ersten Mal zusätzlich als Mitteilung.
 - **Tests:** die 9 Tests aus `menubar.rs` (Logik: Titel, Texte, Kodierung der Tags) und die Bedingungen der Nachfrage.
 
