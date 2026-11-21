@@ -792,6 +792,10 @@ enum DefaultsKey {
     static let timeTrackingHotkeys = "timeTrackingHotkeys"                 // global shortcuts on
     static let timeTrackingAutoWorkdaysOnly = "timeTrackingAutoWorkdaysOnly" // recording counts by itself only on workdays
     static let timeTrackingIdleSeconds = "timeTrackingIdleSeconds"         // idle time that pauses recording (0 = off)
+    /// Machine state, unregistered and never exported: what recording was
+    /// doing when the app last saved (`TTStatus.line`), so a restart resumes
+    /// an open break or work away from the Mac (Tagwerk's `.status` file).
+    static let timeTrackingRestartState = "timeTrackingRestartState"
 
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"

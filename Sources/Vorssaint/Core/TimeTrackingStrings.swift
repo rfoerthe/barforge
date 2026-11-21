@@ -323,6 +323,14 @@ struct TimeTrackingTexts {
     let importProblemBoundsReversed: String
     let importProblemAbsenceWithEntries: String
 
+    // Tracker (tracker.rs)
+    /// The end of work the start must precede.
+    let refusedStartNotBeforeEndFormat: String
+    /// The manual start the end must follow.
+    let refusedEndNotAfterStartFormat: String
+    /// The start of the working-time frame.
+    let refusedEndBeforeFrameFormat: String
+
     /// Short weekday names, Monday first.
     var weekdayShortNames: [String] {
         [weekdayMonday, weekdayTuesday, weekdayWednesday, weekdayThursday, weekdayFriday,
@@ -467,7 +475,10 @@ extension TimeTrackingTexts {
         importProblemFuture: "times in the future",
         importProblemLaterToday: "times after the current time",
         importProblemBoundsReversed: "start of work not before the end of work",
-        importProblemAbsenceWithEntries: "full-day absence next to other entries"
+        importProblemAbsenceWithEntries: "full-day absence next to other entries",
+        refusedStartNotBeforeEndFormat: "The start of work must be before the end of work at %@.",
+        refusedEndNotAfterStartFormat: "The end of work must be after the start of work at %@.",
+        refusedEndBeforeFrameFormat: "Nothing counts today before %@, when the working-time frame begins. Yesterday already ended with its frame."
     )
 
     static let de = TimeTrackingTexts(
@@ -597,6 +608,9 @@ extension TimeTrackingTexts {
         importProblemFuture: "Zeiten in der Zukunft",
         importProblemLaterToday: "Zeiten nach der jetzigen Uhrzeit",
         importProblemBoundsReversed: "Arbeitsbeginn nicht vor dem Feierabend",
-        importProblemAbsenceWithEntries: "ganztägige Abwesenheit neben anderen Einträgen"
+        importProblemAbsenceWithEntries: "ganztägige Abwesenheit neben anderen Einträgen",
+        refusedStartNotBeforeEndFormat: "Der Arbeitsbeginn muss vor dem Feierabend um %@ Uhr liegen.",
+        refusedEndNotAfterStartFormat: "Der Feierabend muss nach dem Arbeitsbeginn um %@ Uhr liegen.",
+        refusedEndBeforeFrameFormat: "Vor %@ Uhr zählt heute noch nichts – der Arbeitszeitrahmen beginnt erst dann. Der gestrige Tag ist mit seinem Rahmen schon zu Ende."
     )
 }
