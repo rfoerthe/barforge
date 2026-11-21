@@ -801,6 +801,12 @@ enum DefaultsKey {
     /// doing when the app last saved (`TTStatus.line`), so a restart resumes
     /// an open break or work away from the Mac (Tagwerk's `.status` file).
     static let timeTrackingRestartState = "timeTrackingRestartState"
+    /// UI state of the Records window, unregistered and never exported: the
+    /// last view (0 days, 1 week), whether the inspector is shown (absent:
+    /// shown) and whether "Recorded automatically" is expanded.
+    static let timeTrackingRecordsView = "timeTrackingRecordsView"
+    static let timeTrackingRecordsInspector = "timeTrackingRecordsInspector"
+    static let timeTrackingRecordsRecordedOpen = "timeTrackingRecordsRecordedOpen"
 
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"

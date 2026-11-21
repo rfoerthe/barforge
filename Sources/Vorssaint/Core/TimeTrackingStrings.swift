@@ -1437,3 +1437,838 @@ extension TimeTrackingSettingsStrings {
         errorLoadFormat: "Die Datenbank konnte nicht gelesen werden: %@"
     )
 }
+
+/// Texts of the Records window: table, cards, inspector, undo, export and
+/// import (Tagwerk's `records.rs` and `pdf.rs`). German is Tagwerk's wording;
+/// the other languages show English until they are translated.
+struct TimeTrackingRecordsStrings {
+    // Window and toolbar
+    let windowTitle: String
+    /// Subtitle while recording is off.
+    let subtitleOff: String
+    let viewLabel: String
+    let viewTip: String
+    let days: String
+    let week: String
+    let daysTip: String
+    let weekTip: String
+    let filter: String
+    let filterTip: String
+    let filterActiveTip: String
+    let periodAll: String
+    let periodThisMonth: String
+    let periodLastMonth: String
+    let periodThisYear: String
+    let periodLastYear: String
+    let filterWarnings: String
+    let filterCorrected: String
+    let filterReset: String
+    let refresh: String
+    let refreshTip: String
+    let editDay: String
+    let editDayTip: String
+    let export: String
+    let exportTip: String
+    let importLabel: String
+    let importTip: String
+    let inspector: String
+    let inspectorTip: String
+    let showInWeek: String
+    let weekPlaceholderTitle: String
+    let weekPlaceholderText: String
+    let today: String
+
+    // Cards
+    let cardToday: String
+    let cardWeek: String
+    let cardMonth: String
+    let cardAverage: String
+    let cardAccount: String
+    /// Hours and minutes of today's target.
+    let targetFormat: String
+    let notAWorkday: String
+    let startFormat: String
+    let startManualFormat: String
+    let detailSeparator: String
+    /// Workdays; the balance follows in colour.
+    let balanceDetailFormat: String
+    /// Average breaks, then the month.
+    let averageDetailFormat: String
+    let accountFromFormat: String
+    let accountSinceFormat: String
+    let accountNothingYet: String
+    /// Since when, then the carry.
+    let accountCarryFormat: String
+    let workdaysOneFormat: String
+    let workdaysManyFormat: String
+    /// Weekday, day, month and year.
+    let longDateFormat: String
+    /// Monday first.
+    let weekdayNames: [String]
+    let monthNames: [String]
+
+    // Table
+    let columnDate: String
+    let columnStart: String
+    let columnEnd: String
+    let columnWork: String
+    let columnBreaks: String
+    let columnBalance: String
+    let markColumnTip: String
+    /// ISO week, first and last day.
+    let weekTitleFormat: String
+    /// Day and month of the Monday (the Sunday follows in full).
+    let weekStartFormat: String
+    /// Workdays and total; the balance follows in colour.
+    let weekTotalFormat: String
+    let running: String
+    let warningTip: String
+    let correctedTip: String
+    let missingTip: String
+
+    // Footer
+    let footerRecordedFormat: String
+    /// Days shown, then `footerDays…Format`.
+    let footerFilterFormat: String
+    let footerDaysOneFormat: String
+    let footerDaysManyFormat: String
+    let footerSeparator: String
+    /// Day, then the rules.
+    let rulesOnFormat: String
+
+    // Inspector
+    let noDayTitle: String
+    let noDayHint: String
+    let statWork: String
+    let statBreaks: String
+    let statBalance: String
+    let noteFutureWorkday: String
+    let noteFutureFreeDay: String
+    let noteNoWorkNoTarget: String
+    let noteFreeDayUncounted: String
+    let noteNoWorkInFrame: String
+    let noteNothingYet: String
+    let explanation: String
+    let sectionAbsence: String
+    let sectionRecording: String
+    let sectionStart: String
+    let sectionBreaks: String
+    let sectionWork: String
+    let sectionEnd: String
+    let sectionRecorded: String
+    let helpAbsence: String
+    /// `countBalanceYes` or `countBalanceNo`.
+    let helpRecordingFormat: String
+    let helpStart: String
+    /// Minimum break in minutes.
+    let helpBreaksFormat: String
+    let helpWork: String
+    let helpEnd: String
+    /// The working-time frame.
+    let helpRecordedFormat: String
+    let absenceNone: String
+    let wholeDay: String
+    let halfDay: String
+    let partTipNone: String
+    let partTip: String
+    let freeDayAbsence: String
+    let wholeDayBlocked: String
+    let lockedByAbsence: String
+    let effectNoTarget: String
+    let effectFreeDay: String
+    let effectKeepsTargetFormat: String
+    /// Full and lowered target.
+    let effectLowersFormat: String
+    let countRecorded: String
+    let countBalanceYes: String
+    let countBalanceNo: String
+    /// `countBalanceYes` or `countBalanceNo`.
+    let countTipFormat: String
+    let freeDayCountedInBalance: String
+    let freeDayCountedNotInBalance: String
+    let freeDayStoppedNote: String
+    let freeDayUncountedNote: String
+    let setManually: String
+    let futureText: String
+    let uncountedNote: String
+    let inFrameSuffix: String
+    /// `inFrameSuffix` or nothing, then the time.
+    let startNoteFormat: String
+    let startNoteNone: String
+    let endNoteFormat: String
+    let endNoteNone: String
+    let endNoteToday: String
+    let startCut: String
+    let endCut: String
+    let noBreaks: String
+    let to: String
+    let add: String
+    let removeBreak: String
+    /// Minimum break in minutes.
+    let breakMinFormat: String
+    let breakOrder: String
+    let nothingEntered: String
+    let reason: String
+    let removeWork: String
+    /// Minimum length in minutes.
+    let minWorkFormat: String
+    let workOrder: String
+    let gapAddedTitle: String
+    let recordedToggleTip: String
+    let recordedNone: String
+    let recordedOneFormat: String
+    let recordedManyFormat: String
+    /// Count, first and last time.
+    let recordedSummaryFormat: String
+    let clearDay: String
+    let clearDayTip: String
+
+    // Edits and refusals
+    let editSetStart: String
+    let editSetEnd: String
+    let editAddBreak: String
+    let editRemoveBreak: String
+    let editAddWork: String
+    let editRemoveWork: String
+    let editSetAbsence: String
+    let editCountOn: String
+    let editCountOff: String
+    let editClearDay: String
+    /// The time now.
+    let laterThanNowFormat: String
+    /// First recorded day, the new day, `beforeFirstBetween…`, hours.
+    let beforeFirstFormat: String
+    let beforeFirstBetweenOne: String
+    let beforeFirstBetweenManyFormat: String
+    /// The long date.
+    let beforeFirstTitleFormat: String
+    let enter: String
+    let cancel: String
+    let ok: String
+    let notSaved: String
+    let saveFailed: String
+    let workCutTitle: String
+
+    // Undo and redo
+    let undo: String
+    let redo: String
+    /// Undo or redo, then the step.
+    let historyTitleFormat: String
+    /// Name and day of the step.
+    let rewindStepFormat: String
+    let partialUndoTitle: String
+    let partialRedoTitle: String
+    let partialUndoFormat: String
+    let partialRedoFormat: String
+    let refusedUndoTitle: String
+    let refusedRedoTitle: String
+    let refusedUndoFormat: String
+    let refusedRedoFormat: String
+    let whyChangedFormat: String
+    let whyOrder: String
+    let whyAbsenceBesideEntries: String
+    let fieldStart: String
+    let fieldBreaks: String
+    let fieldWork: String
+    let fieldEnd: String
+    let fieldAbsence: String
+    let fieldCounting: String
+
+    // Delete all entries, absence today, edit day
+    /// The long date.
+    let clearTitleFormat: String
+    let delete: String
+    let deleteFailed: String
+    let clearPeriodsOne: String
+    let clearPeriodsManyFormat: String
+    let clearStart: String
+    let clearBreaksOne: String
+    let clearBreaksManyFormat: String
+    let clearWorkOne: String
+    let clearWorkManyFormat: String
+    let clearEnd: String
+    let clearAbsenceFormat: String
+    let clearNothing: String
+    let clearAffectsFormat: String
+    let clearTodayFreeDay: String
+    let clearTodayContinues: String
+    let undoHint: String
+    /// The absence.
+    let absenceTodayTitleFormat: String
+    /// The time recorded today.
+    let absenceTodayFormat: String
+    let absenceTodayHalf: String
+    let absenceWholeButton: String
+    let absenceHalfButton: String
+    let editDayMessage: String
+    let open: String
+
+    // Export
+    let exportMessage: String
+    let presetLastFourWeeks: String
+    let presetCustom: String
+    let periodLabel: String
+    let fromLabel: String
+    let formatLabel: String
+    /// Workdays, working time, balance.
+    let exportSummaryFormat: String
+    let exportSavedTitle: String
+    /// First day, last day, file name.
+    let exportSavedFormat: String
+    let showInFinder: String
+    let exportFailedTitle: String
+    let readFailedFormat: String
+    let writeFailedFormat: String
+    /// App name, first and last day.
+    let pdfTitleFormat: String
+    /// Day and time.
+    let pdfExportedFormat: String
+    let pdfWeekFormat: String
+    /// Number of workdays and the word.
+    let pdfTotalFormat: String
+    /// Target and its note.
+    let pdfTargetFormat: String
+    let pdfWarningsHeading: String
+
+    // Import
+    let importMessage: String
+    let importReadFailedFormat: String
+    let importFailedTitle: String
+    let noRecordsTitle: String
+    let noRecordsFormat: String
+    let nothingToImportTitle: String
+    /// File name, skipped days.
+    let nothingToImportFormat: String
+    /// Days, first and last day.
+    let importConfirmFormat: String
+    let importDaysOneFormat: String
+    let importDaysManyFormat: String
+    let importNoExisting: String
+    let importExistingFormat: String
+    let importBackupNote: String
+    let importDoneTitle: String
+    let importedFormat: String
+    /// Days, then the backup file.
+    let importedBackupFormat: String
+}
+
+extension FeatureStrings {
+    static func timeTrackingRecords(_ language: AppLanguage) -> TimeTrackingRecordsStrings {
+        switch language {
+        case .de: return .de
+        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        }
+    }
+}
+
+extension TimeTrackingRecordsStrings {
+    static let enUS = TimeTrackingRecordsStrings(
+        windowTitle: "Records",
+        subtitleOff: "Recording is off",
+        viewLabel: "View",
+        viewTip: "Switch between days and week",
+        days: "Days",
+        week: "Week",
+        daysTip: "Table with inspector (⌘1)",
+        weekTip: "Week as a calendar (⌘2)",
+        filter: "Filter",
+        filterTip: "Limit the table to a period or certain days",
+        filterActiveTip: "Filter on – the table doesn’t show all days",
+        periodAll: "All Days",
+        periodThisMonth: "This Month",
+        periodLastMonth: "Last Month",
+        periodThisYear: "This Year",
+        periodLastYear: "Last Year",
+        filterWarnings: "Only Days with Warnings",
+        filterCorrected: "Only Corrected Days",
+        filterReset: "Reset Filter",
+        refresh: "Refresh",
+        refreshTip: "Reload the records (⌘R)",
+        editDay: "Edit Day",
+        editDayTip: "Open any day and add times (⌘N)",
+        export: "Export",
+        exportTip: "Export a period as Markdown, CSV or PDF (⌘E)",
+        importLabel: "Import",
+        importTip: "Read a Markdown export back in (⇧⌘I)",
+        inspector: "Inspector",
+        inspectorTip: "Show or hide the inspector (⌥⌘I)",
+        showInWeek: "Show in Week View",
+        weekPlaceholderTitle: "Week View",
+        weekPlaceholderText: "The week as a calendar arrives with a later version. Switch back to Days with ⌘1.",
+        today: "Today",
+        cardToday: "Today",
+        cardWeek: "This Week",
+        cardMonth: "This Month",
+        cardAverage: "Ø per Workday",
+        cardAccount: "Time Account",
+        targetFormat: "Target %@",
+        notAWorkday: "Not a workday",
+        startFormat: "Start %@",
+        startManualFormat: "Start %@ (manual)",
+        detailSeparator: " · ",
+        balanceDetailFormat: "%@ · Balance ",
+        averageDetailFormat: "Breaks Ø %1$@ · %2$@",
+        accountFromFormat: "from %@",
+        accountSinceFormat: "since %@",
+        accountNothingYet: "nothing recorded yet",
+        accountCarryFormat: "%1$@ · carried over %2$@",
+        workdaysOneFormat: "%d workday",
+        workdaysManyFormat: "%d workdays",
+        longDateFormat: "%1$@, %3$@ %2$d, %4$d",
+        weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+                     "October", "November", "December"],
+        columnDate: "Date",
+        columnStart: "Start",
+        columnEnd: "End",
+        columnWork: "Working Time",
+        columnBreaks: "Breaks",
+        columnBalance: "Balance",
+        markColumnTip: "Warnings about rule violations and corrections by hand",
+        weekTitleFormat: "Week %1$d  ·  %2$@ – %3$@",
+        weekStartFormat: "%2$02d-%1$02d",
+        weekTotalFormat: "%1$@  ·  %2$@  ·  Balance ",
+        running: "running",
+        warningTip: "Warning",
+        correctedTip: "Corrected by hand",
+        missingTip: "Nothing recorded – the workday counts with its target. Times or an absence can be added in the inspector.",
+        footerRecordedFormat: "%@ recorded",
+        footerFilterFormat: "Filter: %1$d of %2$@",
+        footerDaysOneFormat: "%d day",
+        footerDaysManyFormat: "%d days",
+        footerSeparator: "  ·  ",
+        rulesOnFormat: "Rules on %1$@: %2$@",
+        noDayTitle: "No Day Selected",
+        noDayHint: "Select a day in the list to correct the start of work, breaks, work away from the Mac or the end of work.",
+        statWork: "Working Time",
+        statBreaks: "Breaks",
+        statBalance: "Balance",
+        noteFutureWorkday: "Future day – only an absence can be entered.",
+        noteFutureFreeDay: "Future day off – there is nothing to enter here.",
+        noteNoWorkNoTarget: "No working time, no target.",
+        noteFreeDayUncounted: "Day off – the recorded time doesn’t count.",
+        noteNoWorkInFrame: "No working time within working hours.",
+        noteNothingYet: "Nothing recorded for this day yet.",
+        explanation: "Explanation",
+        sectionAbsence: "Absence",
+        sectionRecording: "Recording",
+        sectionStart: "Start of Work",
+        sectionBreaks: "Breaks",
+        sectionWork: "Work Away from the Mac",
+        sectionEnd: "End of Work",
+        sectionRecorded: "Recorded Automatically",
+        helpAbsence: "Vacation, sickness and holidays lower the day’s target, a half day to half; special leave always applies to the whole day. Time off keeps the target, even without working time – the time account goes down accordingly. A whole-day absence only works on a day without other entries: delete them first with “Delete All Entries…” below. A half day also works next to working time – choose “Half Day” for it, also before the kind. Days off (weekend, deselected workdays) have no target and therefore no absence.",
+        helpRecordingFormat: "On days off (weekend, deselected workdays) the time recorded automatically only counts as working time once it should count – “Record today” in the panel. Until then the start of work, breaks and the end of work can’t be set; work away from the Mac always counts. %@",
+        helpStart: "Without an entry the day starts with the first unlock. If the Mac was locked at the start, the time until the unlock after it counts too; what was recorded before goes. Work away from the Mac before a newly set start goes – the latest entry wins.",
+        helpBreaksFormat: "Locks from %d min on count as breaks by themselves, shorter ones count as working time. Additional breaks can be entered here.",
+        helpWork: "A call, meeting or appointment while the Mac was locked: these times count as working time. A break in that time goes.",
+        helpEnd: "Without an entry the day ends with the last lock. If the Mac was locked at the end of work, the time since the lock before it counts too; what was recorded after goes. Work away from the Mac after a newly set end of work goes – the latest entry wins.",
+        helpRecordedFormat: "Times the Mac was unlocked. Only what lies within working hours (%@) counts. The triangle shows and hides the single times – for all days.",
+        absenceNone: "None",
+        wholeDay: "Whole Day",
+        halfDay: "Half Day",
+        partTipNone: "Whole or half day – applies to the kind chosen next. A half day also works next to working time.",
+        partTip: "Vacation, sickness and holidays come as half days too; a half day also works next to working time.",
+        freeDayAbsence: "Days off (weekend, deselected workdays) have no target – an absence can’t be entered there, an existing one can only be removed.",
+        wholeDayBlocked: "A whole day only once the day has no other entries – see “Delete All Entries…” below.",
+        lockedByAbsence: "The start of work, breaks, work away from the Mac and the end of work can only be changed once the absence is set to “None”.",
+        effectNoTarget: "This day has no target – the absence changes nothing about it. Remove it with “None”.",
+        effectFreeDay: "Day off without a target – there is no absence to enter here.",
+        effectKeepsTargetFormat: "The target of %@ stays, even without working time – the time account goes down accordingly.",
+        effectLowersFormat: "The target goes down from %1$@ to %2$@.",
+        countRecorded: "Count recorded time",
+        countBalanceYes: "On this day it goes into balance and time account – the working time rules count work on days off.",
+        countBalanceNo: "On this day it still doesn’t go into balance and time account: that only happens when “Count work on days off in balance and time account” is on in the working time rules.",
+        countTipFormat: "Checked, the time recorded automatically counts as working time. %@",
+        freeDayCountedInBalance: "Day off: the time recorded automatically counts as working time, also in balance and time account.",
+        freeDayCountedNotInBalance: "Day off: the time recorded automatically counts as working time – by the working time rules it doesn’t go into balance and time account.",
+        freeDayStoppedNote: "Day off: all entries were deleted, automatic recording is off. Checked, it counts again.",
+        freeDayUncountedNote: "Day off: the time recorded automatically doesn’t count. The start of work, breaks and the end of work can only be set once checked; work away from the Mac always counts.",
+        setManually: "Set manually",
+        futureText: "On future days only an absence can be entered – times once the day has come.",
+        uncountedNote: "Only once the recorded time counts (see “Recording” above).",
+        inFrameSuffix: " within working hours",
+        startNoteFormat: "Without an entry the first unlock%1$@ at %2$@ applies. If the Mac was locked at the start, the time until the unlock after it counts too.",
+        startNoteNone: "Without an entry the first unlock of the Mac within working hours applies.",
+        endNoteFormat: "Without an entry the last lock%1$@ at %2$@ applies. If the Mac was locked at the end of work, the time since the lock before it counts too.",
+        endNoteNone: "Without an entry the last lock of the Mac within working hours applies.",
+        endNoteToday: "Without an entry the last lock applies. After the end of work nothing more is recorded today.",
+        startCut: "Work away from the Mac before the start of work was removed – the latest entry wins. ⌘Z takes it back.",
+        endCut: "Work away from the Mac after the end of work was removed – the latest entry wins. ⌘Z takes it back.",
+        noBreaks: "No breaks entered",
+        to: "to",
+        add: "Add",
+        removeBreak: "Remove Break",
+        breakMinFormat: "A break lasts at least %d min (see Settings).",
+        breakOrder: "The end of the break must be after its start.",
+        nothingEntered: "Nothing entered",
+        reason: "Reason",
+        removeWork: "Remove Work Away from the Mac",
+        minWorkFormat: "Work away from the Mac lasts at least %d min (see Settings).",
+        workOrder: "The end of the work away from the Mac must be after its start.",
+        gapAddedTitle: "Gap Added",
+        recordedToggleTip: "Show or hide the times recorded automatically",
+        recordedNone: "None – the Mac was not unlocked.",
+        recordedOneFormat: "%d period",
+        recordedManyFormat: "%d periods",
+        recordedSummaryFormat: "%1$@, %2$@ – %3$@",
+        clearDay: "Delete All Entries…",
+        clearDayTip: "Deletes the times recorded automatically and every entry made by hand on this day.",
+        editSetStart: "Change Start of Work",
+        editSetEnd: "Change End of Work",
+        editAddBreak: "Add Break",
+        editRemoveBreak: "Remove Break",
+        editAddWork: "Add Work Away from the Mac",
+        editRemoveWork: "Remove Work Away from the Mac",
+        editSetAbsence: "Change Absence",
+        editCountOn: "Count Recorded Time",
+        editCountOff: "Don’t Count Recorded Time",
+        editClearDay: "Delete All Entries",
+        laterThanNowFormat: "Times after now (%@) can’t be entered.",
+        beforeFirstFormat: "So far the records begin on %1$@. With an entry on %2$@, %3$@ – together about %4$d h in the minus in balance and time account, until times or absences are entered there.",
+        beforeFirstBetweenOne: "the workday in between counts with its target too",
+        beforeFirstBetweenManyFormat: "the %d workdays in between count with their target too",
+        beforeFirstTitleFormat: "Entry before the first recorded day on %@?",
+        enter: "Enter",
+        cancel: "Cancel",
+        ok: "OK",
+        notSaved: "Not Saved",
+        saveFailed: "Saving Failed",
+        workCutTitle: "Work Away from the Mac Removed",
+        undo: "Undo",
+        redo: "Redo",
+        historyTitleFormat: "%1$@ %2$@",
+        rewindStepFormat: "“%1$@” from %2$@",
+        partialUndoTitle: "Only Partly Undone",
+        partialRedoTitle: "Only Partly Redone",
+        partialUndoFormat: "%1$@ was only partly undone. Changed differently since and therefore kept: %2$@.",
+        partialRedoFormat: "%1$@ was only partly redone. Changed differently since and therefore kept: %2$@.",
+        refusedUndoTitle: "Not Undone",
+        refusedRedoTitle: "Not Redone",
+        refusedUndoFormat: "%1$@ can no longer be undone – %2$@. The day stays as it is.",
+        refusedRedoFormat: "%1$@ can no longer be redone – %2$@. The day stays as it is.",
+        whyChangedFormat: "changed differently since: %@",
+        whyOrder: "the start of work would then not be before the end of work",
+        whyAbsenceBesideEntries: "the full-day absence would then stand next to entries recorded since",
+        fieldStart: "start of work",
+        fieldBreaks: "breaks",
+        fieldWork: "work away from the Mac",
+        fieldEnd: "end of work",
+        fieldAbsence: "absence",
+        fieldCounting: "count recorded time",
+        clearTitleFormat: "Delete all entries of %@?",
+        delete: "Delete",
+        deleteFailed: "Deleting Failed",
+        clearPeriodsOne: "1 period recorded automatically",
+        clearPeriodsManyFormat: "%d periods recorded automatically",
+        clearStart: "the start of work set by hand",
+        clearBreaksOne: "1 break entered",
+        clearBreaksManyFormat: "%d breaks entered",
+        clearWorkOne: "1 entry of work away from the Mac",
+        clearWorkManyFormat: "%d entries of work away from the Mac",
+        clearEnd: "the end of work set by hand",
+        clearAbsenceFormat: "the absence “%@”",
+        clearNothing: "nothing",
+        clearAffectsFormat: "This affects %@.",
+        clearTodayFreeDay: " Automatic recording stays off today until “Record today” is chosen in the panel.",
+        clearTodayContinues: " Automatic recording then goes on from now.",
+        undoHint: " ⌘Z takes it back.",
+        absenceTodayTitleFormat: "Enter “%@” for the whole day today?",
+        absenceTodayFormat: "The time recorded automatically today (%@) is deleted, and recording ends for today – until the absence is set back to “None”. ⌘Z takes it back.",
+        absenceTodayHalf: " A half day also works next to the recorded time – it then stays.",
+        absenceWholeButton: "Enter Whole Day",
+        absenceHalfButton: "Enter Half Day",
+        editDayMessage: "Choose a day to add the start of work, breaks, work away from the Mac or the end of work.",
+        open: "Open",
+        exportMessage: "Save the records of a period as Markdown, CSV or PDF.",
+        presetLastFourWeeks: "Last 4 Weeks",
+        presetCustom: "Custom Range",
+        periodLabel: "Period:",
+        fromLabel: "From:",
+        formatLabel: "Format:",
+        exportSummaryFormat: "%1$@ · %2$@ working time · Balance %3$@",
+        exportSavedTitle: "Export Saved",
+        exportSavedFormat: "The records from %1$@ to %2$@ were saved to “%3$@”.",
+        showInFinder: "Show in Finder",
+        exportFailedTitle: "Export Failed",
+        readFailedFormat: "The database could not be read: %@",
+        writeFailedFormat: "Writing failed: %@",
+        pdfTitleFormat: "%1$@ – Working time %2$@ to %3$@",
+        pdfExportedFormat: "Exported on %1$@ at %2$@",
+        pdfWeekFormat: "Week %d",
+        pdfTotalFormat: "Total: %1$d %2$@",
+        pdfTargetFormat: "Target: %1$@ (%2$@).  ✎ corrected by hand  ·  ⚠ see warnings",
+        pdfWarningsHeading: "Warnings",
+        importMessage: "Choose a Markdown export (CSV and PDF don’t hold all data).",
+        importReadFailedFormat: "“%1$@” could not be read: %2$@",
+        importFailedTitle: "Import Failed",
+        noRecordsTitle: "No Records Found",
+        noRecordsFormat: "“%@” holds no records. A Markdown export of Barforge or Tagwerk can be read in.",
+        nothingToImportTitle: "Nothing to Import",
+        nothingToImportFormat: "No day from “%1$@” can be taken over. %2$@",
+        importConfirmFormat: "Import %1$@ from %2$@ to %3$@?",
+        importDaysOneFormat: "%d day",
+        importDaysManyFormat: "%d days",
+        importNoExisting: "These days have no entries yet.",
+        importExistingFormat: "%@ of them already have entries – they are replaced by the ones from the file.",
+        importBackupNote: "Before that, Barforge saves the current state in the “backups” folder – it can be brought back from there.",
+        importDoneTitle: "Import Complete",
+        importedFormat: "%@ taken over.",
+        importedBackupFormat: "%1$@ taken over. The state before is saved in the “backups” folder as “%2$@”."
+    )
+
+    static let de = TimeTrackingRecordsStrings(
+        windowTitle: "Aufzeichnungen",
+        subtitleOff: "Zeiterfassung aus",
+        viewLabel: "Ansicht",
+        viewTip: "Zwischen Tagen und Woche wechseln",
+        days: "Tage",
+        week: "Woche",
+        daysTip: "Tabelle mit Inspektor (⌘1)",
+        weekTip: "Woche als Kalender (⌘2)",
+        filter: "Filter",
+        filterTip: "Tabelle auf einen Zeitraum oder bestimmte Tage einschränken",
+        filterActiveTip: "Filter aktiv – die Tabelle zeigt nicht alle Tage",
+        periodAll: "Alle Tage",
+        periodThisMonth: "Dieser Monat",
+        periodLastMonth: "Letzter Monat",
+        periodThisYear: "Dieses Jahr",
+        periodLastYear: "Letztes Jahr",
+        filterWarnings: "Nur Tage mit Hinweisen",
+        filterCorrected: "Nur korrigierte Tage",
+        filterReset: "Filter zurücksetzen",
+        refresh: "Aktualisieren",
+        refreshTip: "Aufzeichnungen neu laden (⌘R)",
+        editDay: "Tag bearbeiten",
+        editDayTip: "Einen beliebigen Tag öffnen und Zeiten nachtragen (⌘N)",
+        export: "Exportieren",
+        exportTip: "Zeitraum als Markdown, CSV oder PDF exportieren (⌘E)",
+        importLabel: "Importieren",
+        importTip: "Einen Markdown-Export wieder einlesen (⇧⌘I)",
+        inspector: "Informationen",
+        inspectorTip: "Informationen ein- oder ausblenden (⌥⌘I)",
+        showInWeek: "In der Wochenansicht zeigen",
+        weekPlaceholderTitle: "Wochenansicht",
+        weekPlaceholderText: "Die Woche als Kalender kommt mit einer späteren Version. Zurück zu den Tagen mit ⌘1.",
+        today: "Heute",
+        cardToday: "Heute",
+        cardWeek: "Diese Woche",
+        cardMonth: "Dieser Monat",
+        cardAverage: "Ø pro Arbeitstag",
+        cardAccount: "Zeitkonto",
+        targetFormat: "Soll %@",
+        notAWorkday: "Kein Arbeitstag",
+        startFormat: "Beginn %@ Uhr",
+        startManualFormat: "Beginn %@ Uhr (manuell)",
+        detailSeparator: " · ",
+        balanceDetailFormat: "%@ · Saldo ",
+        averageDetailFormat: "Pausen Ø %1$@ · %2$@",
+        accountFromFormat: "ab %@",
+        accountSinceFormat: "seit %@",
+        accountNothingYet: "noch nichts erfasst",
+        accountCarryFormat: "%1$@ · Übertrag %2$@",
+        workdaysOneFormat: "%d Arbeitstag",
+        workdaysManyFormat: "%d Arbeitstage",
+        longDateFormat: "%1$@, %2$d. %3$@ %4$d",
+        weekdayNames: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
+        monthNames: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September",
+                     "Oktober", "November", "Dezember"],
+        columnDate: "Datum",
+        columnStart: "Beginn",
+        columnEnd: "Ende",
+        columnWork: "Arbeitszeit",
+        columnBreaks: "Pausen",
+        columnBalance: "Saldo",
+        markColumnTip: "Hinweise auf Regelverstöße und manuelle Korrekturen",
+        weekTitleFormat: "KW %1$d  ·  %2$@ – %3$@",
+        weekStartFormat: "%1$02d.%2$02d.",
+        weekTotalFormat: "%1$@  ·  %2$@  ·  Saldo ",
+        running: "läuft",
+        warningTip: "Hinweis",
+        correctedTip: "Manuell korrigiert",
+        missingTip: "Nichts erfasst – der Arbeitstag zählt mit seinem Soll. Zeiten oder eine Abwesenheit lassen sich im Inspektor nachtragen.",
+        footerRecordedFormat: "%@ erfasst",
+        footerFilterFormat: "Filter: %1$d von %2$@",
+        footerDaysOneFormat: "%d Tag",
+        footerDaysManyFormat: "%d Tagen",
+        footerSeparator: "  ·  ",
+        rulesOnFormat: "Regeln am %1$@: %2$@",
+        noDayTitle: "Kein Tag ausgewählt",
+        noDayHint: "Wähle in der Liste einen Tag aus, um Arbeitsbeginn, Pausen, Arbeit ohne Mac oder Feierabend zu korrigieren.",
+        statWork: "Arbeitszeit",
+        statBreaks: "Pausen",
+        statBalance: "Saldo",
+        noteFutureWorkday: "Künftiger Tag – eintragen lässt sich nur eine Abwesenheit.",
+        noteFutureFreeDay: "Künftiger freier Tag – hier gibt es nichts einzutragen.",
+        noteNoWorkNoTarget: "Keine Arbeitszeit, kein Soll.",
+        noteFreeDayUncounted: "Freier Tag – die erfasste Zeit zählt nicht.",
+        noteNoWorkInFrame: "Keine Arbeitszeit im Arbeitszeitrahmen.",
+        noteNothingYet: "Für diesen Tag ist noch nichts erfasst.",
+        explanation: "Erklärung",
+        sectionAbsence: "Abwesenheit",
+        sectionRecording: "Erfassung",
+        sectionStart: "Arbeitsbeginn",
+        sectionBreaks: "Pausen",
+        sectionWork: "Arbeit ohne Mac",
+        sectionEnd: "Feierabend",
+        sectionRecorded: "Automatisch erfasst",
+        helpAbsence: "Urlaub, Krankheit und Feiertag senken das Soll des Tages, ein halber Tag auf die Hälfte; Sonderurlaub gilt immer ganztags. Zeitausgleich lässt das Soll stehen, auch ohne Arbeitszeit – das Zeitkonto sinkt entsprechend. Ganztags geht eine Abwesenheit nur an einem Tag ohne andere Einträge: Die löscht man vorher mit „Alle Einträge löschen …“ unten; ein halber Tag geht auch neben Arbeitszeit – dafür „Halber Tag“ wählen, auch vor der Art. An freien Tagen (Wochenende, abgewählte Arbeitstage) gibt es kein Soll und deshalb keine Abwesenheit.",
+        helpRecordingFormat: "An freien Tagen (Wochenende, abgewählte Arbeitstage) zählt die automatisch erfasste Zeit erst als Arbeitszeit, wenn sie gezählt werden soll – im Panel „Heute erfassen“. Bis dahin lassen sich Arbeitsbeginn, Pausen und Feierabend nicht festlegen; Arbeit ohne Mac zählt immer. %@",
+        helpStart: "Ohne Angabe beginnt der Tag mit dem ersten Entsperren. War der Mac zum Beginn gesperrt, zählt die Zeit bis zum Entsperren danach mit; was davor erfasst wurde, entfällt. Arbeit ohne Mac vor einem neu festgelegten Beginn entfällt – die letzte Angabe gilt.",
+        helpBreaksFormat: "Sperren ab %d Min. gelten automatisch als Pause, kürzere zählen zur Arbeitszeit. Hier lassen sich zusätzliche Pausen eintragen.",
+        helpWork: "Telefonat, Meeting oder Termin bei gesperrtem Mac: Diese Zeiten zählen als Arbeitszeit. Eine Pause in dieser Zeit entfällt.",
+        helpEnd: "Ohne Angabe endet der Tag mit dem letzten Sperren. War der Mac zum Feierabend gesperrt, zählt die Zeit seit dem Sperren davor mit; was danach erfasst wurde, entfällt. Arbeit ohne Mac nach einem neu festgelegten Feierabend entfällt – die letzte Angabe gilt.",
+        helpRecordedFormat: "Zeiten, in denen der Mac entsperrt war. Gezählt wird nur im Arbeitszeitrahmen (%@). Das Dreieck klappt die einzelnen Zeiten auf und zu – für alle Tage.",
+        absenceNone: "Keine",
+        wholeDay: "Ganzer Tag",
+        halfDay: "Halber Tag",
+        partTipNone: "Ganzer oder halber Tag – gilt für die Art, die danach gewählt wird. Ein halber Tag geht auch neben Arbeitszeit.",
+        partTip: "Halbe Tage gibt es bei Urlaub, Krankheit und Feiertag; ein halber Tag geht auch neben Arbeitszeit.",
+        freeDayAbsence: "An freien Tagen (Wochenende, abgewählte Arbeitstage) gibt es kein Soll – eine Abwesenheit lässt sich dort nicht eintragen, eine vorhandene nur entfernen.",
+        wholeDayBlocked: "Ganztags erst, wenn der Tag keine anderen Einträge hat – siehe „Alle Einträge löschen …“ unten.",
+        lockedByAbsence: "Arbeitsbeginn, Pausen, Arbeit ohne Mac und Feierabend lassen sich erst ändern, wenn die Abwesenheit auf „Keine“ steht.",
+        effectNoTarget: "An diesem Tag gibt es kein Soll – die Abwesenheit ändert daran nichts. Entfernen lässt sie sich mit „Keine“.",
+        effectFreeDay: "Freier Tag ohne Soll – hier gibt es keine Abwesenheit einzutragen.",
+        effectKeepsTargetFormat: "Das Soll von %@ bleibt, auch ohne Arbeitszeit – das Zeitkonto sinkt entsprechend.",
+        effectLowersFormat: "Das Soll sinkt von %1$@ auf %2$@.",
+        countRecorded: "Erfasste Zeit zählen",
+        countBalanceYes: "In Saldo und Zeitkonto geht sie an diesem Tag ein – der Stand der Arbeitszeitregeln sieht „Arbeit an freien Tagen in Saldo und Zeitkonto einrechnen“ vor.",
+        countBalanceNo: "In Saldo und Zeitkonto geht sie an diesem Tag trotzdem nicht ein: Das geschieht nur, wenn im Stand der Arbeitszeitregeln „Arbeit an freien Tagen in Saldo und Zeitkonto einrechnen“ eingeschaltet ist.",
+        countTipFormat: "Mit Haken zählt die automatisch erfasste Zeit als Arbeitszeit. %@",
+        freeDayCountedInBalance: "Freier Tag: Die automatisch erfasste Zeit zählt als Arbeitszeit, auch in Saldo und Zeitkonto.",
+        freeDayCountedNotInBalance: "Freier Tag: Die automatisch erfasste Zeit zählt als Arbeitszeit – in Saldo und Zeitkonto geht sie nach den Arbeitszeitregeln nicht ein.",
+        freeDayStoppedNote: "Freier Tag: Alle Einträge wurden gelöscht, die automatische Erfassung ist aus. Mit dem Haken zählt sie wieder.",
+        freeDayUncountedNote: "Freier Tag: Die automatisch erfasste Zeit zählt nicht. Arbeitsbeginn, Pausen und Feierabend lassen sich erst mit dem Haken festlegen; Arbeit ohne Mac zählt immer.",
+        setManually: "Manuell festlegen",
+        futureText: "An künftigen Tagen lässt sich nur eine Abwesenheit eintragen – Zeiten erst, wenn der Tag da ist.",
+        uncountedNote: "Erst wenn die erfasste Zeit zählt (siehe „Erfassung“ oben).",
+        inFrameSuffix: " im Arbeitszeitrahmen",
+        startNoteFormat: "Ohne Angabe gilt das erste Entsperren%1$@ um %2$@ Uhr. War der Mac zum Beginn gesperrt, zählt die Zeit bis zum Entsperren danach mit.",
+        startNoteNone: "Ohne Angabe gilt das erste Entsperren des Macs im Arbeitszeitrahmen.",
+        endNoteFormat: "Ohne Angabe gilt das letzte Sperren%1$@ um %2$@ Uhr. War der Mac zum Feierabend gesperrt, zählt die Zeit seit dem Sperren davor mit.",
+        endNoteNone: "Ohne Angabe gilt das letzte Sperren des Macs im Arbeitszeitrahmen.",
+        endNoteToday: "Ohne Angabe gilt das letzte Sperren. Mit Feierabend wird heute nichts mehr erfasst.",
+        startCut: "Arbeit ohne Mac vor dem Arbeitsbeginn ist entfallen – die letzte Angabe gilt. ⌘Z nimmt das zurück.",
+        endCut: "Arbeit ohne Mac nach dem Feierabend ist entfallen – die letzte Angabe gilt. ⌘Z nimmt das zurück.",
+        noBreaks: "Keine Pausen eingetragen",
+        to: "bis",
+        add: "Hinzufügen",
+        removeBreak: "Pause entfernen",
+        breakMinFormat: "Eine Pause dauert mindestens %d Min. (siehe Einstellungen).",
+        breakOrder: "Das Ende der Pause muss nach ihrem Beginn liegen.",
+        nothingEntered: "Nichts eingetragen",
+        reason: "Grund",
+        removeWork: "Arbeit ohne Mac entfernen",
+        minWorkFormat: "Arbeit ohne Mac dauert mindestens %d Min. (siehe Einstellungen).",
+        workOrder: "Das Ende der Arbeit ohne Mac muss nach ihrem Beginn liegen.",
+        gapAddedTitle: "Lücke dazugerechnet",
+        recordedToggleTip: "Automatisch erfasste Zeiten ein- oder ausblenden",
+        recordedNone: "Keine – der Mac war nicht entsperrt.",
+        recordedOneFormat: "%d Zeit",
+        recordedManyFormat: "%d Zeiten",
+        recordedSummaryFormat: "%1$@, %2$@ – %3$@",
+        clearDay: "Alle Einträge löschen …",
+        clearDayTip: "Löscht die automatisch erfassten Zeiten und alle manuellen Einträge dieses Tages.",
+        editSetStart: "Arbeitsbeginn ändern",
+        editSetEnd: "Feierabend ändern",
+        editAddBreak: "Pause eintragen",
+        editRemoveBreak: "Pause entfernen",
+        editAddWork: "Arbeit ohne Mac eintragen",
+        editRemoveWork: "Arbeit ohne Mac entfernen",
+        editSetAbsence: "Abwesenheit ändern",
+        editCountOn: "Erfasste Zeit zählen",
+        editCountOff: "Erfasste Zeit nicht zählen",
+        editClearDay: "Alle Einträge löschen",
+        laterThanNowFormat: "Zeiten nach jetzt (%@ Uhr) lassen sich nicht eintragen.",
+        beforeFirstFormat: "Bisher beginnen die Aufzeichnungen am %1$@. Mit einem Eintrag am %2$@ %3$@ – zusammen etwa %4$d Std. Minus in Saldo und Zeitkonto, bis dort Zeiten oder Abwesenheiten eingetragen sind.",
+        beforeFirstBetweenOne: "zählt auch der Arbeitstag dazwischen mit seinem Soll",
+        beforeFirstBetweenManyFormat: "zählen auch die %d Arbeitstage dazwischen mit ihrem Soll",
+        beforeFirstTitleFormat: "Eintrag vor dem ersten erfassten Tag am %@?",
+        enter: "Eintragen",
+        cancel: "Abbrechen",
+        ok: "OK",
+        notSaved: "Nicht gespeichert",
+        saveFailed: "Speichern fehlgeschlagen",
+        workCutTitle: "Arbeit ohne Mac entfallen",
+        undo: "Widerrufen",
+        redo: "Wiederholen",
+        historyTitleFormat: "%1$@: %2$@",
+        rewindStepFormat: "„%1$@“ vom %2$@",
+        partialUndoTitle: "Nur zum Teil widerrufen",
+        partialRedoTitle: "Nur zum Teil wiederholt",
+        partialUndoFormat: "%1$@ ist nur zum Teil widerrufen. Inzwischen anders geändert und deshalb so geblieben: %2$@.",
+        partialRedoFormat: "%1$@ ist nur zum Teil wiederholt. Inzwischen anders geändert und deshalb so geblieben: %2$@.",
+        refusedUndoTitle: "Nicht widerrufen",
+        refusedRedoTitle: "Nicht wiederholt",
+        refusedUndoFormat: "%1$@ lässt sich nicht mehr widerrufen – %2$@. Der Tag bleibt, wie er ist.",
+        refusedRedoFormat: "%1$@ lässt sich nicht mehr wiederholen – %2$@. Der Tag bleibt, wie er ist.",
+        whyChangedFormat: "inzwischen anders geändert: %@",
+        whyOrder: "der Arbeitsbeginn läge dann nicht vor dem Feierabend",
+        whyAbsenceBesideEntries: "die ganztägige Abwesenheit stünde dann neben inzwischen erfassten Einträgen",
+        fieldStart: "Arbeitsbeginn",
+        fieldBreaks: "Pausen",
+        fieldWork: "Arbeit ohne Mac",
+        fieldEnd: "Feierabend",
+        fieldAbsence: "Abwesenheit",
+        fieldCounting: "Erfasste Zeit zählen",
+        clearTitleFormat: "Alle Einträge vom %@ löschen?",
+        delete: "Löschen",
+        deleteFailed: "Löschen fehlgeschlagen",
+        clearPeriodsOne: "1 automatisch erfasste Zeit",
+        clearPeriodsManyFormat: "%d automatisch erfasste Zeiten",
+        clearStart: "den festgelegten Arbeitsbeginn",
+        clearBreaksOne: "1 eingetragene Pause",
+        clearBreaksManyFormat: "%d eingetragene Pausen",
+        clearWorkOne: "1 Eintrag Arbeit ohne Mac",
+        clearWorkManyFormat: "%d Einträge Arbeit ohne Mac",
+        clearEnd: "den festgelegten Feierabend",
+        clearAbsenceFormat: "die Abwesenheit „%@“",
+        clearNothing: "nichts",
+        clearAffectsFormat: "Das betrifft %@.",
+        clearTodayFreeDay: " Die automatische Erfassung bleibt heute aus, bis im Panel „Heute erfassen“ gewählt ist.",
+        clearTodayContinues: " Die automatische Erfassung läuft danach ab jetzt weiter.",
+        undoHint: " ⌘Z nimmt das zurück.",
+        absenceTodayTitleFormat: "Heute ganztägig „%@“ eintragen?",
+        absenceTodayFormat: "Die heute automatisch erfasste Zeit (%@) wird gelöscht, und die Erfassung endet für heute – bis die Abwesenheit wieder auf „Keine“ steht. ⌘Z nimmt das zurück.",
+        absenceTodayHalf: " Ein halber Tag geht auch neben der erfassten Zeit – sie bleibt dann.",
+        absenceWholeButton: "Ganztags eintragen",
+        absenceHalfButton: "Halben Tag eintragen",
+        editDayMessage: "Wähle einen Tag, um Arbeitsbeginn, Pausen, Arbeit ohne Mac oder Feierabend nachzutragen.",
+        open: "Öffnen",
+        exportMessage: "Aufzeichnungen eines Zeitraums als Markdown, CSV oder PDF sichern.",
+        presetLastFourWeeks: "Letzte 4 Wochen",
+        presetCustom: "Eigener Zeitraum",
+        periodLabel: "Zeitraum:",
+        fromLabel: "Von:",
+        formatLabel: "Format:",
+        exportSummaryFormat: "%1$@ · %2$@ Arbeitszeit · Saldo %3$@",
+        exportSavedTitle: "Export gesichert",
+        exportSavedFormat: "Die Aufzeichnungen vom %1$@ bis %2$@ wurden in „%3$@“ gesichert.",
+        showInFinder: "Im Finder zeigen",
+        exportFailedTitle: "Export fehlgeschlagen",
+        readFailedFormat: "Die Datenbank konnte nicht gelesen werden: %@",
+        writeFailedFormat: "Schreiben fehlgeschlagen: %@",
+        pdfTitleFormat: "%1$@ – Arbeitszeiten %2$@ bis %3$@",
+        pdfExportedFormat: "Exportiert am %1$@ um %2$@ Uhr",
+        pdfWeekFormat: "KW %d",
+        pdfTotalFormat: "Summe: %1$d %2$@",
+        pdfTargetFormat: "Soll: %1$@ (%2$@).  ✎ manuell korrigiert  ·  ⚠ siehe Hinweise",
+        pdfWarningsHeading: "Hinweise",
+        importMessage: "Einen Markdown-Export wählen (CSV und PDF enthalten nicht alle Daten).",
+        importReadFailedFormat: "„%1$@“ konnte nicht gelesen werden: %2$@",
+        importFailedTitle: "Import fehlgeschlagen",
+        noRecordsTitle: "Keine Aufzeichnungen gefunden",
+        noRecordsFormat: "„%@“ enthält keine Aufzeichnungen. Einlesen lässt sich ein Markdown-Export von Barforge oder Tagwerk.",
+        nothingToImportTitle: "Nichts zu importieren",
+        nothingToImportFormat: "Kein Tag aus „%1$@“ lässt sich übernehmen. %2$@",
+        importConfirmFormat: "%1$@ vom %2$@ bis %3$@ importieren?",
+        importDaysOneFormat: "%d Tag",
+        importDaysManyFormat: "%d Tage",
+        importNoExisting: "Für diese Tage gibt es noch keine Einträge.",
+        importExistingFormat: "Für %@ davon gibt es schon Einträge – sie werden durch die aus der Datei ersetzt.",
+        importBackupNote: "Vorher sichert Barforge den jetzigen Stand eigens im Ordner „backups“ – damit lässt er sich zurückholen.",
+        importDoneTitle: "Import abgeschlossen",
+        importedFormat: "%@ übernommen.",
+        importedBackupFormat: "%1$@ übernommen. Der Stand davor ist im Ordner „backups“ als „%2$@“ gesichert."
+    )
+}

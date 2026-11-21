@@ -77,6 +77,8 @@ final class TimeTrackingService: ObservableObject {
         } else if engine != nil || databaseFault != nil {
             deactivate()
         }
+        // Uninstalled: the Records window closes and lets go of its state.
+        if !AppFeature.timeTracking.isAvailable { RecordsWindowController.shared.close() }
         syncHotkeys()
     }
 
@@ -171,6 +173,28 @@ final class TimeTrackingService: ObservableObject {
     /// Takes changed settings over (workdays, free days, idle time …).
     func reloadSettings() { perform { $0.reload() } }
 
+    /// All days (with what runs right now), the settings and "now" for the
+    /// records window. Works while recording is off too (then straight from
+    /// the database, like `editDay`).
+    func recordsState() throws -> (days: [TTDay], settings: TTSettings, now: TTDateTime) {
+        if let engine { return engine.recordsState() }
+        let database = try TimeTrackingDatabase.openDefault()
+        return (try database.load(), try database.loadSettings(defaults: .standard), clock.now())
+    }
+
+    /// Takes over the days of an import (they replace what these days had),
+    /// after a backup of the database. While recording runs it goes through
+    /// the engine, so the running period stays and the tracker reads the new
+    /// days. Returns the backup (`nil`: there was nothing to back up yet).
+    @discardableResult
+    func importDays(_ days: [TTDay]) throws -> URL? {
+        if let engine, let database {
+            defer { refresh() }
+            return try engine.changeStore { _, t in try database.importDays(days, now: t) }
+        }
+        return try TimeTrackingDatabase.openDefault().importDays(days, now: clock.now())
+    }
+
     // MARK: Settings page
 
     /// All settings: the preferences from UserDefaults, the working-time rules
@@ -242,16 +266,16 @@ final class TimeTrackingService: ObservableObject {
     /// may be up to 15 s old.
     func refreshDisplay() { refresh() }
 
-    /// "Records…" in the panel and its shortcut. The Records window arrives
-    /// with M6; until then the panel hides the entry and the shortcut does
-    /// nothing visible.
+    /// "Records…" in the panel, its shortcut, the Command Bar and the
+    /// context menu: opens the Records window or brings it to the front. It
+    /// also works while recording is off (then on the database alone).
     func showRecords() {
-        guard engine != nil else { return }
-        Self.log.info("Time Tracking: the Records window is not available yet")
+        guard AppFeature.timeTracking.isAvailable else { return }
+        RecordsWindowController.shared.show()
     }
 
-    /// Whether "Records…" has a window to open (M6).
-    static let recordsAvailable = false
+    /// Whether "Records…" has a window to open.
+    static let recordsAvailable = true
 
     /// The answer to the question after a long lock (`menubar.rs`
     /// `lock_answered`): the lock was work away from the Mac, or the end of

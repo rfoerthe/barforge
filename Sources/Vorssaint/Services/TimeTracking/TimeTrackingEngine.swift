@@ -450,12 +450,27 @@ final class TimeTrackingEngine {
     /// merged with what runs (`tracker.rs` `replace_days`). Errors of the edit
     /// itself are thrown; nothing changed then.
     func editDay(_ date: TTDate, _ change: (inout TTDay) throws -> Void) throws {
+        try changeStore { store, t in try store.editDay(date, now: t, change) }
+    }
+
+    /// Changes the database some other way (an import) and takes it over,
+    /// like `editDay`: the running state is saved first and merged back after,
+    /// all at the same moment, so nothing of the change is written over.
+    @discardableResult
+    func changeStore<T>(_ change: (TimeTrackingStore, TTDateTime) throws -> T) throws -> T {
         let t = begin()
         tracker.rollOver(t)
         persist(t)
-        try store.editDay(date, now: t, change)
+        let result = try change(store, t)
         reload(t)
         persist(t)
+        return result
+    }
+
+    /// All days including what runs right now, and the settings (Records window).
+    func recordsState() -> (days: [TTDay], settings: TTSettings, now: TTDateTime) {
+        let t = begin()
+        return (tracker.snapshot(t), tracker.settings, t)
     }
 
     /// Reads days and settings again after the settings or the database

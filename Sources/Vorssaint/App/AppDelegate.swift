@@ -1738,6 +1738,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             menu.addItem(diskAnalyzerItem)
         }
 
+        if AppFeature.timeTracking.isAvailable {
+            let recordsItem = NSMenuItem(title: FeatureStrings.timeTrackingMenu(L10n.shared.language).records,
+                                         action: #selector(menuOpenTimeTrackingRecords), keyEquivalent: "")
+            recordsItem.target = self
+            menu.addItem(recordsItem)
+        }
+
         if AppFeature.uninstaller.isAvailable {
             let uninstallItem = NSMenuItem(title: strings.uninstallerMenuItem,
                                            action: #selector(menuOpenUninstaller), keyEquivalent: "")
@@ -1802,6 +1809,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     @objc private func menuOpenDiskAnalyzer() {
         DiskAnalyzerService.shared.show()
+    }
+
+    @objc private func menuOpenTimeTrackingRecords() {
+        TimeTrackingService.shared.showRecords()
     }
 
     @objc private func menuOpenUninstaller() {
