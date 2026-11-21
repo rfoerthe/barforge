@@ -103,10 +103,36 @@ enum TTWarning: Hashable, Sendable {
         let work = spans.reduce(0) { $0 + $1.len }
         let actual = day.actualSpans(s)
 
+        // The checks of the Working Hours Act (breaks, stretch, maximum hours
+        // and rest) only while its hints are on (plan E2); the hints about free
+        // days and the working-time frame are not about the Act.
+        if s.legalHints {
+            out.append(contentsOf: legalWarnings(days, index: idx, spans: spans, actual: actual, settings: s))
+        }
+        // Work on a day without a target: it only goes into the balance when the
+        // rules say so, on the weekend as on a deselected workday.
+        if work > 0 && !s.isWorkday(date) {
+            let countsInBalance = s.workCountsOn(date)
+            out.append(date.isWeekend ? .weekend(counted: countsInBalance) : .freeWeekday(counted: countsInBalance))
+        }
+        // Spans under a minute (a short unlock at night) are not worth a warning.
+        let outside = day.outsideFrameSpans(s).filter { $0.len >= 60 }
+        if !outside.isEmpty {
+            let r = s.rules(date)
+            out.append(.outsideFrame(spans: outside, frame: TTSpan(r.frameFrom, r.frameTo)))
+        }
+        return out
+    }
+
+    /// Breaks, stretch and maximum hours of the day `days[index]` (counted,
+    /// then with the time outside the frame), and its rest since the last day
+    /// with work (`spans`/`actual`: its counted and actual blocks).
+    private static func legalWarnings(_ days: [TTDay], index idx: Int, spans: [TTSpan], actual: [TTSpan],
+                                      settings s: TTSettings) -> [TTWarning] {
+        let date = days[idx].date
         let counted = legalChecks(spans, outside: false)
         let withOutside = actual == spans ? [nil, nil, nil] : legalChecks(actual, outside: true)
-        out.append(contentsOf: zip(counted, withOutside).compactMap { $0 ?? $1 })
-
+        var out = zip(counted, withOutside).compactMap { $0 ?? $1 }
         // Rest since the end of the last day with work, counted or actual.
         func rest(_ first: TTSpan?, _ previous: (date: TTDate, end: Int)?) -> Int? {
             guard let first, let previous else { return nil }
@@ -124,18 +150,6 @@ enum TTWarning: Hashable, Sendable {
             out.append(.rest(rest: r, outside: false))
         } else if let r = rest(actual.first, actualPrevious), r < TTLimits.minRest {
             out.append(.rest(rest: r, outside: true))
-        }
-        // Work on a day without a target: it only goes into the balance when the
-        // rules say so, on the weekend as on a deselected workday.
-        if work > 0 && !s.isWorkday(date) {
-            let countsInBalance = s.workCountsOn(date)
-            out.append(date.isWeekend ? .weekend(counted: countsInBalance) : .freeWeekday(counted: countsInBalance))
-        }
-        // Spans under a minute (a short unlock at night) are not worth a warning.
-        let outside = day.outsideFrameSpans(s).filter { $0.len >= 60 }
-        if !outside.isEmpty {
-            let r = s.rules(date)
-            out.append(.outsideFrame(spans: outside, frame: TTSpan(r.frameFrom, r.frameTo)))
         }
         return out
     }

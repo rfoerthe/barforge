@@ -442,6 +442,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/TimeTracking/TTMenu.swift
         Sources/Vorssaint/Core/TimeTracking/TTNotices.swift
         Sources/Vorssaint/Core/TimeTracking/TTGlyphs.swift
+        Sources/Vorssaint/Core/TimeTracking/TTSettingsModel.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingSQLite.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingDatabase.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingTagwerkImport.swift

@@ -18,6 +18,7 @@ enum TTPreferences {
         DefaultsKey.timeTrackingAskAfterLock,
         DefaultsKey.timeTrackingNotifyLimit,
         DefaultsKey.timeTrackingNotifyBreak,
+        DefaultsKey.timeTrackingLegalHints,
     ]
 
     /// `settings` with the preference fields read from `defaults`. A key
@@ -40,6 +41,7 @@ enum TTPreferences {
         s.askAfterLock = bool(DefaultsKey.timeTrackingAskAfterLock, s.askAfterLock)
         s.notifyLimit = bool(DefaultsKey.timeTrackingNotifyLimit, s.notifyLimit)
         s.notifyBreak = bool(DefaultsKey.timeTrackingNotifyBreak, s.notifyBreak)
+        s.legalHints = bool(DefaultsKey.timeTrackingLegalHints, s.legalHints)
         return s.sanitized
     }
 
@@ -55,6 +57,7 @@ enum TTPreferences {
         defaults.set(s.askAfterLock, forKey: DefaultsKey.timeTrackingAskAfterLock)
         defaults.set(s.notifyLimit, forKey: DefaultsKey.timeTrackingNotifyLimit)
         defaults.set(s.notifyBreak, forKey: DefaultsKey.timeTrackingNotifyBreak)
+        defaults.set(s.legalHints, forKey: DefaultsKey.timeTrackingLegalHints)
     }
 
     /// Tagwerk's keys in its `settings` table (`store.rs` `KEY_*`) for the

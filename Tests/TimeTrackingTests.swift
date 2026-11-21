@@ -18,6 +18,7 @@ enum TimeTrackingTests {
         TimeTrackingTrackerTests.run(suite)
         TimeTrackingEngineTests.run(suite)
         TimeTrackingMenuTests.run(suite)
+        TimeTrackingSettingsTests.run(suite)
     }
 
     private static func catalog(_ suite: TestSuite) {
@@ -41,7 +42,7 @@ enum TimeTrackingTests {
                                       stringFor: { _ in nil })
                 .contains(.timeTracking)
         }
-        let on = [DefaultsKey.timeTrackingEnabled: true]
+        let on = [DefaultsKey.timeTrackingEnabled: true, DefaultsKey.timeTrackingLegalHints: true]
         suite.expect(!notifies(on), "recording without reminders or the lock question uses no notifications")
         for key in [DefaultsKey.timeTrackingNotifyLimit, DefaultsKey.timeTrackingNotifyBreak,
                     DefaultsKey.timeTrackingAskAfterLock] {

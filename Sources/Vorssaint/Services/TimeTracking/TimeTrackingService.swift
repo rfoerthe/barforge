@@ -81,18 +81,20 @@ final class TimeTrackingService: ObservableObject {
     }
 
     /// A reminder or the lock question is on: asked for the permission when
-    /// recording starts with one of them (the Settings page of M5 asks when
-    /// one is switched on).
+    /// recording starts with one of them (the Settings page asks when one is
+    /// switched on). The reminders only count while the hints of the Working
+    /// Hours Act are on.
     static func wantsNotifications(_ defaults: UserDefaults) -> Bool {
-        defaults.bool(forKey: DefaultsKey.timeTrackingNotifyLimit)
-            || defaults.bool(forKey: DefaultsKey.timeTrackingNotifyBreak)
+        (defaults.bool(forKey: DefaultsKey.timeTrackingNotifyLimit)
+            || defaults.bool(forKey: DefaultsKey.timeTrackingNotifyBreak))
+            && defaults.bool(forKey: DefaultsKey.timeTrackingLegalHints)
             || defaults.bool(forKey: DefaultsKey.timeTrackingAskAfterLock)
     }
 
     /// ⌃⌥⌘B (pause) and ⌃⌥⌘A (records) by default, while recording runs and
     /// "Global shortcuts" is on. Also re-registers after a shortcut field
     /// released every key.
-    private func syncHotkeys() {
+    func syncHotkeys() {
         let defaults = UserDefaults.standard
         let on = engine != nil
         var failed = false
@@ -168,6 +170,73 @@ final class TimeTrackingService: ObservableObject {
 
     /// Takes changed settings over (workdays, free days, idle time …).
     func reloadSettings() { perform { $0.reload() } }
+
+    // MARK: Settings page
+
+    /// All settings: the preferences from UserDefaults, the working-time rules
+    /// and the time account from the database. Works while recording is off
+    /// too (then straight from the database, like `editDay`).
+    func loadSettings() throws -> TTSettings {
+        try withDatabase { try $0.loadSettings(defaults: .standard) }
+    }
+
+    /// Saves the database's part of `settings` (the dated working-time rules
+    /// and the time account) and lets recording take them over.
+    func saveRulesAndAccount(_ settings: TTSettings) throws {
+        let today = now().date
+        try withDatabase { try $0.saveSettings(settings, today: today) }
+        reloadSettings()
+    }
+
+    /// "Restore defaults": every setting of the page as at the beginning, the
+    /// working-time rules from today on (`TTSettingsModel.withDefaults`). The
+    /// recording switch and the records stay. Returns the new settings.
+    @discardableResult
+    func restoreDefaults() throws -> TTSettings {
+        let defaults = UserDefaults.standard
+        let today = now().date
+        let fresh = TTSettingsModel.withDefaults(try loadSettings(), today: today)
+        try withDatabase { try $0.saveSettings(fresh, today: today, defaults: defaults) }
+        // Barforge's own options go back to their registered defaults.
+        for key in [DefaultsKey.timeTrackingStatusItem, DefaultsKey.timeTrackingPauseShortcut,
+                    DefaultsKey.timeTrackingRecordsShortcut] {
+            defaults.removeObject(forKey: key)
+        }
+        reloadSettings()
+        syncHotkeys()
+        return fresh
+    }
+
+    /// Tagwerk's database at its usual place (`nil`: there is none).
+    var tagwerkDatabaseURL: URL? {
+        TimeTrackingTagwerkImport.defaultSourceURL.flatMap {
+            FileManager.default.fileExists(atPath: $0.path) ? $0 : nil
+        }
+    }
+
+    /// Takes the data over from Tagwerk (plan E3). Recording stops for it, so
+    /// nothing of the running period mixes into the copy, and starts again
+    /// with the new days and settings.
+    func takeOverTagwerk() throws -> TimeTrackingTagwerkImport.Result {
+        guard let source = TimeTrackingTagwerkImport.defaultSourceURL else {
+            throw TimeTrackingTagwerkImport.Failure.missing("Tagwerk/tagwerk.db")
+        }
+        let wasActive = engine != nil
+        if wasActive { deactivate() }
+        defer {
+            if wasActive { syncWithPreferences() }
+        }
+        let database = try TimeTrackingDatabase.openDefault()
+        return try TimeTrackingTagwerkImport.takeOver(from: source, into: database, defaults: .standard,
+                                                      now: now())
+    }
+
+    /// Runs `body` on the open database, or on a database opened for it while
+    /// recording is off.
+    private func withDatabase<T>(_ body: (TimeTrackingDatabase) throws -> T) throws -> T {
+        if let database { return try body(database) }
+        return try body(TimeTrackingDatabase.openDefault())
+    }
 
     /// The state as of now, when the panel opens (`menuWillOpen`): the tick
     /// may be up to 15 s old.

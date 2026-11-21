@@ -267,6 +267,12 @@ struct TTSettings: Hashable, Sendable {
     var notifyLimit = true
     /// Notifications about breaks (5:45 and 6 h of work in a row).
     var notifyBreak = true
+    /// Hints and reminders of the German Working Hours Act (plan E2): breaks
+    /// (§ 4), more than 6 h in one stretch, rest (§ 5) and maximum hours
+    /// (§ 3), and the reminders about breaks and the maximum working time.
+    /// Barforge only; Tagwerk always checks. Off, the hints about free days
+    /// and the working-time frame stay.
+    var legalHints = true
     /// The time account counts from this day (`nil`: all recorded days).
     var accountFrom: TTDate?
     /// Carried over into the time account: balance from before (seconds, also negative).

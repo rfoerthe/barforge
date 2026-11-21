@@ -180,14 +180,17 @@ struct TTReminders: Hashable, Sendable {
     }
 
     /// New figures of today. The watches always follow; only what the
-    /// settings switch on is returned.
+    /// settings switch on is returned. Both reminders belong to the Working
+    /// Hours Act and stay quiet while its hints are off (plan E2).
     mutating func update(date: TTDate, work: Int, stretch: Int, working: Bool, settings: TTSettings,
                          texts: TimeTrackingTexts) -> [TTNotice] {
         var out: [TTNotice] = []
-        if let alert = limit.update(date: date, work: work, working: working), settings.notifyLimit {
+        if let alert = limit.update(date: date, work: work, working: working),
+           settings.notifyLimit && settings.legalHints {
             out.append(.limit(alert, texts))
         }
-        if let alert = breaks.update(date: date, stretch: stretch, working: working), settings.notifyBreak {
+        if let alert = breaks.update(date: date, stretch: stretch, working: working),
+           settings.notifyBreak && settings.legalHints {
             out.append(.breakReminder(alert, texts))
         }
         return out

@@ -493,8 +493,10 @@ extension AppFeature {
                     && boolFor(DefaultsKey.whatsAppDownloadsNotify)
                 return cleanerNotifies || whatsAppNotifies
             case (.timeTracking, .notifications):
-                return boolFor(DefaultsKey.timeTrackingNotifyLimit)
-                    || boolFor(DefaultsKey.timeTrackingNotifyBreak)
+                // The reminders belong to the Working Hours Act and stay
+                // quiet while its hints are off.
+                return (boolFor(DefaultsKey.timeTrackingNotifyLimit) || boolFor(DefaultsKey.timeTrackingNotifyBreak))
+                    && boolFor(DefaultsKey.timeTrackingLegalHints)
                     || boolFor(DefaultsKey.timeTrackingAskAfterLock)
             case (.screenRecorder, .audioCapture):
                 return boolFor(DefaultsKey.recorderSystemAudio)

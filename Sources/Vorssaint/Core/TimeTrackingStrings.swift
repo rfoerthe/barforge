@@ -11,8 +11,6 @@ struct TimeTrackingFeatureStrings {
     let recordCaption: String
     /// What the section shows, in the panel layout editor.
     let panelDescription: String
-    /// Shown while the feature is a beta, until the full Settings page arrives.
-    let betaNote: String
 }
 
 extension FeatureStrings {
@@ -43,8 +41,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Record working time automatically while your Mac is unlocked, with breaks, balance and German working time rules",
         recordToggle: "Record working time",
         recordCaption: "Time counts while your Mac is unlocked. A lock of 15 minutes or more is a break.",
-        panelDescription: "See today’s working time and balance, and pause or end work without opening a window.",
-        betaNote: "This beta records working time and shows it in the menu bar. Settings for working hours and reminders and the Records window follow in the next builds."
+        panelDescription: "See today’s working time and balance, and pause or end work without opening a window."
     )
 
     static let de = TimeTrackingFeatureStrings(
@@ -52,8 +49,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Erfasst die Arbeitszeit automatisch, solange der Mac entsperrt ist, mit Pausen, Saldo und den Regeln des Arbeitszeitgesetzes",
         recordToggle: "Arbeitszeit erfassen",
         recordCaption: "Gezählt wird, solange der Mac entsperrt ist. Eine Sperre ab 15 Minuten ist eine Pause.",
-        panelDescription: "Arbeitszeit und Saldo von heute im Blick, Pause und Feierabend ohne ein Fenster zu öffnen.",
-        betaNote: "Diese Beta erfasst die Arbeitszeit und zeigt sie in der Menüleiste. Einstellungen für Arbeitszeit und Erinnerungen sowie das Fenster mit den Aufzeichnungen folgen in den nächsten Versionen."
+        panelDescription: "Arbeitszeit und Saldo von heute im Blick, Pause und Feierabend ohne ein Fenster zu öffnen."
     )
 
     static let ptBR = TimeTrackingFeatureStrings(
@@ -61,8 +57,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Registre a jornada automaticamente enquanto o Mac está desbloqueado, com pausas, saldo e as regras alemãs de jornada de trabalho",
         recordToggle: "Registrar a jornada",
         recordCaption: "O tempo conta enquanto o Mac está desbloqueado. Um bloqueio de 15 minutos ou mais é uma pausa.",
-        panelDescription: "Veja a jornada e o saldo de hoje e pause ou encerre o trabalho sem abrir uma janela.",
-        betaNote: "Esta versão beta registra a jornada e a mostra na barra de menus. Os ajustes de jornada e lembretes e a janela de registros chegam nas próximas versões."
+        panelDescription: "Veja a jornada e o saldo de hoje e pause ou encerre o trabalho sem abrir uma janela."
     )
 
     static let tr = TimeTrackingFeatureStrings(
@@ -70,8 +65,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Mac kilidi açıkken çalışma süresini molalar, bakiye ve Alman çalışma süresi kurallarıyla otomatik olarak kaydedin",
         recordToggle: "Çalışma süresini kaydet",
         recordCaption: "Mac kilidi açıkken süre sayılır. 15 dakika veya daha uzun bir kilit moladır.",
-        panelDescription: "Bugünkü çalışma süresini ve bakiyeyi görün, pencere açmadan molaya çıkın veya işi bitirin.",
-        betaNote: "Bu beta çalışma süresini kaydeder ve menü çubuğunda gösterir. Çalışma süresi ve hatırlatıcı ayarları ile kayıtlar penceresi sonraki sürümlerde gelecek."
+        panelDescription: "Bugünkü çalışma süresini ve bakiyeyi görün, pencere açmadan molaya çıkın veya işi bitirin."
     )
 
     static let ru = TimeTrackingFeatureStrings(
@@ -79,8 +73,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Автоматически учитывайте рабочее время, пока Mac разблокирован, с перерывами, балансом и правилами немецкого закона о рабочем времени",
         recordToggle: "Учитывать рабочее время",
         recordCaption: "Время считается, пока Mac разблокирован. Блокировка от 15 минут считается перерывом.",
-        panelDescription: "Рабочее время и баланс за сегодня, а также перерыв и конец рабочего дня без открытия окна.",
-        betaNote: "Эта бета учитывает рабочее время и показывает его в строке меню. Настройки рабочего времени и напоминаний, а также окно записей появятся в следующих сборках."
+        panelDescription: "Рабочее время и баланс за сегодня, а также перерыв и конец рабочего дня без открытия окна."
     )
 
     static let es = TimeTrackingFeatureStrings(
@@ -88,8 +81,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Registra la jornada automáticamente mientras el Mac está desbloqueado, con pausas, saldo y las normas alemanas de jornada laboral",
         recordToggle: "Registrar la jornada",
         recordCaption: "El tiempo cuenta mientras el Mac está desbloqueado. Un bloqueo de 15 minutos o más es una pausa.",
-        panelDescription: "Consulta la jornada y el saldo de hoy, y pausa o termina el trabajo sin abrir ninguna ventana.",
-        betaNote: "Esta beta registra la jornada y la muestra en la barra de menús. Los ajustes de jornada y recordatorios y la ventana de registros llegan en las próximas versiones."
+        panelDescription: "Consulta la jornada y el saldo de hoy, y pausa o termina el trabajo sin abrir ninguna ventana."
     )
 
     static let sk = TimeTrackingFeatureStrings(
@@ -97,8 +89,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Automaticky zaznamenáva pracovný čas, kým je Mac odomknutý, s prestávkami, saldom a pravidlami nemeckého zákona o pracovnom čase",
         recordToggle: "Zaznamenávať pracovný čas",
         recordCaption: "Čas sa počíta, kým je Mac odomknutý. Zamknutie na 15 minút a dlhšie je prestávka.",
-        panelDescription: "Dnešný pracovný čas a saldo, prestávka aj koniec práce bez otvárania okna.",
-        betaNote: "Táto beta zaznamenáva pracovný čas a zobrazuje ho na lište ponúk. Nastavenia pracovného času a pripomienok a okno záznamov prídu v ďalších verziách."
+        panelDescription: "Dnešný pracovný čas a saldo, prestávka aj koniec práce bez otvárania okna."
     )
 
     static let fr = TimeTrackingFeatureStrings(
@@ -106,8 +97,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Enregistrez automatiquement le temps de travail tant que le Mac est déverrouillé, avec pauses, solde et règles allemandes sur le temps de travail",
         recordToggle: "Enregistrer le temps de travail",
         recordCaption: "Le temps compte tant que le Mac est déverrouillé. Un verrouillage de 15 minutes ou plus est une pause.",
-        panelDescription: "Consultez le temps de travail et le solde du jour, et faites une pause ou terminez la journée sans ouvrir de fenêtre.",
-        betaNote: "Cette bêta enregistre le temps de travail et l’affiche dans la barre des menus. Les réglages des horaires et des rappels ainsi que la fenêtre des relevés arrivent dans les prochaines versions."
+        panelDescription: "Consultez le temps de travail et le solde du jour, et faites une pause ou terminez la journée sans ouvrir de fenêtre."
     )
 
     static let it = TimeTrackingFeatureStrings(
@@ -115,8 +105,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Registra automaticamente l’orario di lavoro mentre il Mac è sbloccato, con pause, saldo e regole tedesche sull’orario di lavoro",
         recordToggle: "Registra l’orario di lavoro",
         recordCaption: "Il tempo conta finché il Mac è sbloccato. Un blocco di 15 minuti o più è una pausa.",
-        panelDescription: "L’orario di lavoro e il saldo di oggi, con pausa e fine lavoro senza aprire una finestra.",
-        betaNote: "Questa beta registra l’orario di lavoro e lo mostra nella barra dei menu. Le impostazioni di orario e promemoria e la finestra delle registrazioni arrivano nelle prossime versioni."
+        panelDescription: "L’orario di lavoro e il saldo di oggi, con pausa e fine lavoro senza aprire una finestra."
     )
 
     static let ja = TimeTrackingFeatureStrings(
@@ -124,8 +113,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Mac のロックが解除されている間の勤務時間を、休憩、残高、ドイツの労働時間規則とともに自動で記録します",
         recordToggle: "勤務時間を記録",
         recordCaption: "Mac のロックが解除されている間を勤務時間として数えます。15 分以上のロックは休憩です。",
-        panelDescription: "今日の勤務時間と残高を確認し、ウインドウを開かずに休憩や終業を記録できます。",
-        betaNote: "このベータ版は勤務時間を記録し、メニューバーに表示します。勤務時間とリマインダーの設定、記録ウインドウは今後のビルドで追加されます。"
+        panelDescription: "今日の勤務時間と残高を確認し、ウインドウを開かずに休憩や終業を記録できます。"
     )
 
     static let ko = TimeTrackingFeatureStrings(
@@ -133,8 +121,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Mac 잠금이 해제된 동안 근무 시간을 휴식, 잔여 시간, 독일 근로시간 규정과 함께 자동으로 기록합니다",
         recordToggle: "근무 시간 기록하기",
         recordCaption: "Mac 잠금이 해제된 동안 시간이 계산됩니다. 15분 이상 잠기면 휴식으로 처리됩니다.",
-        panelDescription: "오늘의 근무 시간과 잔여 시간을 확인하고, 창을 열지 않고 휴식이나 퇴근을 기록합니다.",
-        betaNote: "이 베타는 근무 시간을 기록하고 메뉴 막대에 표시합니다. 근무 시간 및 알림 설정과 기록 창은 다음 빌드에서 제공됩니다."
+        panelDescription: "오늘의 근무 시간과 잔여 시간을 확인하고, 창을 열지 않고 휴식이나 퇴근을 기록합니다."
     )
 
     static let uk = TimeTrackingFeatureStrings(
@@ -142,8 +129,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "Автоматично враховуйте робочий час, поки Mac розблоковано, з перервами, балансом і правилами німецького закону про робочий час",
         recordToggle: "Враховувати робочий час",
         recordCaption: "Час рахується, поки Mac розблоковано. Блокування від 15 хвилин є перервою.",
-        panelDescription: "Робочий час і баланс за сьогодні, а також перерва й кінець робочого дня без відкриття вікна.",
-        betaNote: "Ця бета враховує робочий час і показує його в рядку меню. Налаштування робочого часу й нагадувань, а також вікно записів з’являться в наступних збірках."
+        panelDescription: "Робочий час і баланс за сьогодні, а також перерва й кінець робочого дня без відкриття вікна."
     )
 
     static let zhHans = TimeTrackingFeatureStrings(
@@ -151,8 +137,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "在 Mac 解锁期间自动记录工作时间，包括休息、余额和德国工时规定",
         recordToggle: "记录工作时间",
         recordCaption: "Mac 解锁期间计入工作时间。锁定 15 分钟或更久即为休息。",
-        panelDescription: "查看今天的工作时间和余额，无需打开窗口即可暂停或结束工作。",
-        betaNote: "此测试版会记录工作时间并显示在菜单栏中。工时和提醒设置以及记录窗口将在后续版本中提供。"
+        panelDescription: "查看今天的工作时间和余额，无需打开窗口即可暂停或结束工作。"
     )
 
     static let zhTW = TimeTrackingFeatureStrings(
@@ -160,8 +145,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "在 Mac 解鎖期間自動記錄工作時間，包括休息、餘額和德國工時規定",
         recordToggle: "記錄工作時間",
         recordCaption: "Mac 解鎖期間計入工作時間。鎖定 15 分鐘或更久即為休息。",
-        panelDescription: "查看今天的工作時間和餘額，無需打開視窗即可暫停或結束工作。",
-        betaNote: "此測試版會記錄工作時間並顯示在選單列中。工時和提醒設定以及記錄視窗將在後續版本中提供。"
+        panelDescription: "查看今天的工作時間和餘額，無需打開視窗即可暫停或結束工作。"
     )
 
     static let zhHK = TimeTrackingFeatureStrings(
@@ -169,8 +153,7 @@ extension TimeTrackingFeatureStrings {
         hubDescription: "在 Mac 解鎖期間自動記錄工作時間，包括休息、結餘和德國工時規定",
         recordToggle: "記錄工作時間",
         recordCaption: "Mac 解鎖期間計入工作時間。鎖定 15 分鐘或以上即為休息。",
-        panelDescription: "查看今天的工作時間和結餘，無需開啟視窗即可暫停或結束工作。",
-        betaNote: "此測試版會記錄工作時間並顯示在選單列中。工時和提醒設定以及記錄視窗將於後續版本提供。"
+        panelDescription: "查看今天的工作時間和結餘，無需開啟視窗即可暫停或結束工作。"
     )
 }
 
@@ -926,5 +909,531 @@ extension TimeTrackingMenuTexts {
         lockEndOfWork: "Feierabend",
         shortcutPause: "Arbeit unterbrechen bzw. weiter arbeiten",
         shortcutRecords: "Aufzeichnungen öffnen"
+    )
+}
+
+/// Texts of the Time Tracking settings page and its sheet "Change working
+/// time" (Tagwerk's `settings_window.rs`). German is Tagwerk's wording where
+/// it has one; the other languages show English until they are translated.
+struct TimeTrackingSettingsStrings {
+    // Sections
+    let generalSection: String
+    let workingTimeSection: String
+    let recordingSection: String
+    let notificationsSection: String
+    let dataSection: String
+
+    // General
+    let statusItem: String
+    let statusItemCaption: String
+    let iconSet: String
+    let previewRunning: String
+    let previewBreak: String
+    let previewOutside: String
+    let previewClosed: String
+    let showTime: String
+    let showTimeCaption: String
+    let globalShortcuts: String
+    let globalShortcutsCaption: String
+
+    // Working time: the list of rules
+    let columnFrom: String
+    let columnWeekly: String
+    let columnWorkdays: String
+    let columnFrame: String
+    let columnPause: String
+    let columnFreeDays: String
+    let columnFreeDaysHelp: String
+    let rowBeginning: String
+    /// Weekly hours in the list (`39 Std.`).
+    let weeklyCellFormat: String
+    let freeDaysInBalance: String
+    let rowTipCurrent: String
+    let rowTipPlanned: String
+    let rowTipPast: String
+    let newRules: String
+    let newRulesHelp: String
+    let editRules: String
+    let deleteRules: String
+    let deleteRulesHelp: String
+    let rulesCaption: String
+    /// Since when (`currentSinceBeginning` or `currentFromFormat`), then the target per workday.
+    let currentRulesFormat: String
+    let currentSinceBeginning: String
+    let currentFromFormat: String
+    /// The day, then the target per workday.
+    let plannedRulesFormat: String
+    /// Target of a workday, then the week (`5-Tage-Woche`).
+    let perWorkdayFormat: String
+    /// Weekly hours, workdays, target of a workday, frame, minimum break in
+    /// minutes, then `rulesSummaryFreeDays` or nothing.
+    let rulesLineFormat: String
+    let deleteTitleFormat: String
+    /// The day, then the rules that apply from it again (`rulesLineFormat`);
+    /// the end of the sentence is added unless the rules end with one.
+    let deleteInfoFormat: String
+    let deleteChangesFormat: String
+
+    // Working time: time account and the Working Hours Act
+    let accountStart: String
+    let accountStartCaption: String
+    let carry: String
+    let carryCaption: String
+    let carryUnit: String
+    let carryError: String
+    let legalHints: String
+    let legalHintsCaption: String
+
+    // Sheet "Change working time"
+    let sheetNewTitle: String
+    let sheetFirstTitle: String
+    let sheetEditTitleFormat: String
+    let validFrom: String
+    let regularHours: String
+    let hoursPerWeek: String
+    let workdays: String
+    /// The week (`4-Tage-Woche`), then the target of a workday.
+    let dailyNoteFormat: String
+    let freeDays: String
+    let freeDaysCount: String
+    let freeDaysCountHelp: String
+    let freeDaysCaption: String
+    let frame: String
+    let frameTo: String
+    let frameFromHelp: String
+    let frameToHelp: String
+    let frameCaption: String
+    let minBreak: String
+    let minutes: String
+    let minBreakCaption: String
+    let apply: String
+    let cancel: String
+    let hintAllBeforeFormat: String
+    let hintAll: String
+    /// First and last day.
+    let hintRangeFormat: String
+    let hintFromFormat: String
+    let hintReplacesFormat: String
+    let hintSameNothing: String
+    let hintSameDropped: String
+    /// The changed days (`spans…`).
+    let hintRetroactiveFormat: String
+    let hintOtherFormat: String
+    let spansAll: String
+    let spansUntilFormat: String
+    let spansFromFormat: String
+    let spansDayFormat: String
+    /// First and last day.
+    let spansRangeFormat: String
+    /// Lowest and highest weekly hours.
+    let errorWeeklyFormat: String
+    /// Lowest and highest minimum break in minutes.
+    let errorPauseFormat: String
+    let errorWorkday: String
+    let errorFrameTimes: String
+    let errorFrameMidnight: String
+    let errorFrameOrder: String
+
+    // Recording
+    let minWork: String
+    let minWorkCaption: String
+    let atLeast: String
+    let minutesShort: String
+    /// Lowest and highest minimum length in minutes.
+    let errorMinWorkFormat: String
+    let idle: String
+    let idleCaption: String
+    let idleMinutes: String
+    /// Lowest and highest idle time in minutes.
+    let errorIdleFormat: String
+    let askAfterLock: String
+    /// Minutes, then `askNoteMinBreak` or nothing.
+    let askNoteFormat: String
+    let askNoteMinBreak: String
+    let autoWorkdaysOnly: String
+    let autoWorkdaysOnlyCaption: String
+
+    // Notifications
+    let permission: String
+    let permissionAllowed: String
+    let permissionDenied: String
+    let permissionHidden: String
+    let permissionUndetermined: String
+    let permissionUnavailable: String
+    let noteAllowed: String
+    let noteHidden: String
+    let noteDenied: String
+    let noteUnavailable: String
+    let openSystemSettings: String
+    let notifyLimit: String
+    let notifyBreak: String
+    let remindersCaption: String
+    let remindersOffCaption: String
+
+    // Data
+    let dataFolder: String
+    let dataFolderCaption: String
+    let showInFinder: String
+    let takeOver: String
+    let takeOverCaption: String
+    let takeOverButton: String
+    let takeOverMissing: String
+    let tagwerkRunning: String
+    let takeOverConfirmTitle: String
+    let takeOverConfirmInfo: String
+    let takeOverConfirmButton: String
+    let takeOverDoneTitle: String
+    /// Number of days.
+    let takeOverDoneFormat: String
+    /// Path of the backup.
+    let takeOverBackupFormat: String
+    let takeOverNoBackup: String
+    let takeOverFailedTitle: String
+    let resetDefaults: String
+    let resetDefaultsCaption: String
+    let resetButton: String
+    let resetTitle: String
+    let resetWhat: String
+    /// What the account was (`resetAccountFromFormat`, `resetAccountCarryFormat`).
+    let resetAccountFormat: String
+    let resetAccountFromFormat: String
+    let resetAccountCarryFormat: String
+    let resetRulesAlreadyDefault: String
+    /// Today, then the default rules (as `deleteInfoFormat`).
+    let resetRulesFormat: String
+    let resetPlannedOneFormat: String
+    /// The earlier days, then the last.
+    let resetPlannedManyFormat: String
+    let resetStays: String
+    let resetConfirm: String
+    /// The error.
+    let errorSaveFormat: String
+    let errorLoadFormat: String
+}
+
+extension FeatureStrings {
+    static func timeTrackingSettings(_ language: AppLanguage) -> TimeTrackingSettingsStrings {
+        switch language {
+        case .de: return .de
+        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        }
+    }
+}
+
+extension TimeTrackingSettingsStrings {
+    static let enUS = TimeTrackingSettingsStrings(
+        generalSection: "General",
+        workingTimeSection: "Working Time",
+        recordingSection: "Recording",
+        notificationsSection: "Notifications",
+        dataSection: "Data",
+        statusItem: "Menu bar icon",
+        statusItemCaption: "An icon of its own with the state of recording. A click opens the panel on Time Tracking.",
+        iconSet: "Icon set",
+        previewRunning: "Running",
+        previewBreak: "Break",
+        previewOutside: "Outside hours or day off",
+        previewClosed: "End of work",
+        showTime: "Show today’s working time",
+        showTimeCaption: "Shows today’s working time next to the icon, for example 6:12.",
+        globalShortcuts: "Global shortcuts",
+        globalShortcutsCaption: "They work in every app, even with the panel closed.",
+        columnFrom: "Valid from",
+        columnWeekly: "Week",
+        columnWorkdays: "Workdays",
+        columnFrame: "Hours",
+        columnPause: "Break from",
+        columnFreeDays: "Days off",
+        columnFreeDaysHelp: "“in balance”: work on days off counts toward balance and time account",
+        rowBeginning: "Beginning",
+        weeklyCellFormat: "%@ h",
+        freeDaysInBalance: "in balance",
+        rowTipCurrent: "Applies today",
+        rowTipPlanned: "Planned, applies from this day",
+        rowTipPast: "Applied before",
+        newRules: "New…",
+        newRulesHelp: "Add working time rules that apply from a date",
+        editRules: "Edit…",
+        deleteRules: "Delete",
+        deleteRulesHelp: "From its date the rules before apply again",
+        rulesCaption: "Each set of rules applies from its date until the next one, so a change does not recompute earlier days. The regular hours spread evenly over the workdays. Other days have no target, and work there only counts toward balance and time account when the rules say so. Outside working hours neither work nor breaks count.",
+        currentRulesFormat: "Today the rules %1$@ apply: %2$@.",
+        currentSinceBeginning: "since the beginning",
+        currentFromFormat: "from %@",
+        plannedRulesFormat: "Planned from %1$@: %2$@.",
+        perWorkdayFormat: "%1$@ per workday (%2$@)",
+        rulesLineFormat: "%1$@ h/week (%2$@, %3$@ per workday)  ·  working hours %4$@  ·  breaks from %5$d min%6$@",
+        deleteTitleFormat: "Delete the rules from %@?",
+        deleteInfoFormat: "From %1$@ the rules before apply again: %2$@",
+        deleteChangesFormat: " The balance and records from %@ on change.",
+        accountStart: "Count the time account from a date",
+        accountStartCaption: "Off, the time account counts all recorded days.",
+        carry: "Carry-over",
+        carryCaption: "The time account is the balance of all recorded days, or of those from the date, plus the carry-over: the balance from before, for example +12:30 or −3:15.",
+        carryUnit: "h",
+        carryError: "The carry-over is a balance such as +12:30 or −3:15.",
+        legalHints: "German working time law hints",
+        legalHintsCaption: "Checks breaks (§ 4), rest (§ 5) and maximum hours (§ 3) under the German Working Hours Act (ArbZG) and reminds you of breaks and the maximum working time. Off, only the hints about days off and working hours stay.",
+        sheetNewTitle: "Change Working Time",
+        sheetFirstTitle: "Working Time Since the Beginning",
+        sheetEditTitleFormat: "Edit Working Time from %@",
+        validFrom: "Valid from:",
+        regularHours: "Regular hours:",
+        hoursPerWeek: "hours per week",
+        workdays: "Workdays:",
+        dailyNoteFormat: "%1$@  ·  %2$@ per workday",
+        freeDays: "Days off:",
+        freeDaysCount: "Count work on days off in balance and time account",
+        freeDaysCountHelp: "On, work on the weekend and on deselected workdays counts as overtime in balance and time account. Separately, “Record today” in the panel decides whether time recorded on a day off counts as working time at all.",
+        freeDaysCaption: "Weekends and other days off have no target. Off, work there is shown but does not change balance and time account. Whether time recorded there counts as working time at all is up to “Record today” in the panel.",
+        frame: "Working hours:",
+        frameTo: "to",
+        frameFromHelp: "Start of working hours, for example 07:00",
+        frameToHelp: "End of working hours, for example 22:00; until midnight: 24:00",
+        frameCaption: "Outside this span neither work nor breaks count. Until midnight: 24:00.",
+        minBreak: "Minimum break:",
+        minutes: "minutes",
+        minBreakCaption: "A shorter lock keeps counting as working time. Under the German Working Hours Act breaks only count from 15 minutes.",
+        apply: "Apply",
+        cancel: "Cancel",
+        hintAllBeforeFormat: "Applies to all days before %@.",
+        hintAll: "Applies to all days.",
+        hintRangeFormat: "Applies from %1$@ to %2$@.",
+        hintFromFormat: "Applies from %@.",
+        hintReplacesFormat: "Replaces the existing rules from %@.",
+        hintSameNothing: "Same as the rules before, so nothing changes.",
+        hintSameDropped: "Same as the rules before, so they are dropped.",
+        hintRetroactiveFormat: "Retroactive: the balance and records change for %@.",
+        hintOtherFormat: "Different rules than before apply to %@.",
+        spansAll: "all days",
+        spansUntilFormat: "the days until %@",
+        spansFromFormat: "the days from %@",
+        spansDayFormat: "%@",
+        spansRangeFormat: "%1$@ to %2$@",
+        errorWeeklyFormat: "The regular hours must be between %1$d and %2$d hours per week.",
+        errorPauseFormat: "The minimum break must be between %1$d and %2$d minutes.",
+        errorWorkday: "At least one workday must remain.",
+        errorFrameTimes: "Working hours need times such as 07:00 or 24:00.",
+        errorFrameMidnight: "The end of working hours must come after their start. Midnight as the end is 24:00.",
+        errorFrameOrder: "The end of working hours must come after their start.",
+        minWork: "Work away from the Mac",
+        minWorkCaption: "The shortest entry by hand. Shorter spans cannot be entered in the Records window, which guards against accidental entries.",
+        atLeast: "at least",
+        minutesShort: "min",
+        errorMinWorkFormat: "The minimum length of work away from the Mac must be between %1$d and %2$d minutes.",
+        idle: "Pause recording when idle",
+        idleCaption: "The unlocked Mac then counts as left: recording ends at the last input, as with a lock. While an app keeps the display awake (video call, presentation), time keeps counting.",
+        idleMinutes: "minutes without input",
+        errorIdleFormat: "The idle time must be between %1$d and %2$d minutes.",
+        askAfterLock: "Ask after a long lock",
+        askNoteFormat: "After a lock of %1$d min or more%2$@, a notification asks whether it was work away from the Mac or already the end of work, if the lock began within working hours and ends on the same day. Without an answer it stays a break. Needs notifications.",
+        askNoteMinBreak: " (as long as the minimum break)",
+        autoWorkdaysOnly: "Count automatic recording only on workdays",
+        autoWorkdaysOnlyCaption: "On weekends and other days off time is recorded but only counts as working time after “Record today” in the panel. Entries by hand always count. Whether this time also counts toward balance and time account is up to the working time rules.",
+        permission: "Permission",
+        permissionAllowed: "Allowed",
+        permissionDenied: "Not allowed",
+        permissionHidden: "Hidden",
+        permissionUndetermined: "Not allowed yet",
+        permissionUnavailable: "Only in the installed app",
+        noteAllowed: "Reminds you of breaks and the maximum working time in Notification Center, asks after a long lock and reports errors when saving.",
+        noteHidden: "Allowed, but notifications appear neither as banners nor in Notification Center. To be reminded and asked, choose a style in System Settings › Notifications.",
+        noteDenied: "To be reminded of breaks and the maximum working time and asked after a long lock, turn on “Allow notifications” in System Settings › Notifications.",
+        noteUnavailable: "Reminders and the question after a long lock are only available in the installed app.",
+        openSystemSettings: "Open System Settings",
+        notifyLimit: "Maximum working time (at 9:45 and 10 h of work)",
+        notifyBreak: "Break (at 5:45 and 6 h of work in a row)",
+        remindersCaption: "Each threshold is reported once while you work. The hints in the panel are not affected.",
+        remindersOffCaption: "Off while the German working time law hints are off.",
+        dataFolder: "Data folder",
+        dataFolderCaption: "The database and its daily backups.",
+        showInFinder: "Show in Finder",
+        takeOver: "Take over data from Tagwerk",
+        takeOverCaption: "Copies Tagwerk’s recorded days, working time rules, time account and settings.",
+        takeOverButton: "Take Over…",
+        takeOverMissing: "No Tagwerk data found.",
+        tagwerkRunning: "Tagwerk is running. Quit it first, or both apps record the same time.",
+        takeOverConfirmTitle: "Take over the data from Tagwerk?",
+        takeOverConfirmInfo: "This replaces the recorded days, the working time rules and the time account of Time Tracking with Tagwerk’s, and takes over its settings. The current data is backed up first.",
+        takeOverConfirmButton: "Take Over",
+        takeOverDoneTitle: "Data taken over",
+        takeOverDoneFormat: "Days taken over from Tagwerk: %d.",
+        takeOverBackupFormat: " The previous data is backed up in %@.",
+        takeOverNoBackup: " There was no previous data to back up.",
+        takeOverFailedTitle: "The data could not be taken over",
+        resetDefaults: "Restore defaults",
+        resetDefaultsCaption: "Resets all settings of Time Tracking. The records stay.",
+        resetButton: "Restore Defaults…",
+        resetTitle: "Reset all settings to their defaults?",
+        resetWhat: "This resets the menu bar icon with its icon set and working time, the shortcuts, the German working time law hints, the time account with its carry-over, work away from the Mac, idle time, the question after a long lock, days off (recording) and the reminders.",
+        resetAccountFormat: "The time account then counts all recorded days without carry-over (until now %@).",
+        resetAccountFromFormat: "from %@",
+        resetAccountCarryFormat: "carry-over %@",
+        resetRulesAlreadyDefault: "Today’s working time rules already are the defaults.",
+        resetRulesFormat: "From today (%1$@) the default rules apply again: %2$@",
+        resetPlannedOneFormat: "The rules planned from %@ are dropped.",
+        resetPlannedManyFormat: "The rules planned from %1$@ and %2$@ are dropped.",
+        resetStays: "“Record working time”, the working time rules until yesterday and all records stay.",
+        resetConfirm: "Reset",
+        errorSaveFormat: "Saving failed: %@",
+        errorLoadFormat: "The database could not be read: %@"
+    )
+
+    static let de = TimeTrackingSettingsStrings(
+        generalSection: "Allgemein",
+        workingTimeSection: "Arbeitszeit",
+        recordingSection: "Erfassung",
+        notificationsSection: "Mitteilungen",
+        dataSection: "Daten",
+        statusItem: "Symbol in der Menüleiste",
+        statusItemCaption: "Ein eigenes Symbol mit dem Stand der Erfassung. Ein Klick öffnet das Panel bei der Arbeitszeiterfassung.",
+        iconSet: "Symbolsatz",
+        previewRunning: "läuft",
+        previewBreak: "Pause",
+        previewOutside: "außerhalb oder frei",
+        previewClosed: "Feierabend",
+        showTime: "Arbeitszeit von heute zeigen",
+        showTimeCaption: "Zeigt die Arbeitszeit von heute neben dem Symbol in der Menüleiste, z. B. 6:12.",
+        globalShortcuts: "Kurzbefehle",
+        globalShortcutsCaption: "Sie wirken in jeder App, auch bei geschlossenem Panel.",
+        columnFrom: "Gültig ab",
+        columnWeekly: "Woche",
+        columnWorkdays: "Arbeitstage",
+        columnFrame: "Rahmen",
+        columnPause: "Pause ab",
+        columnFreeDays: "Freie Tage",
+        columnFreeDaysHelp: "„im Saldo“: Arbeit an freien Tagen geht in Saldo und Zeitkonto ein",
+        rowBeginning: "Beginn",
+        weeklyCellFormat: "%@ Std.",
+        freeDaysInBalance: "im Saldo",
+        rowTipCurrent: "Gilt heute",
+        rowTipPlanned: "Geplant – gilt ab diesem Tag",
+        rowTipPast: "Galt früher",
+        newRules: "Neu …",
+        newRulesHelp: "Neuen Stand der Arbeitszeitregeln anlegen, gültig ab einem Datum",
+        editRules: "Bearbeiten …",
+        deleteRules: "Löschen",
+        deleteRulesHelp: "Ab dem Datum gilt wieder der Stand davor",
+        rulesCaption: "Jeder Stand gilt ab seinem Datum bis zum nächsten – eine Änderung rechnet frühere Tage nicht neu. Die Regelarbeitszeit verteilt sich gleichmäßig auf die Arbeitstage; an den übrigen Tagen gibt es kein Soll, und Arbeit dort geht nur in Saldo und Zeitkonto ein, wenn der Stand es vorsieht. Außerhalb des Rahmens wird weder Arbeitszeit noch eine Pause gezählt.",
+        currentRulesFormat: "Heute gilt der Stand %1$@: %2$@.",
+        currentSinceBeginning: "seit Beginn",
+        currentFromFormat: "ab %@",
+        plannedRulesFormat: "Geplant ab %1$@: %2$@.",
+        perWorkdayFormat: "%1$@ pro Arbeitstag (%2$@)",
+        rulesLineFormat: "%1$@ Std./Woche (%2$@, %3$@ pro Arbeitstag)  ·  Rahmen %4$@  ·  Pausen ab %5$d Min.%6$@",
+        deleteTitleFormat: "Stand ab %@ löschen?",
+        deleteInfoFormat: "Ab dem %1$@ gilt dann wieder der Stand davor: %2$@",
+        deleteChangesFormat: " Saldo und Aufzeichnungen ab dem %@ ändern sich.",
+        accountStart: "Zeitkonto erst ab einem Datum zählen",
+        accountStartCaption: "Ohne zählt das Zeitkonto alle erfassten Tage.",
+        carry: "Übertrag",
+        carryCaption: "Das Zeitkonto ist der Saldo aller erfassten Tage – oder erst ab dem Datum – plus Übertrag: der Saldo aus der Zeit davor, z. B. +12:30 oder −3:15.",
+        carryUnit: "Std.",
+        carryError: "Der Übertrag ist ein Saldo wie +12:30 oder −3:15.",
+        legalHints: "Hinweise nach dem Arbeitszeitgesetz",
+        legalHintsCaption: "Prüft Pausen (§ 4), Ruhezeit (§ 5) und Höchstarbeitszeit (§ 3) nach dem Arbeitszeitgesetz und erinnert an Pause und Höchstarbeitszeit. Ohne bleiben nur die Hinweise zu freien Tagen und zum Arbeitszeitrahmen.",
+        sheetNewTitle: "Arbeitszeit ändern",
+        sheetFirstTitle: "Arbeitszeit seit Beginn",
+        sheetEditTitleFormat: "Arbeitszeit ab %@ bearbeiten",
+        validFrom: "Gültig ab:",
+        regularHours: "Regelarbeitszeit:",
+        hoursPerWeek: "Stunden pro Woche",
+        workdays: "Arbeitstage:",
+        dailyNoteFormat: "%1$@  ·  %2$@ pro Arbeitstag",
+        freeDays: "Freie Tage:",
+        freeDaysCount: "Arbeit an freien Tagen in Saldo und Zeitkonto einrechnen",
+        freeDaysCountHelp: "Mit Haken geht Arbeit am Wochenende und an abgewählten Arbeitstagen als Mehrarbeit in Saldo und Zeitkonto ein. Davon unabhängig: „Heute erfassen“ im Panel legt fest, ob die an einem freien Tag erfasste Zeit überhaupt als Arbeitszeit zählt.",
+        freeDaysCaption: "Am Wochenende und an den übrigen freien Tagen gibt es kein Soll. Ohne Haken wird Arbeit dort angezeigt, wirkt sich aber nicht auf Saldo und Zeitkonto aus. Ob die automatisch erfasste Zeit dort überhaupt als Arbeitszeit zählt, legt „Heute erfassen“ im Panel fest.",
+        frame: "Arbeitszeitrahmen:",
+        frameTo: "bis",
+        frameFromHelp: "Beginn des Arbeitszeitrahmens, z. B. 07:00",
+        frameToHelp: "Ende des Arbeitszeitrahmens, z. B. 22:00 – bis Mitternacht: 24:00",
+        frameCaption: "Außerhalb dieses Zeitraums wird weder Arbeitszeit noch eine Pause gezählt. Bis Mitternacht: 24:00.",
+        minBreak: "Mindestpause:",
+        minutes: "Minuten",
+        minBreakCaption: "Ist der Mac kürzer gesperrt, zählt die Zeit weiter zur Arbeitszeit. Nach dem Arbeitszeitgesetz zählen Pausen erst ab 15 Minuten.",
+        apply: "Übernehmen",
+        cancel: "Abbrechen",
+        hintAllBeforeFormat: "Gilt für alle Tage vor dem %@.",
+        hintAll: "Gilt für alle Tage.",
+        hintRangeFormat: "Gilt vom %1$@ bis %2$@.",
+        hintFromFormat: "Gilt ab %@.",
+        hintReplacesFormat: "Ersetzt den vorhandenen Stand ab %@.",
+        hintSameNothing: "Gleicht dem Stand davor – es ändert sich nichts.",
+        hintSameDropped: "Gleicht dem Stand davor und entfällt deshalb.",
+        hintRetroactiveFormat: "Rückwirkend: Saldo und Aufzeichnungen %@ ändern sich.",
+        hintOtherFormat: "Andere Regeln als bisher gelten %@.",
+        spansAll: "aller Tage",
+        spansUntilFormat: "bis zum %@",
+        spansFromFormat: "ab dem %@",
+        spansDayFormat: "am %@",
+        spansRangeFormat: "vom %1$@ bis %2$@",
+        errorWeeklyFormat: "Die Regelarbeitszeit muss zwischen %1$d und %2$d Stunden pro Woche liegen.",
+        errorPauseFormat: "Die Mindestpause muss zwischen %1$d und %2$d Minuten liegen.",
+        errorWorkday: "Mindestens ein Arbeitstag muss bleiben.",
+        errorFrameTimes: "Der Arbeitszeitrahmen braucht Uhrzeiten wie 07:00 oder 24:00.",
+        errorFrameMidnight: "Das Ende des Arbeitszeitrahmens muss nach seinem Beginn liegen – Mitternacht als Ende ist 24:00.",
+        errorFrameOrder: "Das Ende des Arbeitszeitrahmens muss nach seinem Beginn liegen.",
+        minWork: "Arbeit ohne Mac",
+        minWorkCaption: "Mindestdauer eines Eintrags von Hand. Kürzere Abschnitte lassen sich im Fenster „Aufzeichnungen“ nicht eintragen. Das schützt vor versehentlichen Einträgen.",
+        atLeast: "mindestens",
+        minutesShort: "Min.",
+        errorMinWorkFormat: "Die Mindestdauer für Arbeit ohne Mac muss zwischen %1$d und %2$d Minuten liegen.",
+        idle: "Erfassung bei Inaktivität anhalten",
+        idleCaption: "Der entsperrte Mac gilt dann als verlassen: Die Erfassung endet rückwirkend mit der letzten Eingabe, wie bei einer Sperre. Solange eine App den Bildschirm wach hält (Videokonferenz, Präsentation), zählt die Zeit weiter.",
+        idleMinutes: "Minuten ohne Eingabe",
+        errorIdleFormat: "Die Inaktivität muss zwischen %1$d und %2$d Minuten liegen.",
+        askAfterLock: "Beim Entsperren nach langer Sperre nachfragen",
+        askNoteFormat: "Ab %1$d Min. Sperre%2$@ fragt eine Mitteilung, ob es Arbeit ohne Mac oder schon Feierabend war – sofern die Sperre im Arbeitszeitrahmen begonnen hat und am selben Tag endet. Ohne Antwort bleibt es eine Pause. Braucht Mitteilungen.",
+        askNoteMinBreak: " (so lang wie die Mindestpause)",
+        autoWorkdaysOnly: "Automatische Erfassung nur an Arbeitstagen zählen",
+        autoWorkdaysOnlyCaption: "Am Wochenende und an den übrigen freien Tagen wird erfasst, aber erst als Arbeitszeit gezählt, wenn im Panel „Heute erfassen“ gewählt ist. Einträge von Hand zählen immer. Ob diese Arbeitszeit auch in Saldo und Zeitkonto eingeht, legt der Stand der Arbeitszeitregeln fest.",
+        permission: "Berechtigung",
+        permissionAllowed: "Erlaubt",
+        permissionDenied: "Nicht erlaubt",
+        permissionHidden: "Ausgeblendet",
+        permissionUndetermined: "Noch nicht erlaubt",
+        permissionUnavailable: "Nur in der installierten App",
+        noteAllowed: "Erinnert über die Mitteilungszentrale an Pause und Höchstarbeitszeit, fragt nach langer Sperre nach und meldet Fehler beim Speichern.",
+        noteHidden: "Erlaubt, aber Mitteilungen erscheinen weder als Banner noch in der Mitteilungszentrale. Damit erinnert und nachgefragt werden kann, unter Systemeinstellungen › Mitteilungen einen Stil wählen.",
+        noteDenied: "Damit an Pause und Höchstarbeitszeit erinnert und nach langer Sperre nachgefragt werden kann, unter Systemeinstellungen › Mitteilungen „Mitteilungen erlauben“ einschalten.",
+        noteUnavailable: "Erinnerungen und die Nachfrage nach langer Sperre gibt es nur in der installierten App.",
+        openSystemSettings: "Systemeinstellungen öffnen",
+        notifyLimit: "Höchstarbeitszeit (bei 9:45 und 10 Std. Arbeit)",
+        notifyBreak: "Pause (bei 5:45 und 6 Std. Arbeit am Stück)",
+        remindersCaption: "Jede Schwelle wird einmal gemeldet, solange gearbeitet wird. Die Hinweise im Panel bleiben davon unberührt.",
+        remindersOffCaption: "Aus, solange die Hinweise nach dem Arbeitszeitgesetz aus sind.",
+        dataFolder: "Datenordner",
+        dataFolderCaption: "Die Datenbank und ihre täglichen Backups.",
+        showInFinder: "Im Finder zeigen",
+        takeOver: "Daten aus Tagwerk übernehmen",
+        takeOverCaption: "Übernimmt die erfassten Tage, die Arbeitszeitregeln, das Zeitkonto und die Einstellungen von Tagwerk.",
+        takeOverButton: "Übernehmen …",
+        takeOverMissing: "Keine Daten von Tagwerk gefunden.",
+        tagwerkRunning: "Tagwerk läuft. Erst beenden, sonst erfassen beide Apps dieselbe Zeit.",
+        takeOverConfirmTitle: "Daten aus Tagwerk übernehmen?",
+        takeOverConfirmInfo: "Das ersetzt die erfassten Tage, die Arbeitszeitregeln und das Zeitkonto der Arbeitszeiterfassung durch die von Tagwerk und übernimmt seine Einstellungen. Die bisherigen Daten werden vorher gesichert.",
+        takeOverConfirmButton: "Übernehmen",
+        takeOverDoneTitle: "Daten übernommen",
+        takeOverDoneFormat: "Aus Tagwerk übernommene Tage: %d.",
+        takeOverBackupFormat: " Die bisherigen Daten sind gesichert in %@.",
+        takeOverNoBackup: " Bisher gab es keine Daten zu sichern.",
+        takeOverFailedTitle: "Die Daten konnten nicht übernommen werden",
+        resetDefaults: "Standardwerte wiederherstellen",
+        resetDefaultsCaption: "Setzt alle Einstellungen der Arbeitszeiterfassung zurück. Die Aufzeichnungen bleiben.",
+        resetButton: "Standardwerte …",
+        resetTitle: "Alle Einstellungen auf Standardwerte zurücksetzen?",
+        resetWhat: "Zurückgesetzt werden Symbol, Symbolsatz und Arbeitszeit in der Menüleiste, Kurzbefehle, die Hinweise nach dem Arbeitszeitgesetz, Zeitkonto samt Übertrag, Arbeit ohne Mac, Inaktivität, Nachfrage nach langer Sperre, freie Tage (Erfassung) und Erinnerungen.",
+        resetAccountFormat: "Das Zeitkonto zählt danach alle erfassten Tage ohne Übertrag (bisher %@).",
+        resetAccountFromFormat: "ab %@",
+        resetAccountCarryFormat: "Übertrag %@",
+        resetRulesAlreadyDefault: "Die Arbeitszeitregeln von heute sind schon die Standardwerte.",
+        resetRulesFormat: "Ab heute (%1$@) gelten wieder die Standardregeln: %2$@",
+        resetPlannedOneFormat: "Der geplante Stand ab %@ entfällt.",
+        resetPlannedManyFormat: "Die geplanten Stände ab %1$@ und %2$@ entfallen.",
+        resetStays: "Es bleiben „Arbeitszeit erfassen“, die Arbeitszeitregeln bis gestern und alle Aufzeichnungen.",
+        resetConfirm: "Zurücksetzen",
+        errorSaveFormat: "Speichern fehlgeschlagen: %@",
+        errorLoadFormat: "Die Datenbank konnte nicht gelesen werden: %@"
     )
 }
