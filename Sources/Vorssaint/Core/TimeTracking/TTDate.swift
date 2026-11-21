@@ -123,3 +123,52 @@ struct TTDate: Comparable, Hashable, Sendable, CustomStringConvertible {
         (lhs.year, lhs.month, lhs.day) < (rhs.year, rhs.month, rhs.day)
     }
 }
+
+/// A local date and time without time zone, the port of chrono's
+/// `NaiveDateTime` as Tagwerk uses it: the day plus the seconds since its
+/// midnight (`0..<TTLimits.dayEnd`). The logic never reads the clock itself;
+/// "now" always comes in as one of these.
+struct TTDateTime: Comparable, Hashable, Sendable, CustomStringConvertible {
+    let date: TTDate
+    /// Seconds since midnight.
+    let secs: Int
+
+    init(_ date: TTDate, _ secs: Int) {
+        self.date = date
+        self.secs = secs
+    }
+
+    init(_ date: TTDate, hour: Int, minute: Int, second: Int = 0) {
+        self.init(date, hour * 3600 + minute * 60 + second)
+    }
+
+    /// The same moment `seconds` later (or earlier), across midnight if need be.
+    func adding(seconds: Int) -> TTDateTime {
+        let total = secs + seconds
+        let days = total >= 0 ? total / TTLimits.dayEnd : (total + 1) / TTLimits.dayEnd - 1
+        return TTDateTime(date.adding(days: days), total - days * TTLimits.dayEnd)
+    }
+
+    /// `2026-11-17T12:03:09` (chrono's `%Y-%m-%dT%H:%M:%S`).
+    var iso: String {
+        "\(date.iso)T\(TTFormat.clockSeconds(secs))"
+    }
+
+    var description: String { iso }
+
+    /// Reads `2026-11-17T12:03:09` (see `iso`).
+    init?(iso text: String) {
+        let parts = text.split(separator: "T", omittingEmptySubsequences: false)
+        guard parts.count == 2, let date = TTDate(iso: String(parts[0])) else { return nil }
+        let clock = parts[1].split(separator: ":", omittingEmptySubsequences: false)
+        guard clock.count == 3,
+              clock.allSatisfy({ $0.count == 2 && $0.allSatisfy { $0.isASCII && $0.isNumber } }),
+              let h = Int(clock[0]), let m = Int(clock[1]), let s = Int(clock[2]),
+              h < 24, m < 60, s < 60 else { return nil }
+        self.init(date, h * 3600 + m * 60 + s)
+    }
+
+    static func < (lhs: TTDateTime, rhs: TTDateTime) -> Bool {
+        (lhs.date, lhs.secs) < (rhs.date, rhs.secs)
+    }
+}

@@ -434,6 +434,13 @@ if (( TEST )); then
         Sources/Vorssaint/Core/TimeTracking/TTRules.swift
         Sources/Vorssaint/Core/TimeTracking/TTWarnings.swift
         Sources/Vorssaint/Core/TimeTracking/TTAlerts.swift
+        Sources/Vorssaint/Core/TimeTracking/TTStatus.swift
+        Sources/Vorssaint/Core/TimeTracking/TTPreferences.swift
+        Sources/Vorssaint/Core/TimeTracking/TTExport.swift
+        Sources/Vorssaint/Core/TimeTracking/TTImport.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingSQLite.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingDatabase.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingTagwerkImport.swift
         Sources/Vorssaint/Core/ForkBuildStrings.swift
         Sources/Vorssaint/Services/MouseClickDebounce/MouseClickDebounceSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift

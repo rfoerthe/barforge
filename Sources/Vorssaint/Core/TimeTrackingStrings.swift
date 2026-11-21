@@ -270,6 +270,59 @@ struct TimeTrackingTexts {
     let breakSoonBodyFormat: String
     let breakReachedBody: String
 
+    // Export and import (store.rs)
+    /// Short weekday, then the day (`Mo, 16.11.2026`).
+    let weekdayDateFormat: String
+    let exportFormatMarkdown: String
+    let exportFormatCSV: String
+    let exportFormatPDF: String
+    /// App name, first and last day.
+    let exportTitleFormat: String
+    /// Day and time of the export, then `exportLocksUnderFormat` or
+    /// `exportLocksUnderMinimum`, then the frame in parentheses or nothing.
+    let exportIntroFormat: String
+    let exportLocksUnderFormat: String
+    let exportLocksUnderMinimum: String
+    let exportRulesHeading: String
+    let exportOverviewHeader: String
+    /// Number of workdays, `exportWorkdayOne` or `exportWorkdayMany`, working
+    /// time, breaks and balance.
+    let exportTotalFormat: String
+    let exportWorkdayOne: String
+    let exportWorkdayMany: String
+    /// Target, then `targetNote…`.
+    let exportTargetFormat: String
+    /// Basis of the target (see `targetBasisFormat`).
+    let targetNoteTodayFormat: String
+    let targetNoteFormat: String
+    let exportWarningsHeading: String
+    let exportNoWarnings: String
+    let exportWarningsHeader: String
+    let exportCorrectionsHeading: String
+    let exportCorrectionsIntro: String
+    let exportCorrectionsHeader: String
+    let correctionStart: String
+    let correctionBreak: String
+    let correctionEnd: String
+    let correctionAbsence: String
+    let correctionCounting: String
+    let exportPeriodsHeading: String
+    /// App name.
+    let exportPeriodsIntroFormat: String
+    let exportPeriodsHeader: String
+    let csvHeader: String
+    let csvYes: String
+    let csvNo: String
+    /// The first skipped days, then `importSkippedMoreFormat` for the rest.
+    let importSkippedFormat: String
+    /// Day and reason.
+    let importSkippedDayFormat: String
+    let importSkippedMoreFormat: String
+    let importProblemFuture: String
+    let importProblemLaterToday: String
+    let importProblemBoundsReversed: String
+    let importProblemAbsenceWithEntries: String
+
     /// Short weekday names, Monday first.
     var weekdayShortNames: [String] {
         [weekdayMonday, weekdayTuesday, weekdayWednesday, weekdayThursday, weekdayFriday,
@@ -374,7 +427,47 @@ extension TimeTrackingTexts {
         breakSoonTitleFormat: "%d min left until 6 h without a break",
         breakReachedTitle: "6 h worked without a break",
         breakSoonBodyFormat: "%@ without a break – after 6 h in a row at the latest, a break of at least 15 min is required (§ 4 ArbZG).",
-        breakReachedBody: "A break of at least 15 min is required now (§ 4 ArbZG)."
+        breakReachedBody: "A break of at least 15 min is required now (§ 4 ArbZG).",
+        weekdayDateFormat: "%1$@, %2$@",
+        exportFormatMarkdown: "Markdown (complete, can be imported again)",
+        exportFormatCSV: "CSV (table for Excel or Numbers)",
+        exportFormatPDF: "PDF (for printing)",
+        exportTitleFormat: "# %1$@ – Working time %2$@ to %3$@",
+        exportIntroFormat: "Exported on %1$@ at %2$@. Working time = time the Mac was unlocked, combined with the manual corrections; locks %3$@ count as working time. Only time within working hours%4$@ counts. Break time = time between start and end without work. The balance is computed like the Records window, with times in whole minutes.",
+        exportLocksUnderFormat: "under %d min",
+        exportLocksUnderMinimum: "shorter than the minimum break",
+        exportRulesHeading: "Rules:",
+        exportOverviewHeader: "| Date | Start | End | Working time | Break time | Balance |",
+        exportTotalFormat: "| **Total: %1$d %2$@** | | | **%3$@** | **%4$@** | **%5$@** |",
+        exportWorkdayOne: "workday",
+        exportWorkdayMany: "workdays",
+        exportTargetFormat: "Target: %1$@ (%2$@).",
+        targetNoteTodayFormat: "%@; workdays up to yesterday count even without an entry, today only what is already worked",
+        targetNoteFormat: "%@; workdays up to yesterday count even without an entry",
+        exportWarningsHeading: "## Warnings",
+        exportNoWarnings: "No violations of the Working Hours Act or of working hours.",
+        exportWarningsHeader: "| Date | Warning |",
+        exportCorrectionsHeading: "## Corrections",
+        exportCorrectionsIntro: "Set by hand. Kind: Start of work, Break, Work away from the Mac (a call or meeting, for example), End of work, Absence (Vacation, Special leave, Sick, Holiday, Time off) or Recording (free day: recorded time counted or not).",
+        exportCorrectionsHeader: "| Date | Kind | From | To | Note |",
+        correctionStart: "Start of work",
+        correctionBreak: "Break",
+        correctionEnd: "End of work",
+        correctionAbsence: "Absence",
+        correctionCounting: "Recording",
+        exportPeriodsHeading: "## Recorded periods",
+        exportPeriodsIntroFormat: "Recorded automatically (Mac unlocked, %@ running), unabridged.",
+        exportPeriodsHeader: "| Date | From | To |",
+        csvHeader: "Date;Weekday;Start;End;Working time;Working time (hours);Breaks;Target;Balance;Absence;Corrected;Warnings",
+        csvYes: "yes",
+        csvNo: "no",
+        importSkippedFormat: "Skipped: %@.",
+        importSkippedDayFormat: "%1$@ (%2$@)",
+        importSkippedMoreFormat: "and %d more",
+        importProblemFuture: "times in the future",
+        importProblemLaterToday: "times after the current time",
+        importProblemBoundsReversed: "start of work not before the end of work",
+        importProblemAbsenceWithEntries: "full-day absence next to other entries"
     )
 
     static let de = TimeTrackingTexts(
@@ -464,6 +557,46 @@ extension TimeTrackingTexts {
         breakSoonTitleFormat: "Noch %d Min. bis 6 Std. ohne Pause",
         breakReachedTitle: "6 Std. ohne Pause gearbeitet",
         breakSoonBodyFormat: "Seit %@ ohne Pause – nach spätestens 6 Std. am Stück ist eine Pause von mindestens 15 Min. vorgeschrieben (§ 4 ArbZG).",
-        breakReachedBody: "Jetzt ist eine Pause von mindestens 15 Min. vorgeschrieben (§ 4 ArbZG)."
+        breakReachedBody: "Jetzt ist eine Pause von mindestens 15 Min. vorgeschrieben (§ 4 ArbZG).",
+        weekdayDateFormat: "%1$@, %2$@",
+        exportFormatMarkdown: "Markdown (vollständig, wieder einlesbar)",
+        exportFormatCSV: "CSV (Tabelle für Excel)",
+        exportFormatPDF: "PDF (zum Drucken)",
+        exportTitleFormat: "# %1$@ – Arbeitszeiten %2$@ bis %3$@",
+        exportIntroFormat: "Exportiert am %1$@ um %2$@ Uhr. Arbeitszeit = Zeit, in der der Mac entsperrt war, verrechnet mit den manuellen Korrekturen; Sperren %3$@ zählen als Arbeitszeit. Gezählt wird nur im Arbeitszeitrahmen%4$@. Pausenzeit = Zeit zwischen Beginn und Ende, in der nicht gearbeitet wurde. Der Saldo rechnet wie das Fenster „Aufzeichnungen“ mit den Uhrzeiten in ganzen Minuten.",
+        exportLocksUnderFormat: "unter %d Min.",
+        exportLocksUnderMinimum: "unter der Mindestpause",
+        exportRulesHeading: "Regeln:",
+        exportOverviewHeader: "| Datum | Beginn | Ende | Arbeitszeit | Pausenzeit | Saldo |",
+        exportTotalFormat: "| **Summe: %1$d %2$@** | | | **%3$@** | **%4$@** | **%5$@** |",
+        exportWorkdayOne: "Arbeitstag",
+        exportWorkdayMany: "Arbeitstage",
+        exportTargetFormat: "Soll: %1$@ (%2$@).",
+        targetNoteTodayFormat: "%@; Arbeitstage bis gestern auch ohne Eintrag, heute nur das schon Erarbeitete",
+        targetNoteFormat: "%@; Arbeitstage bis gestern auch ohne Eintrag",
+        exportWarningsHeading: "## Hinweise",
+        exportNoWarnings: "Keine Verstöße gegen Arbeitszeitgesetz oder Arbeitszeitrahmen.",
+        exportWarningsHeader: "| Datum | Hinweis |",
+        exportCorrectionsHeading: "## Korrekturen",
+        exportCorrectionsIntro: "Manuell festgelegt. Art: Arbeitsbeginn, Pause, Arbeit ohne Mac (z. B. Telefonat oder Meeting), Feierabend, Abwesenheit (Urlaub, Sonderurlaub, Krank, Feiertag, Zeitausgleich) oder Erfassung (freier Tag: erfasste Zeit gezählt oder nicht).",
+        exportCorrectionsHeader: "| Datum | Art | Von | Bis | Notiz |",
+        correctionStart: "Arbeitsbeginn",
+        correctionBreak: "Pause",
+        correctionEnd: "Feierabend",
+        correctionAbsence: "Abwesenheit",
+        correctionCounting: "Erfassung",
+        exportPeriodsHeading: "## Erfasste Perioden",
+        exportPeriodsIntroFormat: "Automatisch erfasst (Mac entsperrt, %@ aktiv), ungekürzt.",
+        exportPeriodsHeader: "| Datum | Von | Bis |",
+        csvHeader: "Datum;Wochentag;Beginn;Ende;Arbeitszeit;Arbeitszeit (Std.);Pausen;Soll;Saldo;Abwesenheit;Korrigiert;Hinweise",
+        csvYes: "ja",
+        csvNo: "nein",
+        importSkippedFormat: "Übersprungen: %@.",
+        importSkippedDayFormat: "%1$@ (%2$@)",
+        importSkippedMoreFormat: "und %d weitere",
+        importProblemFuture: "Zeiten in der Zukunft",
+        importProblemLaterToday: "Zeiten nach der jetzigen Uhrzeit",
+        importProblemBoundsReversed: "Arbeitsbeginn nicht vor dem Feierabend",
+        importProblemAbsenceWithEntries: "ganztägige Abwesenheit neben anderen Einträgen"
     )
 }

@@ -780,12 +780,18 @@ enum DefaultsKey {
     /// unregistered and out of backups: the paths belong to this Mac.
     static let diskAnalyzerKeptFolders = "diskAnalyzerKeptFolders"
 
-    // Time Tracking. Recorded days and the dated working time rules live in
-    // the feature's own database, never here.
+    // Time Tracking. Recorded days, the dated working time rules and the time
+    // account live in the feature's own database, never here.
     static let timeTrackingEnabled = "timeTrackingEnabled"
     static let timeTrackingNotifyLimit = "timeTrackingNotifyLimit"     // reminders at 9:45 and 10 h of work
     static let timeTrackingNotifyBreak = "timeTrackingNotifyBreak"     // reminders at 5:45 and 6 h without a break
     static let timeTrackingAskAfterLock = "timeTrackingAskAfterLock"   // ask what a long lock was
+    static let timeTrackingMinWorkSeconds = "timeTrackingMinWorkSeconds"   // shortest work away from the Mac entered by hand
+    static let timeTrackingIconSet = "timeTrackingIconSet"                 // TTIconSet id of the menu bar icon
+    static let timeTrackingShowTime = "timeTrackingShowTime"               // today's working time next to the icon
+    static let timeTrackingHotkeys = "timeTrackingHotkeys"                 // global shortcuts on
+    static let timeTrackingAutoWorkdaysOnly = "timeTrackingAutoWorkdaysOnly" // recording counts by itself only on workdays
+    static let timeTrackingIdleSeconds = "timeTrackingIdleSeconds"         // idle time that pauses recording (0 = off)
 
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"
@@ -1595,6 +1601,12 @@ enum Defaults {
         DefaultsKey.timeTrackingNotifyLimit: true,
         DefaultsKey.timeTrackingNotifyBreak: true,
         DefaultsKey.timeTrackingAskAfterLock: false,
+        DefaultsKey.timeTrackingMinWorkSeconds: 15 * 60,
+        DefaultsKey.timeTrackingIconSet: 0,
+        DefaultsKey.timeTrackingShowTime: false,
+        DefaultsKey.timeTrackingHotkeys: false,
+        DefaultsKey.timeTrackingAutoWorkdaysOnly: true,
+        DefaultsKey.timeTrackingIdleSeconds: 0,
         DefaultsKey.screenshotShowCaptureMenuOnShortcut: true,
         DefaultsKey.recorderShowCaptureMenuOnShortcut: true,
         DefaultsKey.screenOCRShowCaptureMenuOnShortcut: true,

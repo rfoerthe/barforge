@@ -1,0 +1,410 @@
+﻿Datum;Wochentag;Beginn;Ende;Arbeitszeit;Arbeitszeit (Std.);Pausen;Soll;Saldo;Abwesenheit;Korrigiert;Hinweise
+01.05.2025;Do;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+02.05.2025;Fr;;;0:00;0,00;0:00;7:48;-7:48;Zeitausgleich;ja;
+05.05.2025;Mo;08:31;17:17;8:46;8,77;0:00;7:48;+0:58;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+06.05.2025;Di;08:06;18:47;9:46;9,77;0:55;7:48;+1:58;;nein;
+07.05.2025;Mi;08:02;15:23;7:00;7,00;0:21;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+08.05.2025;Do;07:49;18:24;9:46;9,77;0:49;7:48;+1:58;;ja;
+09.05.2025;Fr;07:30;17:20;9:20;9,33;0:30;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+12.05.2025;Mo;07:57;17:19;8:06;8,10;1:16;7:48;+0:18;;ja;
+13.05.2025;Di;08:32;19:09;9:46;9,77;0:51;7:48;+1:58;;nein;6:01 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG)
+14.05.2025;Mi;07:13;15:29;7:46;7,77;0:30;7:48;-0:02;;nein;
+15.05.2025;Do;07:26;18:03;9:46;9,77;0:51;7:48;+1:58;;ja;
+16.05.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+19.05.2025;Mo;08:22;16:40;7:47;7,78;0:31;7:48;-0:01;;nein;
+20.05.2025;Di;08:13;16:54;8:41;8,68;0:00;7:48;+0:53;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+21.05.2025;Mi;08:08;16:56;8:04;8,07;0:44;7:48;+0:16;;nein;
+22.05.2025;Do;08:57;18:14;8:40;8,67;0:37;7:48;+0:52;;ja;
+23.05.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+26.05.2025;Mo;07:43;13:52;5:15;5,25;0:54;7:48;-2:33;;nein;
+27.05.2025;Di;11:40;21:25;9:00;9,00;0:45;7:48;+1:12;;nein;
+28.05.2025;Mi;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+29.05.2025;Do;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+30.05.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+02.06.2025;Mo;08:52;19:16;9:16;9,27;1:08;7:48;+1:28;;nein;
+03.06.2025;Di;07:09;15:02;6:46;6,77;1:07;7:48;-1:02;;ja;
+04.06.2025;Mi;07:42;16:35;7:50;7,83;1:03;7:48;+0:02;;nein;
+05.06.2025;Do;13:40;22:00;7:34;7,57;0:46;7:48;-0:14;;nein;22:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+06.06.2025;Fr;09:24;19:36;9:05;9,08;1:07;7:48;+1:17;;nein;Ruhezeit nur 10:27 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+09.06.2025;Mo;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+10.06.2025;Di;07:00;15:32;7:52;7,87;0:40;7:48;+0:04;;nein;06:12–07:00 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+11.06.2025;Mi;08:09;16:37;7:49;7,82;0:39;7:48;+0:01;;nein;
+12.06.2025;Do;07:32;16:48;8:34;8,57;0:42;7:48;+0:46;;ja;
+13.06.2025;Fr;;;0:00;0,00;0:00;7:48;-7:48;Zeitausgleich;ja;
+16.06.2025;Mo;08:25;18:59;9:38;9,63;0:56;7:48;+1:50;;nein;
+17.06.2025;Di;07:47;18:50;9:45;9,75;1:18;7:48;+1:57;;nein;
+18.06.2025;Mi;08:02;15:22;7:00;7,00;0:20;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+19.06.2025;Do;07:30;17:34;8:17;8,28;1:47;7:48;+0:29;;ja;
+20.06.2025;Fr;07:30;17:21;9:20;9,33;0:31;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+23.06.2025;Mo;07:06;14:38;7:32;7,53;0:00;7:48;-0:16;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+24.06.2025;Di;07:49;18:50;9:46;9,77;1:15;7:48;+1:58;;nein;
+25.06.2025;Mi;08:53;18:04;8:24;8,40;0:47;7:48;+0:36;;ja;
+26.06.2025;Do;07:15;16:56;8:31;8,52;1:10;7:48;+0:43;;ja;
+27.06.2025;Fr;08:32;17:14;7:33;7,55;1:09;7:48;-0:15;;nein;
+30.06.2025;Mo;08:34;17:32;7:44;7,73;1:14;7:48;-0:04;;nein;
+01.07.2025;Di;08:35;19:22;9:34;9,57;1:13;7:48;+1:46;;ja;
+02.07.2025;Mi;08:12;17:29;8:26;8,43;0:51;7:48;+0:38;;nein;
+03.07.2025;Do;07:35;15:11;7:36;7,60;0:00;7:48;-0:12;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+04.07.2025;Fr;08:34;17:43;8:14;8,23;0:55;7:48;+0:26;;nein;
+07.07.2025;Mo;08:28;17:04;7:56;7,93;0:40;7:48;+0:08;;ja;
+08.07.2025;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+09.07.2025;Mi;11:40;21:25;9:00;9,00;0:45;7:48;+1:12;;nein;
+10.07.2025;Do;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:39 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+11.07.2025;Fr;;;0:00;0,00;0:00;7:48;-7:48;Zeitausgleich;ja;
+14.07.2025;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+15.07.2025;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+16.07.2025;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+17.07.2025;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+18.07.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+21.07.2025;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+22.07.2025;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+23.07.2025;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+24.07.2025;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+25.07.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+28.07.2025;Mo;07:05;17:16;9:08;9,13;1:03;7:48;+1:20;;nein;
+29.07.2025;Di;07:53;16:32;7:45;7,75;0:54;7:48;-0:03;;nein;
+30.07.2025;Mi;08:02;15:22;7:00;7,00;0:20;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+31.07.2025;Do;07:07;15:30;6:31;6,52;1:52;7:48;-1:17;;ja;
+01.08.2025;Fr;07:30;17:21;9:20;9,33;0:31;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+04.08.2025;Mo;08:22;17:07;8:45;8,75;0:00;7:48;+0:57;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+05.08.2025;Di;08:43;19:36;9:46;9,77;1:07;7:48;+1:58;;nein;
+06.08.2025;Mi;08:32;17:16;8:11;8,18;0:33;7:48;+0:23;;ja;
+07.08.2025;Do;08:06;16:14;7:02;7,03;1:06;7:48;-0:46;;nein;
+08.08.2025;Fr;;;0:00;0,00;0:00;7:48;-7:48;Zeitausgleich;ja;
+11.08.2025;Mo;08:13;16:20;8:07;8,12;0:00;7:48;+0:19;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+12.08.2025;Di;07:55;20:00;9:45;9,75;2:20;7:48;+1:57;;ja;
+13.08.2025;Mi;07:29;17:11;8:52;8,87;0:50;7:48;+1:04;;nein;
+14.08.2025;Do;07:05;15:55;8:17;8,28;0:33;7:48;+0:29;;nein;
+15.08.2025;Fr;07:53;16:57;8:26;8,43;0:38;7:48;+0:38;;nein;
+16.08.2025;Sa;09:51;14:52;5:01;5,02;0:00;0:00;;;nein;Arbeit am Wochenende – zählt nicht im Saldo
+18.08.2025;Mo;;;0:00;0,00;0:00;0:00;;Sonderurlaub;ja;
+19.08.2025;Di;11:40;21:26;9:00;9,00;0:46;7:48;+1:12;;nein;
+20.08.2025;Mi;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:37 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+21.08.2025;Do;08:46;16:24;6:45;6,75;0:53;7:48;-1:03;;ja;
+22.08.2025;Fr;07:40;18:06;9:37;9,62;0:49;7:48;+1:49;;nein;
+25.08.2025;Mo;07:30;14:20;6:50;6,83;0:00;7:48;-0:58;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+26.08.2025;Di;08:03;15:43;7:09;7,15;0:31;7:48;-0:39;;ja;
+27.08.2025;Mi;07:37;16:37;7:57;7,95;1:03;7:48;+0:09;;nein;
+28.08.2025;Do;13:40;22:00;7:35;7,58;0:45;7:48;-0:13;;nein;22:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+29.08.2025;Fr;09:11;17:15;7:25;7,42;0:39;7:48;-0:23;;nein;Ruhezeit nur 10:15 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+01.09.2025;Mo;07:00;15:32;7:52;7,87;0:40;7:48;+0:04;;nein;06:12–07:00 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+02.09.2025;Di;08:05;16:47;7:59;7,98;0:43;7:48;+0:11;;ja;
+03.09.2025;Mi;07:40;17:57;9:06;9,10;1:11;7:48;+1:18;;nein;
+04.09.2025;Do;08:39;17:10;7:50;7,83;0:41;7:48;+0:02;;ja;
+05.09.2025;Fr;07:13;16:02;8:15;8,25;0:34;7:48;+0:27;;nein;
+08.09.2025;Mo;08:15;19:00;9:46;9,77;0:59;7:48;+1:58;;nein;
+09.09.2025;Di;08:05;16:50;8:45;8,75;0:00;7:48;+0:57;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+10.09.2025;Mi;08:02;15:23;7:00;7,00;0:21;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+11.09.2025;Do;07:30;17:21;9:20;9,33;0:31;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+12.09.2025;Fr;;;0:00;0,00;0:00;7:48;-7:48;Zeitausgleich;ja;
+15.09.2025;Mo;07:28;17:26;8:54;8,90;1:04;7:48;+1:06;;nein;
+16.09.2025;Di;08:40;19:22;9:46;9,77;0:56;7:48;+1:58;;nein;6:18 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG)
+17.09.2025;Mi;07:19;15:33;7:03;7,05;1:11;7:48;-0:45;;ja;
+18.09.2025;Do;07:37;15:43;7:27;7,45;0:39;7:48;-0:21;;nein;
+19.09.2025;Fr;07:37;15:30;7:10;7,17;0:43;7:48;-0:38;;ja;
+22.09.2025;Mo;08:30;16:38;7:35;7,58;0:33;7:48;-0:13;;nein;
+23.09.2025;Di;07:05;16:34;7:17;7,28;2:12;7:48;-0:31;;ja;
+24.09.2025;Mi;08:46;19:42;9:47;9,78;1:09;7:48;+1:59;;nein;
+25.09.2025;Do;07:56;16:58;8:14;8,23;0:48;7:48;+0:26;;nein;
+26.09.2025;Fr;07:53;17:19;8:37;8,62;0:49;7:48;+0:49;;nein;
+29.09.2025;Mo;08:14;14:25;6:11;6,18;0:00;7:48;-1:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+30.09.2025;Di;11:40;21:25;9:00;9,00;0:45;7:48;+1:12;;nein;
+01.10.2025;Mi;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:39 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+02.10.2025;Do;07:24;14:28;6:11;6,18;0:53;7:48;-1:37;;ja;
+03.10.2025;Fr;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+06.10.2025;Mo;07:26;16:35;8:24;8,40;0:45;7:48;+0:36;;nein;
+07.10.2025;Di;08:10;16:11;7:29;7,48;0:32;7:48;-0:19;;ja;
+08.10.2025;Mi;07:52;15:22;6:53;6,88;0:37;7:48;-0:55;;nein;
+09.10.2025;Do;13:40;22:00;7:35;7,58;0:45;7:48;-0:13;;nein;22:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+10.10.2025;Fr;09:12;16:29;6:38;6,63;0:39;7:48;-1:10;;nein;Ruhezeit nur 10:16 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+13.10.2025;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+14.10.2025;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+15.10.2025;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+16.10.2025;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+17.10.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+20.10.2025;Mo;07:29;15:35;7:31;7,52;0:35;7:48;-0:17;;ja;
+21.10.2025;Di;07:55;17:13;8:41;8,68;0:37;7:48;+0:53;;nein;
+22.10.2025;Mi;08:02;15:22;7:00;7,00;0:20;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+23.10.2025;Do;08:14;15:43;6:59;6,98;0:30;7:48;-0:49;;nein;
+24.10.2025;Fr;07:30;17:20;9:20;9,33;0:30;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+27.10.2025;Mo;08:50;16:24;7:34;7,57;0:00;7:48;-0:14;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+28.10.2025;Di;07:50;18:05;9:20;9,33;0:55;7:48;+1:32;;ja;
+29.10.2025;Mi;08:02;16:27;8:25;8,42;0:00;7:48;+0:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+30.10.2025;Do;07:42;17:58;9:26;9,43;0:50;7:48;+1:38;;nein;
+31.10.2025;Fr;07:10;16:40;8:10;8,17;1:20;7:48;+0:22;;ja;
+03.11.2025;Mo;07:12;16:07;8:08;8,13;0:47;7:48;+0:20;;nein;
+04.11.2025;Di;08:09;15:39;6:55;6,92;0:35;7:48;-0:53;;ja;
+05.11.2025;Mi;08:04;18:47;9:46;9,77;0:57;7:48;+1:58;;nein;
+06.11.2025;Do;08:34;17:33;8:14;8,23;0:45;7:48;+0:26;;nein;
+07.11.2025;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+10.11.2025;Mo;07:43;15:47;6:56;6,93;1:08;7:48;-0:52;;nein;
+11.11.2025;Di;11:40;21:25;9:00;9,00;0:45;7:48;+1:12;;nein;
+12.11.2025;Mi;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:39 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+13.11.2025;Do;08:10;17:52;8:29;8,48;1:13;7:48;+0:41;;nein;
+14.11.2025;Fr;07:05;17:33;8:18;8,30;2:10;7:48;+0:30;;ja;
+17.11.2025;Mo;08:12;16:53;7:47;7,78;0:54;7:48;-0:01;;nein;
+18.11.2025;Di;08:14;14:24;6:10;6,17;0:00;7:48;-1:38;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+19.11.2025;Mi;07:43;15:43;6:54;6,90;1:06;7:48;-0:54;;ja;
+20.11.2025;Do;13:40;22:00;7:35;7,58;0:45;7:48;-0:13;;nein;22:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+21.11.2025;Fr;09:25;18:03;7:52;7,87;0:46;7:48;+0:04;;nein;Ruhezeit nur 10:29 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+24.11.2025;Mo;07:00;15:32;7:52;7,87;0:40;7:48;+0:04;;nein;06:12–07:00 Uhr außerhalb des Arbeitszeitrahmens (07:00–22:00 Uhr) – nicht gezählt
+25.11.2025;Di;08:13;16:30;7:44;7,73;0:33;7:48;-0:04;;ja;
+26.11.2025;Mi;07:17;15:17;7:09;7,15;0:51;7:48;-0:39;;nein;
+27.11.2025;Do;08:01;17:13;8:07;8,12;1:05;7:48;+0:19;;nein;
+28.11.2025;Fr;07:56;15:50;7:24;7,40;0:30;7:48;-0:24;;ja;
+01.12.2025;Mo;09:00;18:04;8:11;8,18;0:53;7:48;+0:23;;nein;
+02.12.2025;Di;08:12;16:23;7:31;7,52;0:40;7:48;-0:17;;ja;
+03.12.2025;Mi;08:02;15:22;7:00;7,00;0:20;7:48;-0:48;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+04.12.2025;Do;08:49;19:28;9:46;9,77;0:53;7:48;+1:58;;nein;
+05.12.2025;Fr;07:30;17:21;9:20;9,33;0:31;7:48;+1:32;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+08.12.2025;Mo;08:46;16:32;7:46;7,77;0:00;7:48;-0:02;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+09.12.2025;Di;08:06;17:35;8:35;8,58;0:54;7:48;+0:47;;nein;
+10.12.2025;Mi;07:39;16:10;7:26;7,43;1:05;7:48;-0:22;;nein;
+11.12.2025;Do;07:18;15:38;7:09;7,15;1:11;7:48;-0:39;;ja;
+12.12.2025;Fr;07:30;16:10;8:00;8,00;0:40;7:48;+0:12;;ja;
+15.12.2025;Mo;08:18;15:29;7:11;7,18;0:00;7:48;-0:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+16.12.2025;Di;08:46;18:08;8:50;8,83;0:32;7:48;+1:02;;nein;
+17.12.2025;Mi;08:52;19:04;9:13;9,22;0:59;7:48;+1:25;;nein;
+18.12.2025;Do;07:06;14:26;6:28;6,47;0:52;7:48;-1:20;;nein;
+19.12.2025;Fr;08:28;19:36;9:12;9,20;1:56;7:48;+1:24;;ja;
+22.12.2025;Mo;11:40;21:26;9:00;9,00;0:46;7:48;+1:12;;nein;
+23.12.2025;Di;07:04;15:44;8:00;8,00;0:40;7:48;+0:12;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG)
+24.12.2025;Mi;08:10;12:01;3:51;3,85;0:00;3:54;-0:03;Urlaub (halber Tag);ja;
+25.12.2025;Do;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+26.12.2025;Fr;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+29.12.2025;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+30.12.2025;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+31.12.2025;Mi;09:28;13:22;3:54;3,90;0:00;3:54;+0:00;Urlaub (halber Tag);ja;
+01.01.2026;Do;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+02.01.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+05.01.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+06.01.2026;Di;07:19;17:13;9:07;9,12;0:47;9:38;-0:31;;nein;
+07.01.2026;Mi;07:43;16:24;7:49;7,82;0:52;9:37;-1:48;;nein;
+08.01.2026;Do;08:02;17:41;8:51;8,85;0:48;9:38;-0:47;;ja;
+09.01.2026;Fr;08:47;18:11;8:43;8,72;0:41;0:00;+8:43;;ja;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+12.01.2026;Mo;07:05;14:36;6:43;6,72;0:48;9:37;-2:54;;nein;
+13.01.2026;Di;08:58;17:07;8:09;8,15;0:00;9:38;-1:29;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+14.01.2026;Mi;08:02;15:23;7:00;7,00;0:21;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+15.01.2026;Do;08:23;18:31;8:57;8,95;1:11;9:38;-0:41;;nein;
+16.01.2026;Fr;07:30;17:21;9:20;9,33;0:31;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+19.01.2026;Mo;08:31;17:36;8:10;8,17;0:55;9:37;-1:27;;ja;
+20.01.2026;Di;08:03;16:23;7:37;7,62;0:43;9:38;-2:01;;nein;
+21.01.2026;Mi;07:08;14:52;7:44;7,73;0:00;9:37;-1:53;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+22.01.2026;Do;07:54;16:52;8:17;8,28;0:41;9:38;-1:21;;ja;
+23.01.2026;Fr;07:34;15:16;6:52;6,87;0:50;0:00;+6:52;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+26.01.2026;Mo;07:33;15:09;6:43;6,72;0:53;9:37;-2:54;;nein;
+27.01.2026;Di;07:38;15:14;6:48;6,80;0:48;9:38;-2:50;;nein;
+28.01.2026;Mi;08:10;18:32;9:04;9,07;1:18;9:37;-0:33;;ja;
+29.01.2026;Do;09:01;18:27;8:36;8,60;0:50;9:38;-1:02;;nein;
+30.01.2026;Fr;07:46;14:08;6:22;6,37;0:00;0:00;+6:22;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+02.02.2026;Mo;08:29;15:43;6:16;6,27;0:58;9:37;-3:21;;nein;
+03.02.2026;Di;11:40;20:00;7:34;7,57;0:46;9:38;-2:04;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+04.02.2026;Mi;07:04;15:44;8:00;8,00;0:40;9:37;-1:37;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+05.02.2026;Do;08:32;18:16;8:50;8,83;0:54;9:38;-0:48;;ja;
+06.02.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+09.02.2026;Mo;08:53;16:31;7:06;7,10;0:32;9:37;-2:31;;nein;
+10.02.2026;Di;07:50;15:36;7:10;7,17;0:36;9:38;-2:28;;nein;
+11.02.2026;Mi;09:01;19:25;9:04;9,07;1:20;9:37;-0:33;;ja;
+12.02.2026;Do;13:40;20:00;5:35;5,58;0:45;9:38;-4:03;;nein;20:00–22:55 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+13.02.2026;Fr;09:23;19:48;9:29;9,48;0:56;0:00;+9:29;;ja;Ruhezeit nur 10:27 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+16.02.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+17.02.2026;Di;08:01;16:26;7:31;7,52;0:54;9:38;-2:07;;nein;
+18.02.2026;Mi;08:44;18:43;9:02;9,03;0:57;9:37;-0:35;;nein;
+19.02.2026;Do;07:35;17:52;9:03;9,05;1:14;9:38;-0:35;;nein;
+20.02.2026;Fr;08:43;19:24;9:46;9,77;0:55;0:00;+9:46;;ja;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+21.02.2026;Sa;09:27;14:19;4:52;4,87;0:00;0:00;+4:52;;nein;Arbeit am Wochenende – zählt ohne Soll als Mehrarbeit
+23.02.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+24.02.2026;Di;08:02;15:22;7:00;7,00;0:20;9:38;-2:38;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+25.02.2026;Mi;;;0:00;0,00;0:00;0:00;;Sonderurlaub;ja;
+26.02.2026;Do;07:05;15:22;7:45;7,75;0:32;9:38;-1:53;;nein;
+27.02.2026;Fr;07:30;17:20;9:20;9,33;0:30;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+02.03.2026;Mo;08:11;18:14;9:18;9,30;0:45;9:37;-0:19;;ja;
+03.03.2026;Di;07:57;15:37;7:40;7,67;0:00;9:38;-1:58;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+04.03.2026;Mi;08:18;16:37;7:44;7,73;0:35;9:37;-1:53;;nein;
+05.03.2026;Do;08:23;17:39;8:40;8,67;0:36;9:38;-0:58;;nein;
+06.03.2026;Fr;09:13;19:38;9:32;9,53;0:53;0:00;+9:32;;nein;6:32 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+09.03.2026;Mo;07:37;15:23;7:01;7,02;0:45;9:37;-2:36;;ja;
+10.03.2026;Di;08:35;17:21;8:46;8,77;0:00;9:38;-0:52;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+11.03.2026;Mi;07:43;16:15;7:48;7,80;0:44;9:37;-1:49;;nein;
+12.03.2026;Do;08:38;18:41;9:04;9,07;0:59;9:38;-0:34;;nein;
+13.03.2026;Fr;07:07;16:38;8:07;8,12;1:24;0:00;+8:07;;ja;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+16.03.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+17.03.2026;Di;11:40;20:00;7:35;7,58;0:45;9:38;-2:03;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+18.03.2026;Mi;07:04;15:45;8:00;8,00;0:41;9:37;-1:37;;nein;Ruhezeit nur 9:39 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+19.03.2026;Do;08:01;14:53;6:08;6,13;0:44;9:38;-3:30;;nein;
+20.03.2026;Fr;08:50;16:25;7:02;7,03;0:33;0:00;+7:02;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+23.03.2026;Mo;07:50;17:33;9:09;9,15;0:34;9:37;-0:28;;ja;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+24.03.2026;Di;07:54;16:42;7:02;7,03;1:46;9:38;-2:36;;ja;
+25.03.2026;Mi;08:42;15:47;7:05;7,08;0:00;9:37;-2:32;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+26.03.2026;Do;13:40;20:00;5:34;5,57;0:46;9:38;-4:04;;nein;20:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+27.03.2026;Fr;09:30;19:30;8:48;8,80;1:12;0:00;+8:48;;nein;Ruhezeit nur 10:34 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+30.03.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+31.03.2026;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+01.04.2026;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+02.04.2026;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+03.04.2026;Fr;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+06.04.2026;Mo;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+07.04.2026;Di;08:26;19:00;9:47;9,78;0:47;9:38;+0:09;;nein;6:09 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG)
+08.04.2026;Mi;08:02;15:22;7:00;7,00;0:20;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+09.04.2026;Do;07:30;17:21;9:20;9,33;0:31;9:38;-0:18;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+10.04.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+13.04.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+14.04.2026;Di;07:23;16:11;8:18;8,30;0:30;9:38;-1:20;;ja;
+15.04.2026;Mi;08:53;17:27;8:03;8,05;0:31;9:37;-1:34;;nein;
+16.04.2026;Do;08:57;16:03;6:23;6,38;0:43;9:38;-3:15;;nein;
+17.04.2026;Fr;07:48;14:58;7:10;7,17;0:00;0:00;+7:10;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+20.04.2026;Mo;08:54;16:52;7:19;7,32;0:39;9:37;-2:18;;ja;
+21.04.2026;Di;07:49;18:10;9:25;9,42;0:56;9:38;-0:13;;ja;
+22.04.2026;Mi;07:29;16:02;7:45;7,75;0:48;9:37;-1:52;;nein;
+23.04.2026;Do;07:53;15:40;7:04;7,07;0:43;9:38;-2:34;;nein;
+24.04.2026;Fr;08:48;19:19;9:46;9,77;0:45;0:00;+9:46;;ja;6:25 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+27.04.2026;Mo;07:44;15:13;6:45;6,75;0:44;9:37;-2:52;;nein;
+28.04.2026;Di;11:40;20:00;7:35;7,58;0:45;9:38;-2:03;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+29.04.2026;Mi;07:04;15:44;8:00;8,00;0:40;9:37;-1:37;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+30.04.2026;Do;07:55;15:15;6:50;6,83;0:30;9:38;-2:48;;nein;
+01.05.2026;Fr;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+04.05.2026;Mo;07:05;16:57;9:04;9,07;0:48;9:37;-0:33;;nein;
+05.05.2026;Di;07:08;16:21;7:57;7,95;1:16;9:38;-1:41;;ja;
+06.05.2026;Mi;07:52;15:52;8:00;8,00;0:00;9:37;-1:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+07.05.2026;Do;13:40;20:00;5:34;5,57;0:46;9:38;-4:04;;nein;20:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+08.05.2026;Fr;09:15;17:54;8:07;8,12;0:32;0:00;+8:07;;nein;Ruhezeit nur 10:18 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+11.05.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+12.05.2026;Di;08:41;18:09;8:43;8,72;0:45;9:38;-0:55;;nein;
+13.05.2026;Mi;09:02;17:52;7:54;7,90;0:56;9:37;-1:43;;nein;
+14.05.2026;Do;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+15.05.2026;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+18.05.2026;Mo;07:37;16:32;8:15;8,25;0:40;9:37;-1:22;;ja;
+19.05.2026;Di;09:18;16:41;6:35;6,58;0:48;9:38;-3:03;;nein;
+20.05.2026;Mi;08:02;15:23;7:00;7,00;0:21;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+21.05.2026;Do;08:08;15:44;6:15;6,25;1:21;9:38;-3:23;;ja;
+22.05.2026;Fr;07:30;17:20;9:20;9,33;0:30;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+25.05.2026;Mo;;;0:00;0,00;0:00;0:00;;Feiertag;ja;
+26.05.2026;Di;07:39;15:52;8:13;8,22;0:00;9:38;-1:25;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+27.05.2026;Mi;07:33;16:02;7:37;7,62;0:52;9:37;-2:00;;ja;
+28.05.2026;Do;08:06;16:24;7:45;7,75;0:33;9:38;-1:53;;nein;
+29.05.2026;Fr;07:57;15:49;7:12;7,20;0:40;0:00;+7:12;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+01.06.2026;Mo;09:15;18:27;8:38;8,63;0:34;9:37;-0:59;;nein;
+02.06.2026;Di;07:33;15:15;6:59;6,98;0:43;9:38;-2:39;;nein;
+03.06.2026;Mi;07:18;16:23;8:26;8,43;0:39;9:37;-1:11;;ja;
+04.06.2026;Do;08:11;16:28;8:17;8,28;0:00;9:38;-1:21;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+05.06.2026;Fr;07:54;17:51;8:56;8,93;1:01;0:00;+8:56;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+08.06.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+09.06.2026;Di;11:40;20:00;7:35;7,58;0:45;9:38;-2:03;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+10.06.2026;Mi;07:04;15:44;8:00;8,00;0:40;9:37;-1:37;;nein;Ruhezeit nur 9:39 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+11.06.2026;Do;07:54;16:49;8:23;8,38;0:32;9:38;-1:15;;ja;
+12.06.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+15.06.2026;Mo;08:26;17:44;8:39;8,65;0:39;9:37;-0:58;;nein;
+16.06.2026;Di;07:27;18:01;9:47;9,78;0:47;9:38;+0:09;;ja;
+17.06.2026;Mi;08:30;17:49;8:33;8,55;0:46;9:37;-1:04;;nein;
+18.06.2026;Do;13:40;20:00;5:35;5,58;0:45;9:38;-4:03;;nein;20:00–22:55 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+19.06.2026;Fr;09:26;19:58;9:22;9,37;1:10;0:00;+9:22;;ja;Ruhezeit nur 10:30 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+22.06.2026;Mo;06:30;15:32;8:22;8,37;0:40;9:37;-1:15;;nein;06:12–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+23.06.2026;Di;08:29;17:30;8:07;8,12;0:54;9:38;-1:31;;nein;
+24.06.2026;Mi;07:32;15:02;7:30;7,50;0:00;9:37;-2:07;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+25.06.2026;Do;07:10;16:50;8:56;8,93;0:44;9:38;-0:42;;nein;
+26.06.2026;Fr;08:11;15:12;6:02;6,03;0:59;0:00;+6:02;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+29.06.2026;Mo;07:05;17:42;9:45;9,75;0:52;9:37;+0:08;;ja;
+30.06.2026;Di;07:14;18:11;9:19;9,32;1:38;9:38;-0:19;;ja;
+01.07.2026;Mi;08:02;15:23;7:00;7,00;0:21;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+02.07.2026;Do;08:09;16:32;7:52;7,87;0:31;9:38;-1:46;;nein;
+03.07.2026;Fr;07:30;17:21;9:20;9,33;0:31;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+06.07.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+07.07.2026;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+08.07.2026;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+09.07.2026;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+10.07.2026;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+13.07.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+14.07.2026;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+15.07.2026;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+16.07.2026;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+17.07.2026;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+20.07.2026;Mo;08:40;15:29;5:54;5,90;0:55;9:37;-3:43;;nein;
+21.07.2026;Di;11:40;20:00;7:35;7,58;0:45;9:38;-2:03;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+22.07.2026;Mi;07:04;15:44;8:00;8,00;0:40;9:37;-1:37;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+23.07.2026;Do;07:05;14:46;6:53;6,88;0:48;9:38;-2:45;;nein;
+24.07.2026;Fr;08:28;14:38;6:10;6,17;0:00;0:00;+6:10;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+27.07.2026;Mo;07:57;16:26;7:41;7,68;0:48;9:37;-1:56;;nein;
+28.07.2026;Di;08:22;18:31;9:17;9,28;0:52;9:38;-0:21;;ja;
+29.07.2026;Mi;07:43;18:15;9:46;9,77;0:46;9:37;+0:09;;nein;
+30.07.2026;Do;13:40;20:00;5:34;5,57;0:46;9:38;-4:04;;nein;20:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+31.07.2026;Fr;09:37;18:17;7:36;7,60;1:04;0:00;+7:36;;ja;Ruhezeit nur 10:41 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+01.08.2026;Sa;10:04;15:53;5:49;5,82;0:00;0:00;+5:49;;nein;Arbeit am Wochenende – zählt ohne Soll als Mehrarbeit
+03.08.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+04.08.2026;Di;07:39;16:20;8:04;8,07;0:37;9:38;-1:34;;nein;
+05.08.2026;Mi;;;0:00;0,00;0:00;0:00;;Sonderurlaub;ja;
+06.08.2026;Do;08:23;16:04;6:46;6,77;0:55;9:38;-2:52;;nein;
+07.08.2026;Fr;07:20;16:58;8:34;8,57;1:04;0:00;+8:34;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+10.08.2026;Mo;07:06;14:16;6:21;6,35;0:49;9:37;-3:16;;ja;
+11.08.2026;Di;07:32;15:08;6:30;6,50;1:06;9:38;-3:08;;ja;
+12.08.2026;Mi;08:02;15:23;7:00;7,00;0:21;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+13.08.2026;Do;08:24;15:39;6:29;6,48;0:46;9:38;-3:09;;nein;
+14.08.2026;Fr;07:30;17:21;9:20;9,33;0:31;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+17.08.2026;Mo;08:19;17:03;8:44;8,73;0:00;9:37;-0:53;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+18.08.2026;Di;07:05;14:49;6:34;6,57;1:10;9:38;-3:04;;ja;
+19.08.2026;Mi;08:24;16:37;7:28;7,47;0:45;9:37;-2:09;;nein;
+20.08.2026;Do;07:24;15:10;7:03;7,05;0:43;9:38;-2:35;;nein;
+21.08.2026;Fr;07:46;16:04;8:18;8,30;0:00;0:00;+8:18;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+24.08.2026;Mo;07:54;18:08;9:17;9,28;0:57;9:37;-0:20;;ja;
+25.08.2026;Di;08:01;18:12;9:17;9,28;0:54;9:38;-0:21;;nein;
+26.08.2026;Mi;07:22;15:38;7:44;7,73;0:32;9:37;-1:53;;nein;
+27.08.2026;Do;08:16;19:47;9:45;9,75;1:46;9:38;+0:07;;ja;
+28.08.2026;Fr;07:11;14:42;6:54;6,90;0:37;0:00;+6:54;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+31.08.2026;Mo;07:34;14:44;6:11;6,18;0:59;9:37;-3:26;;ja;
+01.09.2026;Di;11:40;20:00;7:35;7,58;0:45;9:38;-2:03;;nein;20:00–21:26 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+02.09.2026;Mi;07:04;15:44;8:00;8,00;0:40;9:37;-1:37;;nein;Ruhezeit nur 9:38 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens
+03.09.2026;Do;07:25;13:54;5:58;5,97;0:31;9:38;-3:40;;nein;
+04.09.2026;Fr;09:19;17:05;7:11;7,18;0:35;0:00;+7:11;;nein;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+07.09.2026;Mo;07:22;15:23;7:15;7,25;0:46;9:37;-2:22;;nein;
+08.09.2026;Di;08:32;16:07;7:35;7,58;0:00;9:38;-2:03;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+09.09.2026;Mi;08:15;15:46;7:01;7,02;0:30;9:37;-2:36;;ja;
+10.09.2026;Do;13:40;20:00;5:35;5,58;0:45;9:38;-4:03;;nein;20:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+11.09.2026;Fr;09:32;18:46;8:04;8,07;1:10;0:00;+8:04;;nein;Ruhezeit nur 10:36 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+14.09.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+15.09.2026;Di;07:49;16:39;7:55;7,92;0:55;9:38;-1:43;;nein;
+16.09.2026;Mi;08:28;18:28;9:08;9,13;0:52;9:37;-0:29;;ja;
+17.09.2026;Do;08:05;18:23;9:23;9,38;0:55;9:38;-0:15;;nein;
+18.09.2026;Fr;08:33;16:06;6:53;6,88;0:40;0:00;+6:53;;ja;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+21.09.2026;Mo;08:14;16:48;8:02;8,03;0:32;9:37;-1:35;;nein;
+22.09.2026;Di;07:11;14:04;6:53;6,88;0:00;9:38;-2:45;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+23.09.2026;Mi;08:02;15:22;7:00;7,00;0:20;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+24.09.2026;Do;07:07;14:10;5:58;5,97;1:05;9:38;-3:40;;ja;
+25.09.2026;Fr;07:30;17:21;9:20;9,33;0:31;0:00;+9:20;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+28.09.2026;Mo;08:53;18:29;8:42;8,70;0:54;9:37;-0:55;;nein;
+29.09.2026;Di;08:50;17:13;7:41;7,68;0:42;9:38;-1:57;;nein;
+30.09.2026;Mi;07:31;16:16;7:55;7,92;0:50;9:37;-1:42;;nein;
+01.10.2026;Do;07:08;16:58;9:02;9,03;0:48;9:38;-0:36;;ja;
+02.10.2026;Fr;07:30;16:16;8:46;8,77;0:00;0:00;+8:46;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG) | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+05.10.2026;Mo;08:30;18:02;8:45;8,75;0:47;9:37;-0:52;;nein;
+06.10.2026;Di;07:05;15:39;6:43;6,72;1:51;9:38;-2:55;;ja;
+07.10.2026;Mi;07:32;17:55;9:31;9,52;0:52;9:37;-0:06;;nein;
+08.10.2026;Do;08:45;19:14;9:31;9,52;0:58;9:38;-0:07;;nein;
+09.10.2026;Fr;07:43;16:08;7:41;7,68;0:44;0:00;+7:41;;ja;Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+12.10.2026;Mo;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+13.10.2026;Di;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+14.10.2026;Mi;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+15.10.2026;Do;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+16.10.2026;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+19.10.2026;Mo;07:58;18:40;9:47;9,78;0:55;9:37;+0:10;;nein;
+20.10.2026;Di;07:53;15:05;6:36;6,60;0:36;9:38;-3:02;;nein;
+21.10.2026;Mi;09:30;17:23;7:53;7,88;0:00;9:37;-1:44;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+22.10.2026;Do;13:40;20:00;5:34;5,57;0:46;9:38;-4:04;;nein;20:00–22:56 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+23.10.2026;Fr;09:32;19:51;9:31;9,52;0:48;0:00;+9:31;;ja;Ruhezeit nur 10:36 Std. – vorgeschrieben sind 11 Std. (§ 5 ArbZG), mit der Zeit außerhalb des Arbeitszeitrahmens | Arbeit an einem freien Tag – zählt ohne Soll als Mehrarbeit
+26.10.2026;Mo;06:30;15:33;8:22;8,37;0:41;9:37;-1:15;;nein;06:13–06:30 Uhr außerhalb des Arbeitszeitrahmens (06:30–20:00 Uhr) – nicht gezählt
+27.10.2026;Di;08:04;15:15;6:18;6,30;0:53;9:38;-3:20;;nein;
+28.10.2026;Mi;07:59;15:38;6:48;6,80;0:51;9:37;-2:49;;ja;
+29.10.2026;Do;07:17;14:33;6:37;6,62;0:39;9:38;-3:01;;nein;
+30.10.2026;Fr;;;0:00;0,00;0:00;0:00;;Urlaub;ja;
+02.11.2026;Mo;07:39;15:40;7:00;7,00;1:01;9:37;-2:37;;ja;
+03.11.2026;Di;08:00;17:01;8:06;8,10;0:55;9:38;-1:32;;nein;
+04.11.2026;Mi;08:02;15:23;7:00;7,00;0:21;9:37;-2:37;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+05.11.2026;Do;07:30;17:21;9:20;9,33;0:31;9:38;-0:18;;nein;Ab 9 Std. Arbeit sind 45 Min. Pause vorgeschrieben (§ 4 ArbZG)
+06.11.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+09.11.2026;Mo;07:13;15:45;8:32;8,53;0:00;9:37;-1:05;;nein;Ab 6 Std. Arbeit sind 30 Min. Pause vorgeschrieben (§ 4 ArbZG)
+10.11.2026;Di;07:14;17:57;9:46;9,77;0:57;9:38;+0:08;;nein;
+11.11.2026;Mi;07:12;18:15;9:35;9,58;1:28;9:37;-0:02;;ja;
+12.11.2026;Do;07:37;18:31;9:46;9,77;1:08;9:38;+0:08;;nein;
+13.11.2026;Fr;;;0:00;0,00;0:00;0:00;;Zeitausgleich;ja;
+16.11.2026;Mo;09:02;19:35;9:36;9,60;0:57;9:37;-0:01;;nein;6:31 Std. ohne Pause – erlaubt sind höchstens 6 Std. am Stück (§ 4 ArbZG)
+17.11.2026;Di;;;0:00;0,00;0:00;9:38;-9:38;;nein;
+18.11.2026;Mi;;;0:00;0,00;0:00;9:37;-9:37;;nein;
+19.11.2026;Do;;;0:00;0,00;0:00;9:38;-9:38;;nein;
