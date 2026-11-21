@@ -285,6 +285,18 @@ hinter `isBeta`.
    mit `now` aus `TAGWERK_NOW` (als Umgebungsvariable `BARFORGE_TT_NOW` nur in Developer-Builds), Deinstallation und
    Neuinstallation während einer laufenden Erfassung.
 
+### Testdaten
+
+`Tools/time-tracking-testdata.py` ist die Portierung von Tagwerks `testdata/generate_testdata.py`: gleicher
+Algorithmus, gleicher Startwert, byteweise dasselbe Markdown (Tagwerks deutsches Exportformat; mit
+`--today 2026-11-17` entsteht genau `Tests/Fixtures/TimeTracking/testdata-2026-11-17.md`). Mit `--db PFAD` schreibt
+es zusätzlich eine fertige Datenbank im Barforge-Schema, deren Tagestabellen denen nach einem Import des Markdowns
+gleichen; sie trägt die Kennzeile `settings('barforge_testdata', 1)` (die `application_id` setzt Barforge beim Öffnen
+selbst). `Tools/time-tracking-testdb.sh` baut daraus `build/testdata/timetracking.db` mit Daten bis gestern;
+`--install` setzt sie in der Developer-Variante ein (laufende App wird beendet und wieder geöffnet, echte Daten
+vorher nach `TimeTracking/before-testdata/` gesichert), `--restore` holt die neueste echte Sicherung zurück.
+`BARFORGE_TT_DIR` lenkt auf einen anderen Datenordner, die Release-App nur mit `--allow-release`.
+
 ## 7. Risiken und offene Punkte
 
 | Risiko | Gegenmaßnahme |
