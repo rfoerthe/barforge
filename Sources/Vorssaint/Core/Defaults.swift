@@ -803,10 +803,12 @@ enum DefaultsKey {
     static let timeTrackingRestartState = "timeTrackingRestartState"
     /// UI state of the Records window, unregistered and never exported: the
     /// last view (0 days, 1 week), whether the inspector is shown (absent:
-    /// shown) and whether "Recorded automatically" is expanded.
+    /// shown), whether "Recorded automatically" is expanded and whether the
+    /// week view shows the whole working-time frame.
     static let timeTrackingRecordsView = "timeTrackingRecordsView"
     static let timeTrackingRecordsInspector = "timeTrackingRecordsInspector"
     static let timeTrackingRecordsRecordedOpen = "timeTrackingRecordsRecordedOpen"
+    static let timeTrackingRecordsWeekFullFrame = "timeTrackingRecordsWeekFullFrame"
 
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"

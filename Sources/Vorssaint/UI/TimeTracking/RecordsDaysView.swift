@@ -5,8 +5,7 @@ import AppKit
 import SwiftUI
 
 /// The content of the Records window: in "Days" the five cards, the table
-/// and the inspector; in "Week" the week view (M7, a placeholder until then);
-/// the footer below both.
+/// and the inspector; in "Week" the week view; the footer below both.
 struct RecordsRootView: View {
     @ObservedObject var model: RecordsModel
 
@@ -28,7 +27,7 @@ struct RecordsRootView: View {
                     }
                 }
             case .week:
-                RecordsWeekPlaceholder(model: model)
+                RecordsWeekView(model: model)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Divider()
@@ -95,34 +94,6 @@ private struct RecordsCard: View {
             text += value
         }
         return text
-    }
-}
-
-/// "Week" until the week view arrives (M7).
-struct RecordsWeekPlaceholder: View {
-    @ObservedObject var model: RecordsModel
-
-    var body: some View {
-        let s = model.strings
-        VStack(spacing: 10) {
-            Image(systemName: "calendar")
-                .font(.system(size: 40, weight: .light))
-                .foregroundStyle(.tertiary)
-            Text(s.weekPlaceholderTitle)
-                .font(.title2.weight(.semibold))
-            if let date = model.selected {
-                Text(TTRecords.weekTitle(monday: TTRecords.monday(date), week: date.isoWeek.week, model.texts, s))
-                    .font(.body.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            Text(s.weekPlaceholderText)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 380)
-            Button(s.days) { model.setMode(.days) }
-                .padding(.top, 4)
-        }
-        .padding(40)
     }
 }
 

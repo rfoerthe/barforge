@@ -70,6 +70,10 @@ final class RecordsModel: ObservableObject {
     @Published var recordedOpen: Bool {
         didSet { UserDefaults.standard.set(recordedOpen, forKey: DefaultsKey.timeTrackingRecordsRecordedOpen) }
     }
+    /// The Monday of the week the week view shows.
+    @Published private(set) var weekMonday: TTDate
+    /// The week view shows the whole working-time frame, not only this week's working time.
+    @Published private(set) var weekFullFrame: Bool
     private(set) var history = TTEditHistory()
 
     weak var window: NSWindow?
@@ -83,10 +87,14 @@ final class RecordsModel: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        now = TimeTrackingService.shared.now()
+        let now = TimeTrackingService.shared.now()
+        self.now = now
         mode = RecordsMode(rawValue: defaults.integer(forKey: DefaultsKey.timeTrackingRecordsView)) ?? .days
         inspectorShown = defaults.object(forKey: DefaultsKey.timeTrackingRecordsInspector) as? Bool ?? true
         recordedOpen = defaults.bool(forKey: DefaultsKey.timeTrackingRecordsRecordedOpen)
+        // A freshly opened window shows the current week.
+        weekMonday = TTWeekLayout.monday(now.date)
+        weekFullFrame = defaults.bool(forKey: DefaultsKey.timeTrackingRecordsWeekFullFrame)
     }
 
     // MARK: Loading
@@ -164,21 +172,82 @@ final class RecordsModel: ObservableObject {
         revealToken += 1
     }
 
+    /// ⌘T: today in the table, or the current week in the week view.
     func goToday() {
-        guard mode == .days else { return }
-        goTo(service.now().date)
+        switch mode {
+        case .days: goTo(service.now().date)
+        case .week: showWeek(of: service.now().date)
+        }
     }
 
+    /// Switches between "Days" and "Week". The week shows the week of the
+    /// selected day (without a selection the current one) (`records.rs` `set_mode`).
     func setMode(_ mode: RecordsMode) {
         guard mode != self.mode else { return }
         self.mode = mode
         UserDefaults.standard.set(mode.rawValue, forKey: DefaultsKey.timeTrackingRecordsView)
+        if mode == .week { showWeek(of: selected ?? service.now().date) }
     }
 
-    /// Double-click or "Show in Week View" on a row: its week (a week row: that week).
+    /// Double-click or "Show in Week View" on a row: its week (a week row:
+    /// that week). A day is selected as well, so "Days" shows it when coming back.
     func showInWeek(_ row: TTRecordsRow) {
         if let date = row.date { select(date) }
         setMode(.week)
+        switch row {
+        case let .week(monday, _, _, _, _): showWeek(of: monday)
+        case let .day(day, _, _): showWeek(of: day.date)
+        case let .missing(date, _): showWeek(of: date)
+        }
+    }
+
+    // MARK: Week view
+
+    /// Shows the week of `date` in the week view.
+    func showWeek(of date: TTDate) {
+        let monday = TTWeekLayout.monday(date)
+        if monday != weekMonday { weekMonday = monday }
+    }
+
+    /// ‹ and › or the arrow keys: `weeks` weeks on or back.
+    func stepWeek(_ weeks: Int) {
+        weekMonday = weekMonday.adding(days: 7 * weeks)
+    }
+
+    /// "Whole working hours" in the week view (remembered).
+    func setWeekFullFrame(_ on: Bool) {
+        guard on != weekFullFrame else { return }
+        weekFullFrame = on
+        UserDefaults.standard.set(on, forKey: DefaultsKey.timeTrackingRecordsWeekFullFrame)
+    }
+
+    /// The state for the week view, with what runs right now. After the end of
+    /// work recording goes on, but nothing runs along any more.
+    var weekSnapshot: TTWeekSnapshot {
+        let running: Bool
+        switch status {
+        case .running?, .away?: running = true
+        default: running = false
+        }
+        return TTWeekSnapshot(days: days, settings: settings, now: now, running: running)
+    }
+
+    /// Work away from the Mac entered in the week view (already checked by
+    /// `TTWeekLayout.workInput`). Short gaps to neighbouring work join the new
+    /// block, with a note (`week_view.rs` `show_add_work`).
+    func addWork(_ date: TTDate, _ entered: TTSpan, activity: TTActivity) {
+        let minPause = settings.rules(date).minPause
+        var span = entered
+        var note: String?
+        if let day = day(date) {
+            let joined = day.joinWorkGaps(from: entered.from, to: entered.to, minPause: minPause)
+            span = joined.span
+            note = joined.note(minPause: minPause, texts)
+        }
+        let before = day(date)
+        save(date, .addWork(span.from, span.to, activity.note(texts)), rebuild: true)
+        // Only when it was saved (not refused, and not waiting for a question).
+        if let note, day(date) != before { showSheetLater(strings.gapAddedTitle, note) }
     }
 
     func toggleInspector() {
@@ -219,7 +288,10 @@ final class RecordsModel: ObservableObject {
             }
             return
         }
-        storeEdit(date, edit, rebuild: rebuild)
+        // In the inspector the note stands below the field, in the week as a message.
+        if let cut = storeEdit(date, edit, rebuild: rebuild), mode == .week {
+            showSheetLater(strings.workCutTitle, TTEdits.cutText(cut, strings))
+        }
     }
 
     /// Saves a change without asking (see `save`). Returns whether a new start
@@ -423,6 +495,7 @@ final class RecordsModel: ObservableObject {
             goTo(step.date)
         } else {
             select(step.date)
+            showWeek(of: step.date)
         }
     }
 

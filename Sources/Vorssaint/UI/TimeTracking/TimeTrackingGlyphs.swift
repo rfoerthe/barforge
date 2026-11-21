@@ -170,6 +170,10 @@ enum TimeTrackingPalette {
     static let indigo = adaptive(light: (0.30, 0.24, 0.78), dark: .systemIndigo)
     static let absence = adaptive(light: (0.0, 0.45, 0.52), dark: .systemTeal)
     static let red = adaptive(light: (0.78, 0.12, 0.12), dark: .systemRed)
+    /// The day being edited in the week view: stands apart from blue (work,
+    /// today), teal (absence), orange and red. A true magenta, as the
+    /// system's pink looks reddish in the dark, close to the minus.
+    static let selection = adaptive(light: (0.66, 0.13, 0.58), dark: NSColor(srgbRed: 0.89, green: 0.42, blue: 0.85, alpha: 1))
 
     /// Colour of a balance: green in the plus (and even), red in the minus.
     static func balance(_ secs: Int) -> NSColor {

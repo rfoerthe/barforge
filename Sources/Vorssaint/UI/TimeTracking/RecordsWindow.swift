@@ -152,7 +152,7 @@ final class RecordsWindowController: NSObject, NSToolbarDelegate, NSToolbarItemV
         model.$mode.sink { [weak self] mode in
             self?.switcher?.selectedSegment = mode.rawValue
             self?.window?.toolbar?.validateVisibleItems()
-            if mode == .days { DispatchQueue.main.async { self?.focusTable() } }
+            DispatchQueue.main.async { mode == .days ? self?.focusTable() : self?.focusWeek() }
         }.store(in: &cancellables)
         model.$filter.sink { [weak self] filter in self?.updateFilterItem(filter) }.store(in: &cancellables)
         L10n.shared.objectWillChange.sink { [weak self] _ in
@@ -191,15 +191,21 @@ final class RecordsWindowController: NSObject, NSToolbarDelegate, NSToolbarItemV
     }
 
     private func focusTable() {
-        guard let window, let table = Self.firstTable(in: window.contentView) else { return }
+        guard let window, let table = Self.first(NSTableView.self, in: window.contentView) else { return }
         window.makeFirstResponder(table)
     }
 
-    private static func firstTable(in view: NSView?) -> NSTableView? {
+    /// The week view takes the arrow keys and Esc.
+    private func focusWeek() {
+        guard let window, let grid = Self.first(RecordsWeekGridView.self, in: window.contentView) else { return }
+        window.makeFirstResponder(grid)
+    }
+
+    private static func first<T: NSView>(_ type: T.Type, in view: NSView?) -> T? {
         guard let view else { return nil }
-        if let table = view as? NSTableView { return table }
+        if let match = view as? T { return match }
         for sub in view.subviews {
-            if let table = firstTable(in: sub) { return table }
+            if let match = first(type, in: sub) { return match }
         }
         return nil
     }

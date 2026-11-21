@@ -20,6 +20,7 @@ enum TimeTrackingTests {
         TimeTrackingMenuTests.run(suite)
         TimeTrackingSettingsTests.run(suite)
         TimeTrackingRecordsTests.run(suite)
+        TimeTrackingWeekTests.run(suite)
     }
 
     private static func catalog(_ suite: TestSuite) {

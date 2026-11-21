@@ -445,6 +445,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/TimeTracking/TTSettingsModel.swift
         Sources/Vorssaint/Core/TimeTracking/TTEdits.swift
         Sources/Vorssaint/Core/TimeTracking/TTRecords.swift
+        Sources/Vorssaint/Core/TimeTracking/TTWeekLayout.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingSQLite.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingDatabase.swift
         Sources/Vorssaint/Services/TimeTracking/TimeTrackingTagwerkImport.swift

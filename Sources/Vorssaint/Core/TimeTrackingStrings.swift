@@ -1474,8 +1474,6 @@ struct TimeTrackingRecordsStrings {
     let inspector: String
     let inspectorTip: String
     let showInWeek: String
-    let weekPlaceholderTitle: String
-    let weekPlaceholderText: String
     let today: String
 
     // Cards
@@ -1793,8 +1791,6 @@ extension TimeTrackingRecordsStrings {
         inspector: "Inspector",
         inspectorTip: "Show or hide the inspector (⌥⌘I)",
         showInWeek: "Show in Week View",
-        weekPlaceholderTitle: "Week View",
-        weekPlaceholderText: "The week as a calendar arrives with a later version. Switch back to Days with ⌘1.",
         today: "Today",
         cardToday: "Today",
         cardWeek: "This Week",
@@ -2048,8 +2044,6 @@ extension TimeTrackingRecordsStrings {
         inspector: "Informationen",
         inspectorTip: "Informationen ein- oder ausblenden (⌥⌘I)",
         showInWeek: "In der Wochenansicht zeigen",
-        weekPlaceholderTitle: "Wochenansicht",
-        weekPlaceholderText: "Die Woche als Kalender kommt mit einer späteren Version. Zurück zu den Tagen mit ⌘1.",
         today: "Heute",
         cardToday: "Heute",
         cardWeek: "Diese Woche",
@@ -2270,5 +2264,415 @@ extension TimeTrackingRecordsStrings {
         importDoneTitle: "Import abgeschlossen",
         importedFormat: "%@ übernommen.",
         importedBackupFormat: "%1$@ übernommen. Der Stand davor ist im Ordner „backups“ als „%2$@“ gesichert."
+    )
+}
+
+// MARK: - Week view
+
+/// Texts of the week view in the Records window (Tagwerk's `week_view.rs`).
+/// German is Tagwerk's wording; the other languages show English until they
+/// are translated. Times carry "Uhr" in German only (`clockFormat`).
+struct TimeTrackingWeekStrings {
+    // Bar above the grid
+    let previousWeek: String
+    let nextWeek: String
+    let previousWeekTip: String
+    let nextWeekTip: String
+    let todayTip: String
+    let fullFrame: String
+    let fullFrameTip: String
+    let warningsRowTip: String
+    /// ISO week, first day, last day, month, year.
+    let titleSameMonthFormat: String
+    /// ISO week, first day and month, last day and month, year.
+    let titleSameYearFormat: String
+    /// ISO week, first day, month and year, last day, month and year.
+    let titleAcrossYearsFormat: String
+    /// Working time and breaks of the week.
+    let summaryFormat: String
+    /// Follows the summary; the balance follows in colour.
+    let summaryBalance: String
+    let summaryNone: String
+    let warningsOneDay: String
+    let warningsManyDaysFormat: String
+    /// The missing target.
+    let missingFormat: String
+    /// Short weekday, date.
+    let shortDayFormat: String
+    /// Short weekday, day, month.
+    let headerDateFormat: String
+    /// A time of day.
+    let clockFormat: String
+
+    // Blocks
+    let noteStartManual: String
+    let noteAfterBreak: String
+    let noteBeforeBreak: String
+    /// From, to, `noteAwaySuffixFormat` or nothing.
+    let noteAwayFormat: String
+    let noteAwaySuffixFormat: String
+    let noteEndManual: String
+    let now: String
+    let notCounted: String
+    /// Length of a break.
+    let pauseFormat: String
+    let cutLabel: String
+    /// The copied time.
+    let copiedFormat: String
+    let emptyWeek: String
+
+    // Dragging the start and end of work
+    let dragStart: String
+    let dragEnd: String
+    /// Start or end, the time.
+    let dragLabelFormat: String
+    let dragSeparator: String
+    let dragAuto: String
+    /// Sign, minutes.
+    let diffMinutesFormat: String
+    /// Sign, hours, minutes.
+    let diffHoursFormat: String
+    let dragWorkUnchanged: String
+    /// The change of the working time.
+    let dragWorkFormat: String
+
+    // Limits of the start and end of work
+    let boundFuture: String
+    let startFuture: String
+    let endFuture: String
+    /// The end of work.
+    let startBeforeEndFormat: String
+    /// The start of work.
+    let endAfterStartFormat: String
+    /// Start and end of the working-time frame.
+    let startFrameFormat: String
+    let endFrameFormat: String
+    /// Minutes.
+    let minDayFormat: String
+    let startDialogText: String
+    let endDialogText: String
+    let endDialogToday: String
+    /// The day, the explanation.
+    let dialogInfoFormat: String
+    let apply: String
+
+    // Work away from the Mac
+    let workFuture: String
+    let endBeforeStart: String
+    let endInFuture: String
+    /// From, to, duration.
+    let spanFormat: String
+    let fromLabel: String
+    /// The day.
+    let workDialogTextFormat: String
+
+    // Context menu
+    /// The time.
+    let copyTimeFormat: String
+    let addWorkHere: String
+    /// The note (or "Work away from the Mac"), `spanFormat`.
+    let workLineFormat: String
+    let deleteWork: String
+    let changeStart: String
+    let changeEnd: String
+    /// The recorded time.
+    let resetStartFormat: String
+    let resetEndFormat: String
+    let absenceBlocked: String
+    let absenceFreeDay: String
+
+    // VoiceOver
+    /// The week title, the summary.
+    let axWeekFormat: String
+    /// Weekday, day, month.
+    let axDayFormat: String
+    let axNoWorkFormat: String
+    /// Day, working time, breaks.
+    let axWorkFormat: String
+    let axMissingFormat: String
+    let axWarningFormat: String
+    /// From, to.
+    let axRangeFormat: String
+    /// Range, duration.
+    let axOutsideFormat: String
+    let axFreeDayFormat: String
+    /// Since, duration so far.
+    let axRunningFormat: String
+    let axWorkSpanFormat: String
+    let axPauseFormat: String
+    let axAway: String
+    let axAwayNoteFormat: String
+    /// What, range.
+    let axAwaySpanFormat: String
+    let spokenMinutesFormat: String
+    let spokenHoursFormat: String
+    let spokenHoursMinutesFormat: String
+    let startEarlier: String
+    let startLater: String
+    let endEarlier: String
+    let endLater: String
+    let resetStart: String
+    let resetEnd: String
+
+    // Tooltips
+    /// Day, working time, breaks.
+    let tipDayFormat: String
+    let tipLocked: String
+    let tipWarningsForFormat: String
+    let tipWarnings: String
+    let tipBulletFormat: String
+    let tipDoubleClick: String
+    /// Day, start, end, duration.
+    let tipBlockFormat: String
+    let tipRunning: String
+    let tipOutside: String
+    let tipFreeDay: String
+    let tipCountHint: String
+    let tipClick: String
+    let tipDragTop: String
+    let tipDragBottom: String
+    let tipHatch: String
+    /// Day, `spanFormat`.
+    let tipGapFormat: String
+    /// The day.
+    let popoverTitleFormat: String
+}
+
+extension FeatureStrings {
+    static func timeTrackingWeek(_ language: AppLanguage) -> TimeTrackingWeekStrings {
+        switch language {
+        case .de: return .de
+        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        }
+    }
+}
+
+extension TimeTrackingWeekStrings {
+    static let enUS = TimeTrackingWeekStrings(
+        previousWeek: "Previous Week",
+        nextWeek: "Next Week",
+        previousWeekTip: "Previous week (←)",
+        nextWeekTip: "Next week (→)",
+        todayTip: "Go to the current week (⌘T)",
+        fullFrame: "Whole Working Hours",
+        fullFrameTip: "Show the whole working hours – otherwise only the time worked this week",
+        warningsRowTip: "Click a day with a warning sign to see its warnings",
+        titleSameMonthFormat: "Week %1$d  ·  %4$@ %2$d – %3$d, %5$d",
+        titleSameYearFormat: "Week %1$d  ·  %3$@ %2$d – %5$@ %4$d, %6$d",
+        titleAcrossYearsFormat: "Week %1$d  ·  %3$@ %2$d, %4$d – %6$@ %5$d, %7$d",
+        summaryFormat: "Week: %1$@  ·  Breaks: %2$@",
+        summaryBalance: "  ·  Balance ",
+        summaryNone: "Week: –",
+        warningsOneDay: "Warnings on 1 day",
+        warningsManyDaysFormat: "Warnings on %d days",
+        missingFormat: "No working time: the target of %@ counts as a minus. Add times or an absence (right-click).",
+        shortDayFormat: "%1$@, %2$@",
+        headerDateFormat: "%1$@ %3$02d-%2$02d",
+        clockFormat: "%@",
+        noteStartManual: "Start of work set manually",
+        noteAfterBreak: "Starts after a manual break",
+        noteBeforeBreak: "Ends with a manual break",
+        noteAwayFormat: "Worked away from the Mac %1$@ – %2$@%3$@",
+        noteAwaySuffixFormat: " (%@)",
+        noteEndManual: "End of work set manually",
+        now: "now",
+        notCounted: "not counted",
+        pauseFormat: "Break %@",
+        cutLabel: "removed",
+        copiedFormat: "%@ copied",
+        emptyWeek: "No working time this week",
+        dragStart: "Start",
+        dragEnd: "End",
+        dragLabelFormat: "%1$@ %2$@",
+        dragSeparator: " · ",
+        dragAuto: "automatic",
+        diffMinutesFormat: "%1$@%2$d min",
+        diffHoursFormat: "%1$@%2$d:%3$02d h",
+        dragWorkUnchanged: "Working time unchanged",
+        dragWorkFormat: "Working time %@",
+        boundFuture: "No times can be entered on future days.",
+        startFuture: "The start of work can’t be in the future.",
+        endFuture: "The end of work can’t be in the future.",
+        startBeforeEndFormat: "The start of work must be before the end of work (%@).",
+        endAfterStartFormat: "The end of work must be after the start of work (%@).",
+        startFrameFormat: "The start of work must be within working hours from %1$@ to %2$@ – working time only counts there (see Settings).",
+        endFrameFormat: "The end of work must be within working hours from %1$@ to %2$@ – working time only counts there (see Settings).",
+        minDayFormat: "At least %d minutes must lie between the start and the end of work.",
+        startDialogText: "Without an entry the day starts with the first unlock. Work away from the Mac before it goes – the latest entry wins.",
+        endDialogText: "Without an entry the day ends with the last lock. Work away from the Mac after it goes – the latest entry wins.",
+        endDialogToday: " After the end of work nothing more is recorded today.",
+        dialogInfoFormat: "%1$@: %2$@",
+        apply: "Apply",
+        workFuture: "No work away from the Mac can be entered on future days.",
+        endBeforeStart: "The end must be after the start.",
+        endInFuture: "The end can’t be in the future.",
+        spanFormat: "%1$@ – %2$@ (%3$@)",
+        fromLabel: "From",
+        workDialogTextFormat: "%@: A call, meeting or appointment while the Mac was locked counts as working time. A break in that time goes.",
+        copyTimeFormat: "Copy Time %@",
+        addWorkHere: "Add Work Away from the Mac…",
+        workLineFormat: "%1$@ %2$@",
+        deleteWork: "Delete Work Away from the Mac",
+        changeStart: "Change Start of Work…",
+        changeEnd: "Change End of Work…",
+        resetStartFormat: "Reset Start of Work (%@)",
+        resetEndFormat: "Reset End of Work (%@)",
+        absenceBlocked: "Whole day only after “Delete All Entries”",
+        absenceFreeDay: "Day off: remove only",
+        axWeekFormat: "Week %1$@. %2$@",
+        axDayFormat: "%1$@, %3$@ %2$d",
+        axNoWorkFormat: "%@: no working time",
+        axWorkFormat: "%1$@: working time %2$@, breaks %3$@",
+        axMissingFormat: "Nothing recorded, balance minus %@",
+        axWarningFormat: "Warning: %@",
+        axRangeFormat: "%1$@ to %2$@",
+        axOutsideFormat: "Not counted, outside working hours: %1$@, %2$@",
+        axFreeDayFormat: "Not counted, day off: %1$@, %2$@",
+        axRunningFormat: "Work since %1$@, running, so far %2$@",
+        axWorkSpanFormat: "Work %1$@, %2$@",
+        axPauseFormat: "Break %1$@, %2$@",
+        axAway: "Work away from the Mac",
+        axAwayNoteFormat: "Work away from the Mac, %@",
+        axAwaySpanFormat: "%1$@: %2$@",
+        spokenMinutesFormat: "%d min",
+        spokenHoursFormat: "%d h",
+        spokenHoursMinutesFormat: "%1$d h %2$d min",
+        startEarlier: "Start of work 5 minutes earlier",
+        startLater: "Start of work 5 minutes later",
+        endEarlier: "End of work 5 minutes earlier",
+        endLater: "End of work 5 minutes later",
+        resetStart: "Reset start of work",
+        resetEnd: "Reset end of work",
+        tipDayFormat: "%1$@\nWorking time %2$@  ·  Breaks %3$@",
+        tipLocked: "Other entries only once the absence is set to “None” (right-click).",
+        tipWarningsForFormat: "Warnings for %@:",
+        tipWarnings: "Warnings:",
+        tipBulletFormat: "• %@",
+        tipDoubleClick: "Double-click: edit day",
+        tipBlockFormat: "%1$@\n%2$@ – %3$@\n%4$@",
+        tipRunning: "now (running)",
+        tipOutside: "Outside working hours – not counted",
+        tipFreeDay: "Day off – recorded, but not counted",
+        tipCountHint: "Right-click: “Count recorded time”.",
+        tipClick: "Click a time to copy it. Right-click: all options.",
+        tipDragTop: "Drag the top edge: move the start of work.",
+        tipDragBottom: "Drag the bottom edge: move the end of work.",
+        tipHatch: "Click the hatching: delete work away from the Mac.",
+        tipGapFormat: "%1$@\nBreak %2$@\nClick: enter as work away from the Mac (a call or meeting, for example)",
+        popoverTitleFormat: "Warnings for %@"
+    )
+
+    static let de = TimeTrackingWeekStrings(
+        previousWeek: "Vorherige Woche",
+        nextWeek: "Nächste Woche",
+        previousWeekTip: "Vorherige Woche (←)",
+        nextWeekTip: "Nächste Woche (→)",
+        todayTip: "Zur aktuellen Woche (⌘T)",
+        fullFrame: "Ganzer Rahmen",
+        fullFrameTip: "Den ganzen Arbeitszeitrahmen zeigen – sonst nur die Zeit, in der in dieser Woche gearbeitet wurde",
+        warningsRowTip: "Tage mit Warnschild anklicken, um die Hinweise zu sehen",
+        titleSameMonthFormat: "KW %1$d  ·  %2$d. – %3$d. %4$@ %5$d",
+        titleSameYearFormat: "KW %1$d  ·  %2$d. %3$@ – %4$d. %5$@ %6$d",
+        titleAcrossYearsFormat: "KW %1$d  ·  %2$d. %3$@ %4$d – %5$d. %6$@ %7$d",
+        summaryFormat: "Woche: %1$@  ·  Pausen: %2$@",
+        summaryBalance: "  ·  Saldo ",
+        summaryNone: "Woche: –",
+        warningsOneDay: "Hinweise an 1 Tag",
+        warningsManyDaysFormat: "Hinweise an %d Tagen",
+        missingFormat: "Keine Arbeitszeit: Das Soll von %@ zählt als Minus. Zeiten oder eine Abwesenheit nachtragen (Rechtsklick).",
+        shortDayFormat: "%1$@, %2$@",
+        headerDateFormat: "%1$@ %2$02d.%3$02d.",
+        clockFormat: "%@ Uhr",
+        noteStartManual: "Arbeitsbeginn manuell festgelegt",
+        noteAfterBreak: "beginnt nach einer manuellen Pause",
+        noteBeforeBreak: "endet mit einer manuellen Pause",
+        noteAwayFormat: "ohne Mac gearbeitet %1$@ – %2$@%3$@",
+        noteAwaySuffixFormat: " (%@)",
+        noteEndManual: "Feierabend manuell festgelegt",
+        now: "jetzt",
+        notCounted: "nicht gezählt",
+        pauseFormat: "Pause %@",
+        cutLabel: "entfällt",
+        copiedFormat: "%@ kopiert",
+        emptyWeek: "Keine Arbeitszeit in dieser Woche",
+        dragStart: "Beginn",
+        dragEnd: "Feierabend",
+        dragLabelFormat: "%1$@ %2$@",
+        dragSeparator: " · ",
+        dragAuto: "automatisch",
+        diffMinutesFormat: "%1$@%2$d Min.",
+        diffHoursFormat: "%1$@%2$d:%3$02d h",
+        dragWorkUnchanged: "Arbeitszeit unverändert",
+        dragWorkFormat: "Arbeitszeit %@",
+        boundFuture: "An künftigen Tagen lassen sich keine Zeiten eintragen.",
+        startFuture: "Der Arbeitsbeginn kann nicht in der Zukunft liegen.",
+        endFuture: "Der Feierabend kann nicht in der Zukunft liegen.",
+        startBeforeEndFormat: "Der Arbeitsbeginn muss vor dem Feierabend (%@ Uhr) liegen.",
+        endAfterStartFormat: "Der Feierabend muss nach dem Arbeitsbeginn (%@ Uhr) liegen.",
+        startFrameFormat: "Der Arbeitsbeginn muss im Arbeitszeitrahmen von %1$@ bis %2$@ Uhr liegen – nur dort zählt Arbeitszeit (siehe Einstellungen).",
+        endFrameFormat: "Der Feierabend muss im Arbeitszeitrahmen von %1$@ bis %2$@ Uhr liegen – nur dort zählt Arbeitszeit (siehe Einstellungen).",
+        minDayFormat: "Zwischen Arbeitsbeginn und Feierabend müssen mindestens %d Minuten liegen.",
+        startDialogText: "Ohne Angabe beginnt der Tag mit dem ersten Entsperren. Arbeit ohne Mac davor entfällt – die letzte Angabe gilt.",
+        endDialogText: "Ohne Angabe endet der Tag mit dem letzten Sperren. Arbeit ohne Mac danach entfällt – die letzte Angabe gilt.",
+        endDialogToday: " Mit Feierabend wird heute nichts mehr erfasst.",
+        dialogInfoFormat: "%1$@: %2$@",
+        apply: "Übernehmen",
+        workFuture: "An künftigen Tagen lässt sich keine Arbeit ohne Mac eintragen.",
+        endBeforeStart: "Das Ende muss nach dem Beginn liegen.",
+        endInFuture: "Das Ende kann nicht in der Zukunft liegen.",
+        spanFormat: "%1$@ – %2$@ Uhr (%3$@)",
+        fromLabel: "Von",
+        workDialogTextFormat: "%@: Telefonat, Meeting oder Termin bei gesperrtem Mac zählt als Arbeitszeit. Eine Pause in dieser Zeit entfällt.",
+        copyTimeFormat: "Uhrzeit %@ kopieren",
+        addWorkHere: "Arbeit ohne Mac eintragen …",
+        workLineFormat: "%1$@ %2$@",
+        deleteWork: "Arbeit ohne Mac löschen",
+        changeStart: "Arbeitsbeginn ändern …",
+        changeEnd: "Feierabend ändern …",
+        resetStartFormat: "Arbeitsbeginn zurücksetzen (%@ Uhr)",
+        resetEndFormat: "Feierabend zurücksetzen (%@ Uhr)",
+        absenceBlocked: "Ganztags erst nach „Alle Einträge löschen“",
+        absenceFreeDay: "Freier Tag: nur entfernen",
+        axWeekFormat: "Woche %1$@. %2$@",
+        axDayFormat: "%1$@, %2$d. %3$@",
+        axNoWorkFormat: "%@: keine Arbeitszeit",
+        axWorkFormat: "%1$@: Arbeitszeit %2$@, Pausen %3$@",
+        axMissingFormat: "Nichts erfasst, Saldo minus %@",
+        axWarningFormat: "Hinweis: %@",
+        axRangeFormat: "%1$@ bis %2$@ Uhr",
+        axOutsideFormat: "Nicht gezählt, außerhalb des Arbeitszeitrahmens: %1$@, %2$@",
+        axFreeDayFormat: "Nicht gezählt, freier Tag: %1$@, %2$@",
+        axRunningFormat: "Arbeit seit %1$@, läuft, bisher %2$@",
+        axWorkSpanFormat: "Arbeit %1$@, %2$@",
+        axPauseFormat: "Pause %1$@, %2$@",
+        axAway: "Arbeit ohne Mac",
+        axAwayNoteFormat: "Arbeit ohne Mac, %@",
+        axAwaySpanFormat: "%1$@: %2$@",
+        spokenMinutesFormat: "%d Min.",
+        spokenHoursFormat: "%d Std.",
+        spokenHoursMinutesFormat: "%1$d Std. %2$d Min.",
+        startEarlier: "Arbeitsbeginn 5 Minuten früher",
+        startLater: "Arbeitsbeginn 5 Minuten später",
+        endEarlier: "Feierabend 5 Minuten früher",
+        endLater: "Feierabend 5 Minuten später",
+        resetStart: "Arbeitsbeginn zurücksetzen",
+        resetEnd: "Feierabend zurücksetzen",
+        tipDayFormat: "%1$@\nArbeitszeit %2$@  ·  Pausen %3$@",
+        tipLocked: "Andere Einträge erst, wenn die Abwesenheit auf „Keine“ steht (Rechtsklick).",
+        tipWarningsForFormat: "Hinweise für %@:",
+        tipWarnings: "Hinweise:",
+        tipBulletFormat: "• %@",
+        tipDoubleClick: "Doppelklick: Tag bearbeiten",
+        tipBlockFormat: "%1$@\n%2$@ Uhr – %3$@\n%4$@",
+        tipRunning: "jetzt (läuft)",
+        tipOutside: "außerhalb des Arbeitszeitrahmens – nicht gezählt",
+        tipFreeDay: "freier Tag – erfasst, aber nicht gezählt",
+        tipCountHint: "Rechtsklick: „Erfasste Zeit zählen“.",
+        tipClick: "Klick auf eine Uhrzeit kopiert sie. Rechtsklick: alle Möglichkeiten.",
+        tipDragTop: "Oberkante ziehen: Arbeitsbeginn verschieben.",
+        tipDragBottom: "Unterkante ziehen: Feierabend verschieben.",
+        tipHatch: "Klick auf die Schraffur: Arbeit ohne Mac löschen.",
+        tipGapFormat: "%1$@\nPause %2$@\nKlick: als Arbeit ohne Mac eintragen (z. B. Telefonat oder Meeting)",
+        popoverTitleFormat: "Hinweise für %@"
     )
 }
