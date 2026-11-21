@@ -300,3 +300,32 @@ hinter `isBeta`.
 | M8 Sprachen und Release | M | alle |
 
 M1 und M2 sowie M5 und M6 lassen sich teilweise parallel bearbeiten, wenn die Datentypen aus M1 feststehen.
+
+## 9. Konventionen für die Umsetzung
+
+Diese Regeln gelten für alle Meilensteine ab M1.
+
+1. **Ablage:**
+   - Reine Logik liegt in `Sources/Vorssaint/Core/TimeTracking/`. Sie importiert nur Foundation, kein AppKit und kein SwiftUI, und jede Datei steht in `build.sh` unter `TEST_SOURCES`.
+   - Services kommen nach `Sources/Vorssaint/Services/TimeTracking/`.
+   - Die Oberfläche kommt nach `Sources/Vorssaint/UI/TimeTracking/`, die Einstellungen nach `UI/Settings/`.
+2. **Namen:** Typen der Fachlogik tragen das Präfix `TT` (`TTDate`, `TTSpan`, `TTDay`, `TTWorkRules`, `TTSettings`, `TTTracker` …).
+3. **Getreue Portierung:**
+   - Algorithmen, Standardwerte, Grenzen und Rundungen entsprechen Tagwerk. Ein Kommentar verweist auf die Stelle in Rust (`day.rs:674`), wo das hilft.
+   - Uhrzeiten sind `Int`, gezählt in Sekunden seit Mitternacht (0 bis 86 400).
+   - Ein Datum ist ein `TTDate` (Jahr, Monat, Tag, gregorianisch, ohne Zeitzone). Seine Ordinalzahl entspricht chronos `num_days_from_ce`, denn `account_from_day` wird so gespeichert.
+4. **Keine Uhr in der Logik:** Die Logik liest „jetzt“ nie selbst. Datum und Uhrzeit werden immer übergeben.
+5. **Texte:**
+   - Alle Texte, die Benutzer sehen, stehen in `Core/TimeTrackingStrings.swift`. Dort gibt es neue Structs in `extension FeatureStrings` mit Englisch und Deutsch.
+   - Die übrigen 13 Sprachen liefern bis M8 die englischen Texte (`case .ptBR: return .enUS`).
+   - Funktionen, die Text erzeugen, bekommen den String-Struct als Parameter. Tests, die Tagwerks deutsche Texte prüfen, übergeben `.de`.
+   - Verboten sind der Geviertstrich U+2014 und `...`; stattdessen `…`. Die Anführungszeichen „“ gibt es nur auf Deutsch. Ein negativer Saldo bekommt wie in Tagwerk das Minuszeichen U+2212.
+6. **Tests:**
+   - Jeder `#[test]` des portierten Moduls wird übernommen; die mit `#[ignore]` (GUI) entfallen.
+   - Die Tests stehen in `Tests/TimeTracking<Modul>Tests.swift` als `enum … { static func run(_ suite: TestSuite) }` und werden aus `TimeTrackingTests.run` aufgerufen.
+   - Gezielt laufen sie mit `./build.sh --test-suite=time-tracking`, am Ende jedes Meilensteins mit `./build.sh --test` und `./build.sh --dev`, ohne Warnungen.
+7. **Dateiköpfe:**
+   - Neue Dateien beginnen mit `// SPDX-License-Identifier: GPL-3.0-or-later` und `// Copyright (C) 2026 Roland Foerther`.
+   - Geänderte Upstream-Dateien bekommen die Zeile `Roland Foerther` unter der Zeile von Vorssaint, falls sie fehlt.
+8. **Technik:** Swift 6.2, keine externen Pakete. Der Zugriff auf die Datenbank läuft über `import SQLite3`.
+9. **Dateien:** Die Datenbank liegt unter `PrivateFileStore.containerURL/TimeTracking/timetracking.db`, die Backups unter `…/TimeTracking/backups/`.

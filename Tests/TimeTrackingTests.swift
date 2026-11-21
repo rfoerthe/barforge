@@ -3,14 +3,16 @@
 
 import Foundation
 
-/// Time Tracking, the port of Tagwerk: its place in the catalog, its texts
-/// and its settings. The tracker, rules and store suites join here as the
-/// milestones in docs/TIME-TRACKING-PLAN.md land.
+/// Time Tracking, the port of Tagwerk: its place in the catalog, its texts,
+/// its settings and the logic of days and rules. The tracker and store suites
+/// join here as the milestones in docs/TIME-TRACKING-PLAN.md land.
 enum TimeTrackingTests {
     static func run(_ suite: TestSuite) {
         catalog(suite)
         strings(suite)
         preferences(suite)
+        TimeTrackingDayTests.run(suite)
+        TimeTrackingRulesTests.run(suite)
     }
 
     private static func catalog(_ suite: TestSuite) {

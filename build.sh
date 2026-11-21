@@ -427,6 +427,13 @@ if (( TEST )); then
         Sources/Vorssaint/Services/DiskUsage/DiskUsageLayout.swift
         Sources/Vorssaint/Core/DiskAnalyzerStrings.swift
         Sources/Vorssaint/Core/TimeTrackingStrings.swift
+        Sources/Vorssaint/Core/TimeTracking/TTDate.swift
+        Sources/Vorssaint/Core/TimeTracking/TTSpan.swift
+        Sources/Vorssaint/Core/TimeTracking/TTFormat.swift
+        Sources/Vorssaint/Core/TimeTracking/TTDay.swift
+        Sources/Vorssaint/Core/TimeTracking/TTRules.swift
+        Sources/Vorssaint/Core/TimeTracking/TTWarnings.swift
+        Sources/Vorssaint/Core/TimeTracking/TTAlerts.swift
         Sources/Vorssaint/Core/ForkBuildStrings.swift
         Sources/Vorssaint/Services/MouseClickDebounce/MouseClickDebounceSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift
