@@ -11,6 +11,9 @@ enum TimeTrackingTests {
         catalog(suite)
         strings(suite)
         preferences(suite)
+        markdownLanguage(suite)
+        sentences(suite)
+        translations(suite)
         TimeTrackingDayTests.run(suite)
         TimeTrackingRulesTests.run(suite)
         TimeTrackingStoreTests.run(suite)
@@ -26,8 +29,8 @@ enum TimeTrackingTests {
     private static func catalog(_ suite: TestSuite) {
         let feature = AppFeature.timeTracking
         suite.expect(feature.rawValue == "timeTracking", "the Time Tracking id is stable")
-        suite.expect(feature.group == .tools && !feature.installedByDefault && feature.isBeta,
-                     "Time Tracking is an opt-in beta tool")
+        suite.expect(feature.group == .tools && !feature.installedByDefault && !feature.isBeta,
+                     "Time Tracking is an opt-in tool")
         suite.expect(feature.enabledKeys == [DefaultsKey.timeTrackingEnabled],
                      "installing Time Tracking turns its recording switch on")
         suite.expect(feature.permissions == [.notifications], "Time Tracking only ever uses notifications")
@@ -61,6 +64,42 @@ enum TimeTrackingTests {
                          && text.recordToggle != english.recordToggle
                          && text.recordCaption != english.recordCaption,
                          "\(language.rawValue) translates Time Tracking")
+        }
+    }
+
+    private static func sentences(_ suite: TestSuite) {
+        suite.expect(TTSentence.ended("Pausen ab 15 Min.") == "Pausen ab 15 Min.", "a finished sentence stays")
+        suite.expect(TTSentence.ended("Breaks from 15 min") == "Breaks from 15 min.", "a sentence gets its full stop")
+        suite.expect(TTSentence.ended("休息从 15 分钟") == "休息从 15 分钟。", "Chinese ends with a full-width stop")
+        suite.expect(TTSentence.ended("休憩は 15 分から") == "休憩は 15 分から。", "Japanese ends with a full-width stop")
+        var text = "Beginn 07:30"
+        TTSentence.append("Arbeitszeit +0:25 Std.", to: &text)
+        suite.expect(text == "Beginn 07:30. Arbeitszeit +0:25 Std.", "a further sentence follows after a space")
+        var cjk = "开始时间已更改"
+        TTSentence.append("工作时间 +0:25", to: &cjk)
+        suite.expect(cjk == "开始时间已更改。工作时间 +0:25", "a further Chinese sentence follows without a space")
+    }
+
+    private static func translations(_ suite: TestSuite) {
+        for language in AppLanguage.allCases where language != .enUS {
+            suite.expect(FeatureStrings.timeTrackingTexts(language).workWithoutMac != TimeTrackingTexts.enUS.workWithoutMac
+                         && FeatureStrings.timeTrackingMenu(language).statusAbsentFormat
+                            != TimeTrackingMenuTexts.enUS.statusAbsentFormat
+                         && FeatureStrings.timeTrackingSettings(language).statusItem
+                            != TimeTrackingSettingsStrings.enUS.statusItem
+                         && FeatureStrings.timeTrackingRecords(language).weekdayNames
+                            != TimeTrackingRecordsStrings.enUS.weekdayNames
+                         && FeatureStrings.timeTrackingWeek(language).previousWeekTip
+                            != TimeTrackingWeekStrings.enUS.previousWeekTip,
+                         "\(language.rawValue) translates the Time Tracking texts")
+        }
+    }
+
+    private static func markdownLanguage(_ suite: TestSuite) {
+        for language in AppLanguage.allCases {
+            let texts = TTImport.markdownTexts(for: language)
+            suite.expect(TTImport.languages.contains { $0.workWithoutMac == texts.workWithoutMac },
+                         "a Markdown export in \(language.rawValue) reads back in")
         }
     }
 

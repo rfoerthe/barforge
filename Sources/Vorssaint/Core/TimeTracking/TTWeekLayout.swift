@@ -1093,8 +1093,7 @@ enum TTWeekLayout {
 
     /// Appends `more` as another sentence (without a double point after "Min.").
     static func addSentence(_ text: inout String, _ more: String) {
-        text += text.hasSuffix(".") ? " " : ". "
-        text += more
+        TTSentence.append(more, to: &text)
     }
 
     /// `Dienstag, 17. November`

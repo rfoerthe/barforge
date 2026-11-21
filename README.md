@@ -119,6 +119,7 @@ Reorder or hide panel sections, choose a compact layout, and export settings to 
 - **Radial menu.** Open a customizable wheel of apps, files, shortcuts and tools around the pointer, with profiles and submenus.
 - **Scratchpad.** Keep autosaved notes in tabs, with Markdown preview and export, in a floating window.
 - **Cleaning Mode.** Lock keyboard input while cleaning, with a black screen or a small visible indicator.
+- **Time Tracking.** Record working time automatically while your Mac is unlocked: locks of 15 minutes or more are breaks, and you can pause, work away from the Mac or set start and end of work. See today's time, the week's balance and a running time account in the panel or beside its own menu bar icon. Correct any day in a Records window with a day list, inspector and week calendar, and export Markdown, CSV or PDF. Optional hints follow the German working time law. Ported from [Tagwerk](https://github.com/rfoerthe/tagwerk), whose data it can take over.
 
 ### Capture and create
 

@@ -533,8 +533,8 @@ enum TimeTrackingRecordsTests {
         let en = TimeTrackingRecordsStrings.enUS
         suite.expect(TTEdits.historyTitle(redo: false, name: TTEditName.removeBreak.title(en), en)
                         == "Undo Remove Break", "English undo title")
-        suite.expect(FeatureStrings.timeTrackingRecords(.fr).windowTitle == en.windowTitle,
-                     "other languages show English until they are translated")
+        suite.expect(FeatureStrings.timeTrackingRecords(.fr).windowTitle != en.windowTitle,
+                     "other languages are translated")
         let all = Mirror(reflecting: en).children.compactMap { $0.value as? String }
             + Mirror(reflecting: de).children.compactMap { $0.value as? String }
         suite.expect(!all.contains { $0.contains("\u{2014}") || $0.contains("...") }, "no em dash and no three dots")

@@ -341,8 +341,21 @@ struct TimeTrackingTexts {
 extension FeatureStrings {
     static func timeTrackingTexts(_ language: AppLanguage) -> TimeTrackingTexts {
         switch language {
+        case .enUS: return .enUS
+        case .ptBR: return .ptBR
+        case .tr: return .tr
+        case .ru: return .ru
+        case .es: return .es
+        case .sk: return .sk
         case .de: return .de
-        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        case .fr: return .fr
+        case .it: return .it
+        case .ja: return .ja
+        case .ko: return .ko
+        case .uk: return .uk
+        case .zhHans: return .zhHans
+        case .zhTW: return .zhTW
+        case .zhHK: return .zhHK
         }
     }
 }
@@ -732,8 +745,21 @@ struct TimeTrackingMenuTexts {
 extension FeatureStrings {
     static func timeTrackingMenu(_ language: AppLanguage) -> TimeTrackingMenuTexts {
         switch language {
+        case .enUS: return .enUS
+        case .ptBR: return .ptBR
+        case .tr: return .tr
+        case .ru: return .ru
+        case .es: return .es
+        case .sk: return .sk
         case .de: return .de
-        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        case .fr: return .fr
+        case .it: return .it
+        case .ja: return .ja
+        case .ko: return .ko
+        case .uk: return .uk
+        case .zhHans: return .zhHans
+        case .zhTW: return .zhTW
+        case .zhHK: return .zhHK
         }
     }
 }
@@ -1114,8 +1140,21 @@ struct TimeTrackingSettingsStrings {
 extension FeatureStrings {
     static func timeTrackingSettings(_ language: AppLanguage) -> TimeTrackingSettingsStrings {
         switch language {
+        case .enUS: return .enUS
+        case .ptBR: return .ptBR
+        case .tr: return .tr
+        case .ru: return .ru
+        case .es: return .es
+        case .sk: return .sk
         case .de: return .de
-        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        case .fr: return .fr
+        case .it: return .it
+        case .ja: return .ja
+        case .ko: return .ko
+        case .uk: return .uk
+        case .zhHans: return .zhHans
+        case .zhTW: return .zhTW
+        case .zhHK: return .zhHK
         }
     }
 }
@@ -1753,8 +1792,21 @@ struct TimeTrackingRecordsStrings {
 extension FeatureStrings {
     static func timeTrackingRecords(_ language: AppLanguage) -> TimeTrackingRecordsStrings {
         switch language {
+        case .enUS: return .enUS
+        case .ptBR: return .ptBR
+        case .tr: return .tr
+        case .ru: return .ru
+        case .es: return .es
+        case .sk: return .sk
         case .de: return .de
-        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        case .fr: return .fr
+        case .it: return .it
+        case .ja: return .ja
+        case .ko: return .ko
+        case .uk: return .uk
+        case .zhHans: return .zhHans
+        case .zhTW: return .zhTW
+        case .zhHK: return .zhHK
         }
     }
 }
@@ -2441,8 +2493,21 @@ struct TimeTrackingWeekStrings {
 extension FeatureStrings {
     static func timeTrackingWeek(_ language: AppLanguage) -> TimeTrackingWeekStrings {
         switch language {
+        case .enUS: return .enUS
+        case .ptBR: return .ptBR
+        case .tr: return .tr
+        case .ru: return .ru
+        case .es: return .es
+        case .sk: return .sk
         case .de: return .de
-        case .enUS, .ptBR, .tr, .ru, .es, .sk, .fr, .it, .ja, .ko, .uk, .zhHans, .zhTW, .zhHK: return .enUS
+        case .fr: return .fr
+        case .it: return .it
+        case .ja: return .ja
+        case .ko: return .ko
+        case .uk: return .uk
+        case .zhHans: return .zhHans
+        case .zhTW: return .zhTW
+        case .zhHK: return .zhHK
         }
     }
 }

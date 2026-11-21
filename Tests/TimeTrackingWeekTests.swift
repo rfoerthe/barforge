@@ -819,9 +819,9 @@ enum TimeTrackingWeekTests {
         }
         suite.expect(!all.contains { $0.contains("\u{2014}") || $0.contains("...") || $0.isEmpty },
                      "week texts: no em dash, no three dots, none empty")
-        for language in AppLanguage.allCases where language != .de {
-            suite.expect(FeatureStrings.timeTrackingWeek(language).titleSameMonthFormat == TimeTrackingWeekStrings.enUS.titleSameMonthFormat,
-                         "\(language.rawValue): the week view falls back to English until M8")
+        for language in AppLanguage.allCases where language != .enUS {
+            suite.expect(FeatureStrings.timeTrackingWeek(language).titleSameMonthFormat != TimeTrackingWeekStrings.enUS.titleSameMonthFormat,
+                         "\(language.rawValue): the week view is translated")
         }
     }
 }

@@ -143,3 +143,35 @@ extension Int {
 extension StringProtocol {
     var ttTrimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
 }
+
+/// Ending sentences in the punctuation of the text's script: Chinese and
+/// Japanese close with the full-width "。" and need no space before the
+/// next sentence; every other language with "." and a space.
+enum TTSentence {
+    static func isEnded(_ text: String) -> Bool {
+        guard let last = text.last else { return false }
+        return ".!?。！？".contains(last)
+    }
+
+    /// Whether the text ends in Han, Hiragana or Katakana.
+    static func endsInCJK(_ text: String) -> Bool {
+        guard let scalar = text.unicodeScalars.last else { return false }
+        switch scalar.value {
+        case 0x3040...0x30FF, 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF, 0xFF66...0xFF9F: return true
+        default: return false
+        }
+    }
+
+    /// The text as a finished sentence.
+    static func ended(_ text: String) -> String {
+        if isEnded(text) { return text }
+        return text + (endsInCJK(text) ? "。" : ".")
+    }
+
+    /// Appends `more` as a further sentence.
+    static func append(_ more: String, to text: inout String) {
+        text = ended(text)
+        if !(text.hasSuffix("。") || text.hasSuffix("！") || text.hasSuffix("？")) { text += " " }
+        text += more
+    }
+}

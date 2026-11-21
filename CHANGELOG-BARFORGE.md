@@ -14,6 +14,15 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
+## [Unreleased]
+
+Based on Vorssaint 3.4.4.
+
+### Added
+- Time Tracking records your working time automatically while your Mac is unlocked, ported from Tagwerk. A lock of 15 minutes or more is a break. You can pause, keep working away from the Mac for a meeting or call, set start and end of work, and record a free day. The menu panel and an optional menu bar icon show today's time against the target, the week's balance and a running time account. Reminders before a break or the maximum hours are due follow the German working time law, and those hints can be turned off.
+- The Records window lists every day with its balance and lets you correct breaks, work away from the Mac, start, end and absences, with undo. A week view shows each week like a calendar, where start and end can be dragged. Days export as Markdown, CSV or PDF, and Markdown imports again.
+- Settings → Time Tracking holds the working time rules, each valid from a date, plus the time account and its carry-over, and can take over the data from Tagwerk.
+
 ## [1.0.7] - 2026-11-19
 
 Based on Vorssaint 3.4.4.

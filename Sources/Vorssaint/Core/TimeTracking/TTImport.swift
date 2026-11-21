@@ -50,6 +50,12 @@ struct TTImport: Hashable, Sendable {
     /// The languages whose files the parser reads, besides the keywords below.
     static let languages: [TimeTrackingTexts] = [.de, .enUS]
 
+    /// The texts a Markdown export is written in: German as Tagwerk, English
+    /// for every other app language, so the file always reads back in.
+    static func markdownTexts(for language: AppLanguage) -> TimeTrackingTexts {
+        language == .de ? .de : .enUS
+    }
+
     /// `Übersprungen: 12.03.2026 (Arbeitsbeginn nicht vor dem Feierabend), …`;
     /// empty when nothing was skipped. With many days the first three are named.
     func skippedText(_ texts: TimeTrackingTexts) -> String {

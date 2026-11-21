@@ -427,6 +427,19 @@ if (( TEST )); then
         Sources/Vorssaint/Services/DiskUsage/DiskUsageLayout.swift
         Sources/Vorssaint/Core/DiskAnalyzerStrings.swift
         Sources/Vorssaint/Core/TimeTrackingStrings.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseSimplified.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseTraditionalHK.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseTraditionalTW.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+French.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Italian.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Japanese.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Korean.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+PortugueseBR.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Russian.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Slovak.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Spanish.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Turkish.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Ukrainian.swift
         Sources/Vorssaint/Core/TimeTracking/TTDate.swift
         Sources/Vorssaint/Core/TimeTracking/TTSpan.swift
         Sources/Vorssaint/Core/TimeTracking/TTFormat.swift

@@ -2,6 +2,16 @@
 
 Stand: 21.11.2026 · Quelle: Tagwerk 1.7.0 (Rust, ~22 000 Zeilen, 162 Tests) · Ziel: Barforge 1.0.7 (Swift 6.2, macOS 26)
 
+> **Umsetzungsstand (22.11.2026):** M0 bis M8 sind umgesetzt, je ein Commit auf dem Branch
+> `claude/time-tracking-feature-plan-8aece7`. Alle Logik-Tests von Tagwerk sind portiert, die
+> Exporte stimmen byteweise mit Tagwerk überein, und Build und Testsuite sind grün.
+>
+> **Offen:**
+> - Die Oberfläche (Panel, Statussymbol, Einstellungen, Aufzeichnungen, Wochenansicht) ist nur
+>   über Build und Tests geprüft, noch nicht von Hand in der laufenden App.
+> - Die Übersetzungen der 13 weiteren Sprachen stammen nicht von Muttersprachlern.
+> - M9 (Kommandozeile, Feiertage, Sommer- und Winterzeit) steht aus.
+
 ## 1. Ziel und Abgrenzung
 
 Barforge bekommt ein neues, installierbares Feature **Time Tracking** („Arbeitszeiterfassung“). Es übernimmt den

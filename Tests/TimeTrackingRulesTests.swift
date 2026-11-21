@@ -666,8 +666,8 @@ enum TimeTrackingRulesTests {
     private static func englishTexts(_ suite: TestSuite) {
         let en = FeatureStrings.timeTrackingTexts(.enUS)
         suite.expect(FeatureStrings.timeTrackingTexts(.de).absenceVacation == "Urlaub"
-                     && FeatureStrings.timeTrackingTexts(.fr).absenceVacation == en.absenceVacation,
-                     "German is Tagwerk's, the others are English for now")
+                     && FeatureStrings.timeTrackingTexts(.fr).absenceVacation != en.absenceVacation,
+                     "German is Tagwerk's, the other languages are translated")
         let r4 = TTWorkRules(weeklyTarget: h(38, 30), workdays: 0b0_1011)
         suite.expect(r4.summary(en) == "Working hours 07:00–22:00  ·  Regular hours 38.5 h/week (Mon, Tue, Thu)  ·  Breaks from 15 min",
                      r4.summary(en))

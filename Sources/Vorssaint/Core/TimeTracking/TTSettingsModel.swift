@@ -361,7 +361,7 @@ enum TTSettingsModel {
     /// `text` with a full stop at the end, unless it ends with one already
     /// (`Pausen ab 15 Min.`; Tagwerk shows two there).
     private static func sentence(_ text: String) -> String {
-        text.hasSuffix(".") ? text : text + "."
+        TTSentence.ended(text)
     }
 
     // MARK: Restore defaults

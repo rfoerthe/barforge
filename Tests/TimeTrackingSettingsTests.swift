@@ -384,7 +384,7 @@ enum TimeTrackingSettingsTests {
         let spans = [TTDaySpan(nil, date(1)), TTDaySpan(date(5), date(5)), TTDaySpan(date(9), date(12))]
         suite.expect(TTSettingsModel.spansText(spans, en, texts)
                         == "the days until 2026-11-01, 2026-11-05 and 2026-11-09 to 2026-11-12", "English spans")
-        suite.expect(FeatureStrings.timeTrackingSettings(.fr).statusItem == en.statusItem,
-                     "other languages show English until they are translated")
+        suite.expect(FeatureStrings.timeTrackingSettings(.fr).statusItem != en.statusItem,
+                     "other languages are translated")
     }
 }

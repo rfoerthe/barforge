@@ -166,7 +166,8 @@ extension RecordsModel {
             switch format {
             case .markdown:
                 let text = TTExport.markdown(state.days, from: range.from, to: range.to, now: state.now,
-                                             settings: state.settings, appName: AppInfo.name, texts)
+                                             settings: state.settings, appName: AppInfo.name,
+                                             TTImport.markdownTexts(for: L10n.shared.language))
                 try Data(text.utf8).write(to: url, options: .atomic)
             case .csv:
                 try Data(TTExport.csv(report(), texts).utf8).write(to: url, options: .atomic)
