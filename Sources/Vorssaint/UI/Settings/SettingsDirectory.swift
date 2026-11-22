@@ -223,6 +223,7 @@ enum SettingsDirectory {
         let bluetooth = FeatureStrings.bluetoothSleep(language)
         let barStyle = FeatureStrings.menuBarAppearance(language)
         let previews = FeatureStrings.windowPreviewExclusions(language)
+        let timeTracking = FeatureStrings.timeTrackingSettings(language)
         var liquidGlass: [String] = []
 #if compiler(>=6.2)
         if #available(macOS 26.0, *) {
@@ -477,6 +478,24 @@ enum SettingsDirectory {
                                       keywords: ["port", "ports", "listening", "socket", "PID", "kill port"]),
             ]),
             (categories.utilities, [
+                SettingsDirectoryItem(page: .timeTracking,
+                                      title: FeatureStrings.timeTracking(language).title,
+                                      icon: AppFeature.timeTracking.symbolName,
+                                      keywords: [FeatureStrings.timeTracking(language).recordToggle,
+                                                 "time tracking", "working time", "timesheet", "ArbZG",
+                                                 timeTracking.generalSection, timeTracking.workingTimeSection,
+                                                 timeTracking.recordingSection, timeTracking.notificationsSection,
+                                                 timeTracking.dataSection, timeTracking.statusItem,
+                                                 timeTracking.iconSet, timeTracking.showTime,
+                                                 timeTracking.globalShortcuts, timeTracking.accountStart,
+                                                 timeTracking.carry, timeTracking.legalHints, timeTracking.minWork,
+                                                 timeTracking.idle, timeTracking.askAfterLock,
+                                                 timeTracking.autoWorkdaysOnly, timeTracking.permission,
+                                                 timeTracking.notifyLimit, timeTracking.notifyBreak,
+                                                 timeTracking.dataFolder, timeTracking.takeOver,
+                                                 timeTracking.resetDefaults, timeTracking.sheetNewTitle,
+                                                 timeTracking.regularHours, timeTracking.workdays,
+                                                 timeTracking.frame, timeTracking.minBreak]),
                 SettingsDirectoryItem(page: .commandBar,
                                       title: FeatureStrings.commandBar(language).pageTitle,
                                       icon: "command",

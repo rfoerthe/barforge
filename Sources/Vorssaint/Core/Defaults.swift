@@ -780,6 +780,36 @@ enum DefaultsKey {
     /// unregistered and out of backups: the paths belong to this Mac.
     static let diskAnalyzerKeptFolders = "diskAnalyzerKeptFolders"
 
+    // Time Tracking. Recorded days, the dated working time rules and the time
+    // account live in the feature's own database, never here.
+    static let timeTrackingEnabled = "timeTrackingEnabled"
+    static let timeTrackingNotifyLimit = "timeTrackingNotifyLimit"     // reminders at 9:45 and 10 h of work
+    static let timeTrackingNotifyBreak = "timeTrackingNotifyBreak"     // reminders at 5:45 and 6 h without a break
+    static let timeTrackingAskAfterLock = "timeTrackingAskAfterLock"   // ask what a long lock was
+    static let timeTrackingMinWorkSeconds = "timeTrackingMinWorkSeconds"   // shortest work away from the Mac entered by hand
+    static let timeTrackingIconSet = "timeTrackingIconSet"                 // TTIconSet id of the menu bar icon
+    static let timeTrackingShowTime = "timeTrackingShowTime"               // today's working time next to the icon
+    static let timeTrackingHotkeys = "timeTrackingHotkeys"                 // global shortcuts on
+    static let timeTrackingAutoWorkdaysOnly = "timeTrackingAutoWorkdaysOnly" // recording counts by itself only on workdays
+    static let timeTrackingIdleSeconds = "timeTrackingIdleSeconds"         // idle time that pauses recording (0 = off)
+    static let timeTrackingStatusItem = "timeTrackingStatusItem"           // own menu bar icon with the state
+    static let timeTrackingLegalHints = "timeTrackingLegalHints"           // German working time law (ArbZG) hints and reminders
+    static let timeTrackingPauseShortcut = "timeTrackingPauseShortcut"     // "Pause work" / "Resume work"
+    static let timeTrackingRecordsShortcut = "timeTrackingRecordsShortcut" // opens the records
+    static let panelShowTimeTracking = "panelShowTimeTracking"
+    /// Machine state, unregistered and never exported: what recording was
+    /// doing when the app last saved (`TTStatus.line`), so a restart resumes
+    /// an open break or work away from the Mac (Tagwerk's `.status` file).
+    static let timeTrackingRestartState = "timeTrackingRestartState"
+    /// UI state of the Records window, unregistered and never exported: the
+    /// last view (0 days, 1 week), whether the inspector is shown (absent:
+    /// shown), whether "Recorded automatically" is expanded and whether the
+    /// week view shows the whole working-time frame.
+    static let timeTrackingRecordsView = "timeTrackingRecordsView"
+    static let timeTrackingRecordsInspector = "timeTrackingRecordsInspector"
+    static let timeTrackingRecordsRecordedOpen = "timeTrackingRecordsRecordedOpen"
+    static let timeTrackingRecordsWeekFullFrame = "timeTrackingRecordsWeekFullFrame"
+
     // Window Layout — snapping, global shortcuts and optional pointer gestures.
     static let windowLayoutShortcutsEnabled = "windowLayoutShortcutsEnabled"
     static let windowDirectionalEnabled = "windowDirectionalEnabled"
@@ -1584,6 +1614,21 @@ enum Defaults {
         DefaultsKey.panelUtilityPortManager: true,
         DefaultsKey.panelUtilityDiskAnalyzer: true,
         DefaultsKey.diskAnalyzerViewMode: "rings",
+        DefaultsKey.timeTrackingEnabled: false,
+        DefaultsKey.timeTrackingNotifyLimit: true,
+        DefaultsKey.timeTrackingNotifyBreak: true,
+        DefaultsKey.timeTrackingAskAfterLock: false,
+        DefaultsKey.timeTrackingMinWorkSeconds: 15 * 60,
+        DefaultsKey.timeTrackingIconSet: 0,
+        DefaultsKey.timeTrackingShowTime: false,
+        DefaultsKey.timeTrackingHotkeys: false,
+        DefaultsKey.timeTrackingAutoWorkdaysOnly: true,
+        DefaultsKey.timeTrackingIdleSeconds: 0,
+        DefaultsKey.timeTrackingStatusItem: true,
+        DefaultsKey.timeTrackingLegalHints: true,
+        DefaultsKey.timeTrackingPauseShortcut: GlobalShortcut.timeTrackingPauseDefault.storageValue,
+        DefaultsKey.timeTrackingRecordsShortcut: GlobalShortcut.timeTrackingRecordsDefault.storageValue,
+        DefaultsKey.panelShowTimeTracking: true,
         DefaultsKey.screenshotShowCaptureMenuOnShortcut: true,
         DefaultsKey.recorderShowCaptureMenuOnShortcut: true,
         DefaultsKey.screenOCRShowCaptureMenuOnShortcut: true,

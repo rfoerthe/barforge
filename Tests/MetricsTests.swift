@@ -46,6 +46,7 @@ struct MetricsTests {
             ("linear-scroll", { LinearScrollTapTests.run(suite) }),
             ("logitech-mx", { LogitechMXTests.run(suite) }),
             ("disk-usage", { DiskUsageTests.run(suite) }),
+            ("time-tracking", { TimeTrackingTests.run(suite) }),
             ("fork-build", { ForkBuildTests.run(suite) }),
             ("feedback", { FeedbackIssueLinkTests.run(suite) }),
             ("preferences", { PreferencesFeatureTests.run(suite) }),

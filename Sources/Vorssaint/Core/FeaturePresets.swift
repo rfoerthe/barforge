@@ -121,7 +121,7 @@ extension AppFeature {
             return RadialMenuSupport.opensFromMouseOrTrackpad(
                 UserDefaults.standard.data(forKey: DefaultsKey.radialMenuProfiles))
                 ? .mouse : .idle
-        case .clipboardHistory, .urlCleaner, .extraBrightness,
+        case .clipboardHistory, .urlCleaner, .extraBrightness, .timeTracking,
              .monitorCPU, .monitorGPU, .monitorMemory,
              .monitorNetwork, .monitorDisk, .monitorPower, .connectedDevices:
             return .periodic

@@ -247,6 +247,13 @@ struct GlobalShortcut: Equatable, Hashable {
     // layer, matching how the system numbers its own capture keys.
     static let screenRecorderDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_5),
                                                       modifiers: [.control, .option, .command])
+    // Time Tracking: Tagwerk used P for "Pause work", but P on this layer
+    // already opens a copied image in the editor, so B for "break". A opens
+    // the records, as in Tagwerk.
+    static let timeTrackingPauseDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_B),
+                                                         modifiers: [.control, .option, .command])
+    static let timeTrackingRecordsDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_A),
+                                                           modifiers: [.control, .option, .command])
 
     static func saved(for key: String, fallback: GlobalShortcut) -> GlobalShortcut {
         if let raw = UserDefaults.standard.string(forKey: key),
@@ -737,6 +744,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
     case keyboardBrightnessDecrease
     case keyboardBrightnessIncrease
     case pointerNextDisplay
+    case timeTrackingPause
+    case timeTrackingRecords
 
     var id: String { storageKey }
 
@@ -775,6 +784,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .keyboardBrightnessDecrease: return DefaultsKey.keyboardBrightnessDecreaseShortcut
         case .keyboardBrightnessIncrease: return DefaultsKey.keyboardBrightnessIncreaseShortcut
         case .pointerNextDisplay: return DefaultsKey.pointerDisplayShortcut
+        case .timeTrackingPause: return DefaultsKey.timeTrackingPauseShortcut
+        case .timeTrackingRecords: return DefaultsKey.timeTrackingRecordsShortcut
         }
     }
 
@@ -813,6 +824,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .keyboardBrightnessDecrease: return .keyboardBrightnessDecreaseDefault
         case .keyboardBrightnessIncrease: return .keyboardBrightnessIncreaseDefault
         case .pointerNextDisplay: return .pointerNextDisplayDefault
+        case .timeTrackingPause: return .timeTrackingPauseDefault
+        case .timeTrackingRecords: return .timeTrackingRecordsDefault
         }
     }
 
@@ -895,6 +908,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .keyboardBrightnessIncrease:
             return FeatureStrings.brightness(L10n.shared.language).keyboardBrightnessIncrease
         case .pointerNextDisplay: return PointerDisplayStrings.localized(L10n.shared.language).title
+        case .timeTrackingPause: return FeatureStrings.timeTrackingMenu(L10n.shared.language).shortcutPause
+        case .timeTrackingRecords: return FeatureStrings.timeTrackingMenu(L10n.shared.language).shortcutRecords
         }
     }
 
@@ -958,6 +973,9 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .keyboardBrightnessDecrease, .keyboardBrightnessIncrease:
             return [DefaultsKey.keyboardBrightnessShortcutsEnabled]
         case .pointerNextDisplay: return [DefaultsKey.pointerDisplayEnabled]
+        // Tagwerk's one switch for both shortcuts, while recording is on.
+        case .timeTrackingPause, .timeTrackingRecords:
+            return [DefaultsKey.timeTrackingEnabled, DefaultsKey.timeTrackingHotkeys]
         }
     }
 
@@ -990,6 +1008,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .displayBrightnessDecrease, .displayBrightnessIncrease: return .brightness
         case .keyboardBrightnessDecrease, .keyboardBrightnessIncrease: return .brightness
         case .pointerNextDisplay: return .windowLayout
+        case .timeTrackingPause, .timeTrackingRecords: return .timeTracking
         }
     }
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
+// Copyright (C) 2026 Roland Foerther
 
 import Foundation
 import os.log
@@ -14,6 +15,12 @@ enum Notifier {
         "com.vorssaint.notification.whatsapp-organizer"
     private static let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "vorssaint",
                                     category: "notifications")
+
+    /// Every category with actions, by identifier. `setNotificationCategories`
+    /// replaces all categories of the app at once, so each feature's category
+    /// lives here and every registration hands macOS the whole set: one
+    /// feature registering never drops another's buttons.
+    private static var categories: [String: UNNotificationCategory] = [:]
 
     /// The notification centre aborts the process when it cannot resolve an
     /// app bundle: a bare binary started from the terminal, or a bundle
@@ -47,15 +54,12 @@ enum Notifier {
                                          undoTitle: String,
                                          transactionID: UUID) {
         guard isAvailable else { return }
-        let center = UNUserNotificationCenter.current()
         let undo = UNNotificationAction(
             identifier: whatsAppOrganizerUndoActionIdentifier,
             title: undoTitle,
             options: [.foreground])
-        center.setNotificationCategories([
-            UNNotificationCategory(identifier: whatsAppOrganizerCategoryIdentifier,
-                                   actions: [undo], intentIdentifiers: [], options: []),
-        ])
+        register(UNNotificationCategory(identifier: whatsAppOrganizerCategoryIdentifier,
+                                        actions: [undo], intentIdentifiers: [], options: []))
         post(title: title, body: body,
              categoryIdentifier: whatsAppOrganizerCategoryIdentifier,
              userInfo: [whatsAppOrganizerTransactionKey: transactionID.uuidString])
@@ -68,10 +72,32 @@ enum Notifier {
         return UUID(uuidString: raw)
     }
 
+    /// Adds or replaces one category and registers all of them together.
+    /// Main thread only, like every caller.
+    static func register(_ category: UNNotificationCategory) {
+        guard isAvailable else { return }
+        categories[category.identifier] = category
+        UNUserNotificationCenter.current().setNotificationCategories(Set(categories.values))
+    }
+
+    /// Posts with a fixed identifier, so a newer notification replaces the
+    /// older one of the same kind (Time Tracking's reminders, for example),
+    /// and with the default sound.
+    static func post(identifier: String,
+                     title: String,
+                     body: String,
+                     categoryIdentifier: String? = nil,
+                     userInfo: [AnyHashable: Any] = [:]) {
+        post(title: title, body: body, categoryIdentifier: categoryIdentifier, userInfo: userInfo,
+             identifier: identifier, sound: true)
+    }
+
     private static func post(title: String,
                              body: String,
                              categoryIdentifier: String?,
-                             userInfo: [AnyHashable: Any]) {
+                             userInfo: [AnyHashable: Any],
+                             identifier: String? = nil,
+                             sound: Bool = false) {
         guard isAvailable else { return }
         let center = UNUserNotificationCenter.current()
         center.getNotificationSettings { settings in
@@ -85,7 +111,9 @@ enum Notifier {
             content.body = body
             if let categoryIdentifier { content.categoryIdentifier = categoryIdentifier }
             content.userInfo = userInfo
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+            if sound { content.sound = .default }
+            let request = UNNotificationRequest(identifier: identifier ?? UUID().uuidString,
+                                                content: content, trigger: nil)
             center.add(request) { error in
                 if let error {
                     log.error("notification delivery failed: \(error.localizedDescription, privacy: .public)")

@@ -12,7 +12,7 @@ You can review or change every grant in System Settings, under Privacy and Secur
 | Microphone | Yes | Your voice in a screen recording, only when you turn it on |
 | Camera | Yes | The camera preview mirror |
 | Bluetooth | Yes | Accessory battery levels in Monitor and Bluetooth on sleep |
-| Notifications | Yes | Keep awake, battery, Monitor and update alerts |
+| Notifications | Yes | Keep awake, battery, Monitor, update and Time Tracking alerts |
 | Full Disk Access | Yes | A deeper uninstaller scan, complete Disk Analyzer results and the optional cleanup offer for apps moved to the Trash |
 | Administrator (one time) | Yes | Password free closed lid toggling |
 | Automation | Yes | Finder actions |
@@ -111,6 +111,7 @@ The color picker also uses this permission for Barforge's magnifier and keyboard
 - **Monitor**, with optional alerts for the conditions you turn on.
 - **Updates**, with a one time note when a new version shows up, and only while automatic update checks are on.
 - **App updates**, with a note when other apps on the Mac have a newer version, and only while the background check is on.
+- **Time Tracking**, with reminders before a break or the maximum working hours are due and the question what a long lock was, each only while you have it turned on, plus notes about refused entries and storage errors.
 
 **If you say no.** These system notifications are not posted. Status remains available inside the app.
 

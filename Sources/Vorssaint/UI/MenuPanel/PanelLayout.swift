@@ -12,7 +12,7 @@ protocol PanelOrderItem: RawRepresentable, CaseIterable, Hashable where RawValue
 /// renaming a case would orphan a user's stored layout — keep them stable.
 enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
     case keepAwake, brightness, mixer, system, network, disk, power, utilities, controls,
-         toggles, wallpaper
+         toggles, wallpaper, timeTracking
 
     var id: String { rawValue }
 
@@ -30,6 +30,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return s.quickControlsSection
         case .toggles: return FeatureStrings.quickToggles(L10n.shared.language).pageTitle
         case .wallpaper: return FeatureStrings.wallpaper(L10n.shared.language).pageTitle
+        case .timeTracking: return FeatureStrings.timeTracking(L10n.shared.language).title
         }
     }
 
@@ -46,6 +47,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return "switch.2"
         case .toggles: return "togglepower"
         case .wallpaper: return "photo.on.rectangle"
+        case .timeTracking: return "clock.badge.checkmark"
         }
     }
 
@@ -65,6 +67,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return DefaultsKey.panelShowControls
         case .toggles: return DefaultsKey.panelShowToggles
         case .wallpaper: return DefaultsKey.panelShowWallpaper
+        case .timeTracking: return DefaultsKey.panelShowTimeTracking
         }
     }
 
@@ -95,6 +98,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
                                 .middleClick, .textSnippets, .superKey, .radialMenu, .mouseClickDebounce]
         case .toggles: return [.quickToggles, .micMute, .quitApps]
         case .wallpaper: return [.wallpaper]
+        case .timeTracking: return [.timeTracking]
         }
     }
 

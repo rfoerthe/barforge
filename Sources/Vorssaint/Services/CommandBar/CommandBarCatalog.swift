@@ -472,6 +472,19 @@ enum CommandBarCatalog {
                 icon: .symbol("chart.pie"),
                 run: { _ in afterBeat { DiskAnalyzerService.shared.show() } }))
         }
+        if AppFeature.timeTracking.isAvailable {
+            let records = FeatureStrings.timeTrackingRecords(language)
+            entries.append(CommandBarEntry(
+                id: "action.timeTrackingRecords",
+                title: records.windowTitle,
+                subtitle: area(.timeTracking, under: records.windowTitle),
+                keywords: [TimeTrackingRecordsStrings.enUS.windowTitle,
+                           FeatureStrings.timeTracking(language).title,
+                           TimeTrackingFeatureStrings.enUS.title].joined(separator: " "),
+                icon: .symbol("tablecells"),
+                shortcut: roleShortcut(.timeTrackingRecords),
+                run: { _ in afterBeat { TimeTrackingService.shared.showRecords() } }))
+        }
         if AppFeature.cameraPreview.isAvailable {
             entries.append(CommandBarEntry(
                 id: "action.cameraPreview",

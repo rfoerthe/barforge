@@ -71,6 +71,12 @@ prove the app builds. Build the app and run its selftest for runtime, UI or bund
 resource changes. CI also checks the optimized build, selftest, tests and packaging.
 Builds should finish without warnings.
 
+For Time Tracking, `Tools/time-tracking-testdb.sh` builds a test database with
+18 months of generated records up to yesterday in `build/testdata/`; `--install`
+swaps it into the Developer app (backing up real data first) and `--restore`
+brings the real data back. See `--help` and the test data section in
+[the Time Tracking plan](docs/TIME-TRACKING-PLAN.md#6-teststrategie).
+
 For behavior involving windows, permissions or hardware, describe what you actually
 verified and on which Mac and macOS version. Include display, Spaces or language
 details when relevant, and state what remains untested. Compilation and static

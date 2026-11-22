@@ -426,6 +426,44 @@ if (( TEST )); then
         Sources/Vorssaint/Services/DiskUsage/DiskUsageReport.swift
         Sources/Vorssaint/Services/DiskUsage/DiskUsageLayout.swift
         Sources/Vorssaint/Core/DiskAnalyzerStrings.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseSimplified.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseTraditionalHK.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+ChineseTraditionalTW.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+French.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Italian.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Japanese.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Korean.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+PortugueseBR.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Russian.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Slovak.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Spanish.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Turkish.swift
+        Sources/Vorssaint/Core/TimeTrackingStrings+Ukrainian.swift
+        Sources/Vorssaint/Core/TimeTracking/TTDate.swift
+        Sources/Vorssaint/Core/TimeTracking/TTSpan.swift
+        Sources/Vorssaint/Core/TimeTracking/TTFormat.swift
+        Sources/Vorssaint/Core/TimeTracking/TTDay.swift
+        Sources/Vorssaint/Core/TimeTracking/TTRules.swift
+        Sources/Vorssaint/Core/TimeTracking/TTWarnings.swift
+        Sources/Vorssaint/Core/TimeTracking/TTAlerts.swift
+        Sources/Vorssaint/Core/TimeTracking/TTStatus.swift
+        Sources/Vorssaint/Core/TimeTracking/TTPreferences.swift
+        Sources/Vorssaint/Core/TimeTracking/TTExport.swift
+        Sources/Vorssaint/Core/TimeTracking/TTImport.swift
+        Sources/Vorssaint/Core/TimeTracking/TTTracker.swift
+        Sources/Vorssaint/Core/TimeTracking/TTMenu.swift
+        Sources/Vorssaint/Core/TimeTracking/TTNotices.swift
+        Sources/Vorssaint/Core/TimeTracking/TTGlyphs.swift
+        Sources/Vorssaint/Core/TimeTracking/TTSettingsModel.swift
+        Sources/Vorssaint/Core/TimeTracking/TTEdits.swift
+        Sources/Vorssaint/Core/TimeTracking/TTRecords.swift
+        Sources/Vorssaint/Core/TimeTracking/TTWeekLayout.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingSQLite.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingDatabase.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingTagwerkImport.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingEngine.swift
+        Sources/Vorssaint/Services/TimeTracking/TimeTrackingPDF.swift
         Sources/Vorssaint/Core/ForkBuildStrings.swift
         Sources/Vorssaint/Services/MouseClickDebounce/MouseClickDebounceSupport.swift
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift

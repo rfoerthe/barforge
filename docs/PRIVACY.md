@@ -23,6 +23,8 @@ Recent Captures keeps up to 12 screenshots, within a 256 MB limit, in the app's 
 
 When a feature needs a macOS permission such as Accessibility, Screen Recording or Microphone, that access is used only for the feature it belongs to. Captured content leaves the Mac only when you explicitly share it, from the Share menu or with a temporary link, and the audio of apps you route to AirPlay goes only to the speaker you pick on your local network. The [permissions guide](PERMISSIONS.md) breaks down each permission.
 
+Time Tracking, when you install and turn it on, records when the Mac is locked and unlocked, goes to sleep or sits idle, and nothing about what you do while it is unlocked. Those times, your corrections and your working time rules live in a local SQLite database in the app's private storage, with daily backups next to it. Nothing of it is uploaded; exports are written only where you save them. Taking over Tagwerk's data reads Tagwerk's local database on this Mac.
+
 The camera mirror starts only after an explicit action. Its frames go to the local preview and are not saved or uploaded by that feature. Closing the preview, disabling it or locking the Mac stops capture.
 
 ## Network connections
