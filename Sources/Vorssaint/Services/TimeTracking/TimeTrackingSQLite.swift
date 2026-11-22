@@ -30,11 +30,18 @@ enum TimeTrackingSQLiteValue: Equatable {
 final class TimeTrackingSQLite {
     private let handle: OpaquePointer
 
-    /// Opens (or, unless `readOnly`, creates) the database at `url`.
-    init(url: URL, readOnly: Bool = false) throws {
+    /// Opens the database at `url`: read-only, read-write, or read-write and
+    /// created when missing (the default).
+    ///
+    /// A read-only connection cannot read a database in WAL mode whose
+    /// `-shm` file is gone, which is how SQLite leaves it after the last
+    /// connection closed (SQLITE_CANTOPEN on the first query). To read
+    /// another app's WAL database, open it read-write without `create`.
+    init(url: URL, readOnly: Bool = false, create: Bool = true) throws {
         var db: OpaquePointer?
-        let flags = (readOnly ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
-            | SQLITE_OPEN_NOMUTEX
+        let access = readOnly ? SQLITE_OPEN_READONLY
+            : create ? SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE : SQLITE_OPEN_READWRITE
+        let flags = access | SQLITE_OPEN_NOMUTEX
         let rc = sqlite3_open_v2(url.path, &db, flags, nil)
         guard rc == SQLITE_OK, let db else {
             let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? String(cString: sqlite3_errstr(rc))

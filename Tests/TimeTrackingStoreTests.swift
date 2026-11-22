@@ -34,6 +34,7 @@ enum TimeTrackingStoreTests {
         loadRangeAndRemoval(suite)
         preferencesLiveInUserDefaults(suite)
         takeOverRefusesOtherSchemas(suite)
+        takeOverReadsAClosedWALDatabase(suite)
         englishExportReadsBack(suite)
         dateTimeArithmetic(suite)
     }
@@ -722,6 +723,45 @@ enum TimeTrackingStoreTests {
         let exported = SettingsBackupSupport.exportKeys()
         suite.expect(TTPreferences.keys.allSatisfy(exported.contains), "all preferences travel with backups")
         suite.expect(TTPreferences.keys.allSatisfy { Defaults.registeredDefaults[$0] != nil }, "all are registered")
+    }
+
+    /// Tagwerk's database while Tagwerk is not running: WAL mode, but the
+    /// last connection closed and took its `-wal` and `-shm` files along. A
+    /// read-only connection fails on it with SQLITE_CANTOPEN.
+    private static func takeOverReadsAClosedWALDatabase(_ suite: TestSuite) {
+        withDirectory(suite, "takeover-wal") { dir in
+            try withDefaults { defaults in
+                let source = dir.appendingPathComponent("tagwerk.db")
+                do {
+                    let tagwerk = try TimeTrackingSQLite(url: source)
+                    _ = try tagwerk.text("PRAGMA journal_mode = WAL")
+                    try TimeTrackingDatabase.initSchema(tagwerk)
+                    try tagwerk.run("INSERT INTO periods (date, idx, from_s, to_s) VALUES ('2026-11-16', 0, 28800, 43200)")
+                    _ = try tagwerk.text("PRAGMA wal_checkpoint(TRUNCATE)")
+                }
+                // Tagwerk's bundled SQLite deletes both files when it closes;
+                // Apple's keeps them, so the test removes them as Tagwerk leaves it.
+                let manager = FileManager.default
+                try? manager.removeItem(atPath: source.path + "-shm")
+                try? manager.removeItem(atPath: source.path + "-wal")
+                let header = try Data(contentsOf: source).prefix(20)
+                suite.expect(header.count == 20 && header[18] == 2 && header[19] == 2
+                             && !manager.fileExists(atPath: source.path + "-shm"),
+                             "a WAL database (header bytes 18 and 19) without its -shm file")
+                do {
+                    let readOnly = try TimeTrackingSQLite(url: source, readOnly: true)
+                    _ = try readOnly.integer("PRAGMA user_version")
+                    suite.expect(false, "a read-only connection cannot read it (SQLite's rule)")
+                } catch {
+                    suite.expect(true, "a read-only connection cannot read it (SQLite's rule)")
+                }
+                suite.expect(!manager.fileExists(atPath: source.path + "-shm"), "the failed read left nothing behind")
+                let db = try open(dir.appendingPathComponent("barforge", isDirectory: true))
+                let result = try TimeTrackingTagwerkImport.takeOver(from: source, into: db, defaults: defaults, now: now())
+                suite.expect(result.days == 1, "the takeover reads it: \(result.days) day(s)")
+                suite.expect(try db.load().first?.periods == [TTSpan(28800, 43200)], "with its period")
+            }
+        }
     }
 
     private static func takeOverRefusesOtherSchemas(_ suite: TestSuite) {

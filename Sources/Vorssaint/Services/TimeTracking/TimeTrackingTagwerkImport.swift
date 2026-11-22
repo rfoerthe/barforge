@@ -56,7 +56,10 @@ enum TimeTrackingTagwerkImport {
     static func takeOver(from source: URL, into database: TimeTrackingDatabase, defaults: UserDefaults,
                          now: TTDateTime) throws -> Result {
         guard FileManager.default.fileExists(atPath: source.path) else { throw Failure.missing(source.path) }
-        let tagwerk = try TimeTrackingSQLite(url: source, readOnly: true)
+        // Read-write but never created and never written: Tagwerk keeps its
+        // database in WAL mode, and while Tagwerk is not running its `-shm`
+        // file is gone, which a read-only connection cannot recreate.
+        let tagwerk = try TimeTrackingSQLite(url: source, create: false)
         try tagwerk.setBusyTimeout(seconds: 5)
         let version = try tagwerk.integer("PRAGMA user_version") ?? 0
         guard version == TimeTrackingDatabase.schemaVersion else { throw Failure.unsupportedSchema(version) }
