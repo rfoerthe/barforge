@@ -14,7 +14,7 @@ release's entries from this file first, then the notes of the Vorssaint releases
 it brings: those after the previous release's base up to its own, read from
 CHANGELOG.md.
 
-## [Unreleased]
+## [1.1.0-beta.1] - 2026-11-22
 
 Based on Vorssaint 3.4.4.
 
@@ -22,6 +22,23 @@ Based on Vorssaint 3.4.4.
 - Time Tracking records your working time automatically while your Mac is unlocked, ported from Tagwerk. A lock of 15 minutes or more is a break. You can pause, keep working away from the Mac for a meeting or call, set start and end of work, and record a free day. The menu panel and an optional menu bar icon show today's time against the target, the week's balance and a running time account. Reminders before a break or the maximum hours are due follow the German working time law, and those hints can be turned off.
 - The Records window lists every day with its balance and lets you correct breaks, work away from the Mac, start, end and absences, with undo. A week view shows each week like a calendar, where start and end can be dragged. Days export as Markdown, CSV or PDF, and Markdown imports again.
 - Settings → Time Tracking holds the working time rules, each valid from a date, plus the time account and its carry-over, and can take over the data from Tagwerk.
+- Mic Mute can restore the saved levels of every microphone it muted when a call app unmutes one. Turn it on in Settings → Quick panel. It starts off because an automatic gain change during a recording can also trigger it. Thanks to @Narangor.
+
+### Changed
+- Barforge brings the further changes Vorssaint made since Barforge 1.0.7, listed here, except those for the Dynamic Island with its AI Agents and for Fan Control, which Barforge does not include.
+- Barforge starts without loading unused Shelf, display and Command Bar services. Active shortcuts and recovery for displays previously left off still work. Thanks to @iva-zhu.
+- Window move gestures and edge snapping share pointer events. Starting another drag or handing it to macOS with Option cancels a pending snap. Thanks to @iva-zhu.
+- Low disk space alerts repeat at most once every six hours per volume, with an earlier alert if free space drops below half the warning threshold. Thanks to @ywu73.
+
+### Fixed
+- With finer volume steps on, the volume keys keep working on USB outputs that lack a compatible main volume control: macOS handles each press itself, still in fine steps. Thanks to @royhenengel and @Snrlx-Media.
+- Mic Mute keeps its observers for input controls that did not change, and rechecks mute immediately on device notifications. Thanks to @howardyu60211 and @hash00.
+- Cleaner keeps preferences, support files and caches it can match to audio plugins found in the standard plugin folders. It checks again before moving a selected item to the Trash. Thanks to @heisdanne and @imuhammadnadeem.
+- Clipboard history saves copied spreadsheet cells as text and preserves the tabs and line breaks supplied by the spreadsheet. Image and file copies keep their original types. Thanks to @ego1s1.
+- macOS handles app switching while an exclusive full-screen game covers the window switcher. Barforge resumes its shortcuts when the game leaves full screen. Thanks to @nh4ttruong.
+- If macOS pauses the window switcher's input filter, the switcher waits until it can dismiss the interrupted session before filtering keys and clicks again. Thanks to @GeezusChrotch.
+- Settings opens on Macs without a backlit keyboard and only offers keyboard light controls on supported hardware. Thanks to @13v13reddy.
+- Super Key waits for a Bluetooth keyboard after login or wake and checks its existing mappings before turning on. Thanks to @iva-zhu.
 
 ## [1.0.7] - 2026-11-19
 
