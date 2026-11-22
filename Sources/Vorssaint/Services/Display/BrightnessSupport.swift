@@ -10,6 +10,17 @@ import Foundation
 /// reply parsing, value scaling and the display-to-service match score. No
 /// IOKit here so the unit tests cover every byte.
 enum BrightnessSupport {
+    /// A saved display number must fit the system type. Zero means no display.
+    static func restorableDisplayID(_ value: Int) -> CGDirectDisplayID? {
+        guard let id = CGDirectDisplayID(exactly: value), id != kCGNullDirectDisplay else { return nil }
+        return id
+    }
+
+    /// Launch can check the saved list before building the brightness service.
+    static func hasDisplaysToRestore(stored: [Int]?) -> Bool {
+        (stored ?? []).contains { restorableDisplayID($0) != nil }
+    }
+
     struct DisplayTopology: Equatable {
         let online: Set<UInt32>
         let active: Set<UInt32>

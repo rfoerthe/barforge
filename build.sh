@@ -529,6 +529,8 @@ if (( TEST )); then
         Sources/Vorssaint/Services/Switcher/SwitcherModels.swift
         Sources/Vorssaint/Services/Switcher/WindowServerCaptureQueue.swift
         Sources/Vorssaint/Services/Switcher/SwitcherSupport.swift
+        Sources/Vorssaint/Services/Switcher/SwitcherExclusiveFullscreenWatch.swift
+        Sources/Vorssaint/Services/Switcher/AppFullscreenWindows.swift
         Sources/Vorssaint/Services/Switcher/SpaceHopSupport.swift
         Sources/Vorssaint/Services/Switcher/WindowUseOrder.swift
         Sources/Vorssaint/Services/Switcher/WindowEnumeratorAccessibilityPrefetch.swift
@@ -623,7 +625,9 @@ swiftc "${APP_OPTIMIZATION_FLAGS[@]}" -incremental -enable-batch-mode -j "$(sysc
     "${APP_SOURCES[@]}" "${GIF_CODEC_OBJECTS[@]}" -o "build/$EXECUTABLE"
 
 echo "▸ Generating app icon…"
-swift Tools/MakeIcon.swift build/AppIcon.iconset
+# Use the same pinned SDK as the app build: the default MacOSX.sdk may be 27,
+# whose Command Line Tools copy is missing Foundation headers MakeIcon needs.
+swift -sdk "$SDK" Tools/MakeIcon.swift build/AppIcon.iconset
 xattr -c -r build/AppIcon.iconset build/AppIcon.icns build/MenuBarIcon.png build/MenuBarIcon@2x.png build/BrandMark.png 2>/dev/null || true
 ACTOOL_BIN="$(xcrun --find actool 2>/dev/null || true)"
 ICON_TMP="$(mktemp -d)"
